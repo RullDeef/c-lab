@@ -7,6 +7,6 @@ int main()
 
     scanf("%f %f %f", &R1, &R2, &R3);
     R = R1 * R2 * R3 / (R1 * R2 + R1 * R3 + R2 * R3);
-    printf("Total resistance = %.3f", R);
+    printf("Total resistance = %.5f", R);
     return 0;
 }
