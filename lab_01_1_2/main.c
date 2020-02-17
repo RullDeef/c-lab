@@ -10,6 +10,6 @@ int main()
     scanf("%f %f %f", &a, &b, &alpha);
     alpha *= 180 / M_PI;
     perimeter = a + b + (b - a) / cos(alpha);
-    printf("Perimeter = %.3f", perimeter);
+    printf("Perimeter = %.5f", perimeter);
     return 0;
 }
