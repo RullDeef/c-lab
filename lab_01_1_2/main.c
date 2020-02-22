@@ -1,15 +1,27 @@
 #include <stdio.h>
 #include <math.h>
 
+#define M_PI 3.1415926535
+
 int main()
 {
     float a, b;
     float alpha;
-    float perimeter;
+    float area;
 
-    scanf("%f %f %f", &a, &b, &alpha);
-    alpha *= 180 / M_PI;
-    perimeter = a + b + (b - a) / cos(alpha);
-    printf("Perimeter = %.5f", perimeter);
+    printf("Base A: ");
+    scanf("%f", &a);
+
+    printf("Base B: ");
+    scanf("%f", &b);
+
+    printf("Angle: ");
+    scanf("%f", &alpha);
+    
+    alpha *= M_PI / 180;
+    area = (a * a - b * b) / 2 * tan(alpha);
+    
+    printf("Area = %.5f", area);
+    
     return 0;
 }
