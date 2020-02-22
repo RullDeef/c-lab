@@ -2,13 +2,13 @@
 
 int main()
 {
-    int S;
+    int s;
     int amount;
 
     printf("Enter integer: ");
-    scanf("%d", &S);
+    scanf("%d", &s);
 
-    amount = S < 45 ? 0 : (S - 45) / 25 + 1;
+    amount = s < 45 ? 0 : (s - 45) / 25 + 1;
 
     printf("Amount = %d", amount);
 
