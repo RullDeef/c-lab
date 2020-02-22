@@ -1,10 +1,9 @@
-image: testimg
+image: testing
 test:
   tags:
     - testing-docker
   script:
     - testing
   artifacts:
-    path: [report.txt.enc]
+    paths: [report.txt.enc]
     when: always
-
