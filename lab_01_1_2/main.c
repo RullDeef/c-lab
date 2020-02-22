@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <math.h>
 
+#ifndef M_PI
 #define M_PI 3.1415926535
+#endif
 
 int main()
 {
@@ -19,7 +21,7 @@ int main()
     scanf("%f", &alpha);
     
     alpha *= M_PI / 180;
-    area = (a * a - b * b) / 2 * tan(alpha);
+    area = (a * a - b * b) / 2 * tanf(alpha);
     
     printf("Area = %.5f", area);
     
