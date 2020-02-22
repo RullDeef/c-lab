@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-bool input_int(int* n)
+bool input_int(int *n)
 {
     char c;
     int argc = scanf("%d%c", n, &c);
@@ -16,13 +16,13 @@ int main()
 
     printf("Enter natural n: ");
 
-    if(input_int(&n))
+    if (input_int(&n))
     {
         printf("Incorrect input. Closing program...\n");
         return 1;
     }
 
-    if(n <= 0)
+    if (n <= 0)
     {
         printf("Number n must be positive. Closing program...\n");
         return 1;
@@ -30,12 +30,12 @@ int main()
 
     printf("\nDivisors of n: l");
 
-    for(int i = 2; i <= n; i++)
+    for (int i = 2; i <= n; i++)
     {
-        if(n % i == 0)
+        if (n % i == 0)
             printf(", %d", i);
 
-        while(n % i == 0)
+        while (n % i == 0)
             n /= i;
     }
 

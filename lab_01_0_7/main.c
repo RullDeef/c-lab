@@ -20,12 +20,12 @@ float s(float x, float eps)
         term *= x / n;
         n++;
     }
-    while(fabsf(term) > eps);
+    while (fabsf(term) > eps);
 
     return res;
 }
 
-bool input_float(float* x)
+bool input_float(float *x)
 {
     char c;
     int argc = scanf("%f%c", x, &c);
@@ -41,7 +41,7 @@ int main()
 
     printf("Input x: ");
 
-    if(input_float(&x))
+    if (input_float(&x))
     {
         printf("Incorrect input. Closing program...\n");
         return 1;
@@ -49,13 +49,13 @@ int main()
 
     printf("Input eps: ");
 
-    if(input_float(&eps))
+    if (input_float(&eps))
     {
         printf("Incorrect input. Closing program...\n");
         return 1;
     }
 
-    if(eps <= 0)
+    if (eps <= 0)
     {
         printf("Eps must be positive number. Closing program...\n");
         return 1;
