@@ -1,2 +1,11 @@
 *.exe
+*.o
+
+*.cflags
+*.config
+*.creator
+*.user
+*.cxxflags
+*.files
+*.includes
 
