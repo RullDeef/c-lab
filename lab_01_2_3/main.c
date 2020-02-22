@@ -2,15 +2,15 @@
 
 int main()
 {
-    float R1, R2, R3;
-    float R;
+    float r1, r2, r3;
+    float r;
 
     printf("Enter three numbers: ");
-    scanf("%f %f %f", &R1, &R2, &R3);
+    scanf("%f %f %f", &r1, &r2, &r3);
 
-    R = R1 * R2 * R3 / (R1 * R2 + R1 * R3 + R2 * R3);
+    r = r1 * r2 * r3 / (r1 * r2 + r1 * r3 + r2 * r3);
 
-    printf("Total resistance = %.5f", R);
+    printf("Total resistance = %.5f", r);
 
     return 0;
 }
