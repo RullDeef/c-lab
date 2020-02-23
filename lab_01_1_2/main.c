@@ -21,7 +21,7 @@ int main()
     scanf("%f", &alpha);
     
     alpha *= M_PI / 180;
-    area = (a * a - b * b) / 2 * tanf(alpha);
+    area = fabsf(a * a - b * b) / 2 * tanf(alpha);
     
     printf("Area = %.5f", area);
     
