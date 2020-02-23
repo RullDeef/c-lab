@@ -61,13 +61,16 @@ int main()
         return 1;
     }
 
-    float f_x = f(x);
+    // float f_x = f(x);
     float s_x = s(x, eps);
 
     printf("\ns(x) = %.6f\n", s_x);
+    
+    /*
     printf("f(x) = %.6f\n", f_x);
     printf("\nAbs error: %.6f\n", fabsf(s_x - f_x));
     printf("Rel error: %.6f\n", fabsf(1 - s_x / f_x));
+    */
 
     return 0;
 }
