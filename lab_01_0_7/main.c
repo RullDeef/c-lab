@@ -30,7 +30,7 @@ bool input_float(float *x)
     char c;
     int argc = scanf("%f%c", x, &c);
 
-    return (argc != 2 && argc != EOF) || c != '\n';
+    return argc != 2 || (c != '\n' && c != ' ');
 }
 
 
@@ -44,7 +44,7 @@ int main()
     if (input_float(&x))
     {
         printf("Incorrect input. Closing program...\n");
-        return 1;
+        return -1;
     }
 
     printf("Input eps: ");
@@ -52,25 +52,24 @@ int main()
     if (input_float(&eps))
     {
         printf("Incorrect input. Closing program...\n");
-        return 1;
+        return -1;
     }
 
     if (eps <= 0)
     {
         printf("Eps must be positive number. Closing program...\n");
-        return 1;
+        return -1;
     }
 
-    // float f_x = f(x);
+    float f_x = f(x);
     float s_x = s(x, eps);
 
-    printf("\ns(x) = %.6f\n", s_x);
+    printf(" %.6f\n", s_x);
     
-    /*
-    printf("f(x) = %.6f\n", f_x);
-    printf("\nAbs error: %.6f\n", fabsf(s_x - f_x));
-    printf("Rel error: %.6f\n", fabsf(1 - s_x / f_x));
-    */
+    printf("%.6f\n", f_x);
+    printf("%.6f\n", fabsf(s_x - f_x));
+    printf("%.6f\n", fabsf(1 - s_x / f_x));
+    
 
     return 0;
 }

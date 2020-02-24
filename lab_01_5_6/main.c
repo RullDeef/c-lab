@@ -44,7 +44,7 @@ bool input_point(point_t *p)
 {
     char c;
     int argc = scanf("%f%c%f%c", &p->x, &c, &p->y, &c);
-    return (argc != 4 && argc != EOF) || c != '\n';
+    return argc != 4 || (c != '\n' && c != ' ');
 }
 
 
@@ -53,7 +53,7 @@ int main()
     point_t a, b, c, d;
     bool res;
 
-    printf("Input point A(x, y): ");
+    //printf("Input point A(x, y): ");
 
     if (input_point(&a))
     {
@@ -61,7 +61,7 @@ int main()
         return 1;
     }
 
-    printf("Input point B(x, y): ");
+    //printf("Input point B(x, y): ");
 
     if (input_point(&b))
     {
@@ -69,7 +69,7 @@ int main()
         return 1;
     }
 
-    printf("Input point C(x, y): ");
+    //printf("Input point C(x, y): ");
 
     if (input_point(&c))
     {
@@ -77,7 +77,7 @@ int main()
         return 1;
     }
 
-    printf("Input point D(x, y): ");
+    //printf("Input point D(x, y): ");
 
     if (input_point(&d))
     {
@@ -87,7 +87,7 @@ int main()
 
     res = intersect_line(a, b, c, d) && intersect_line(c, d, a, b);
 
-    printf("Intersect: %d", res);
+    printf("%d", res);
 
     return 0;
 }
