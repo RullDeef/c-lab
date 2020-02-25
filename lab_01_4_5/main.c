@@ -6,7 +6,7 @@ bool input_int(int *n)
     char c;
     int argc = scanf("%d%c", n, &c);
 
-    return argc != 2 || c != '\n';
+    return argc != 1 && (argc == 0 || c != '\n');
 }
 
 

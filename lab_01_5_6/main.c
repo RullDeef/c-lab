@@ -3,6 +3,9 @@
 #include <math.h>
 
 
+#define EPS 1e-8
+
+
 typedef struct
 {
     float x, y;
@@ -18,9 +21,44 @@ point_t subtract(point_t a, point_t b)
 }
 
 
+float length(point_t vect)
+{
+    return sqrtf(vect.x * vect.x + vect.y * vect.y);
+}
+
+
 float slant_product(point_t a, point_t b)
 {
     return a.x * b.y - b.x * a.y;
+}
+
+
+bool is_too_close(point_t a, point_t b)
+{
+    return length(subtract(a, b)) < EPS;
+}
+
+
+bool has_same_ends(point_t a, point_t b, point_t c, point_t d)
+{
+    bool a_c = is_too_close(a, c);
+    bool a_d = is_too_close(a, d);
+    bool b_c = is_too_close(b, c);
+    bool b_d = is_too_close(b, d);
+
+    return a_c || a_d || b_c || b_d;
+}
+
+
+bool in_between(point_t a, point_t b, point_t c)
+{
+    point_t v = subtract(b, a);
+    point_t u = subtract(c, a);
+
+    bool xx = (c.x - a.x) * (c.x - b.x) < 0;
+    bool yy = (c.y - a.y) * (c.y - b.y) < 0;
+    
+    return fabsf(slant_product(u, v)) < EPS && xx && yy;
 }
 
 
@@ -44,7 +82,7 @@ bool input_point(point_t *p)
 {
     char c;
     int argc = scanf("%f%c%f%c", &p->x, &c, &p->y, &c);
-    return argc != 4 || (c != '\n' && c != ' ');
+    return argc != 3 && (argc != 4 || (c != '\n' && c != ' '));
 }
 
 
@@ -85,7 +123,16 @@ int main()
         return 1;
     }
 
-    res = intersect_line(a, b, c, d) && intersect_line(c, d, a, b);
+    res = has_same_ends(a, b, c, d);
+
+    if (!res)
+    {
+        res = in_between(a, b, c) || in_between(a, b, d);
+        res = res || in_between(c, d, a) || in_between(c, d, b);
+    }
+
+    if (!res)
+        res = intersect_line(a, b, c, d) && intersect_line(c, d, a, b);
 
     printf("%d", res);
 

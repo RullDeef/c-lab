@@ -27,10 +27,10 @@ float s(float x, float eps)
 
 bool input_float(float *x)
 {
-    char c;
+    char c = '\0';
     int argc = scanf("%f%c", x, &c);
 
-    return argc != 2 || (c != '\n' && c != ' ');
+    return argc != 1 && (c != '\n' && c != ' ');
 }
 
 
@@ -55,7 +55,7 @@ int main()
         return -1;
     }
 
-    if (eps <= 0)
+    if (eps * (eps - 1) >= 0)
     {
         printf("Eps must be positive number. Closing program...\n");
         return -1;
