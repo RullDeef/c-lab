@@ -1,4 +1,6 @@
 #include <stdio.h>
+
+/*
 #include <stdbool.h>
 
 bool input_int(int *n)
@@ -8,7 +10,7 @@ bool input_int(int *n)
 
     return argc != 1 && (argc == 0 || c != '\n');
 }
-
+*/
 
 int main()
 {
@@ -16,7 +18,8 @@ int main()
 
     printf("Enter natural n: ");
 
-    if (input_int(&n))
+    //if (input_int(&n))
+    if (scanf("%d", &n) != 1)
     {
         printf("Incorrect input. Closing program...\n");
         return 1;
@@ -28,13 +31,13 @@ int main()
         return 1;
     }
 
-    printf("\nn = 1");
+    // printf("\nDivisors of n: l");
 
     for (int i = 2; i <= n; i++)
     {
         while (n % i == 0)
         {
-            printf(" * %d", i);
+            printf("%d ", i);
             n /= i;
         }
     }
