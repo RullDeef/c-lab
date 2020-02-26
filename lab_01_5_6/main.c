@@ -82,7 +82,7 @@ bool input_point(point_t *p)
 {
     char c;
     int argc = scanf("%f%c%f%c", &p->x, &c, &p->y, &c);
-    return argc != 3 && (argc != 4 || (c != '\n' && c != ' '));
+    return argc < 3 || (argc == 4 && c != '\n' && c != ' ');
 }
 
 

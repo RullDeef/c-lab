@@ -28,13 +28,13 @@ int main()
         return 1;
     }
 
-    printf("\nDivisors of n: l");
+    printf("\nn = 1");
 
     for (int i = 2; i <= n; i++)
     {
         while (n % i == 0)
         {
-            printf(", %d", i);
+            printf(" * %d", i);
             n /= i;
         }
     }
