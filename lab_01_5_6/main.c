@@ -2,137 +2,62 @@
 #include <stdbool.h>
 #include <math.h>
 
-
-#define EPS 1e-8
-
-
-typedef struct
-{
-    float x, y;
-} point_t;
+//#define _MAT_PRINTF 1
+#include "mat.h"
 
 
-point_t subtract(point_t a, point_t b)
-{
-    point_t res;
-    res.x = a.x - b.x;
-    res.y = a.y - b.y;
-    return res;
-}
-
-
-float length(point_t vect)
-{
-    return sqrtf(vect.x * vect.x + vect.y * vect.y);
-}
-
-
-float slant_product(point_t a, point_t b)
-{
-    return a.x * b.y - b.x * a.y;
-}
-
-
-bool is_too_close(point_t a, point_t b)
-{
-    return length(subtract(a, b)) < EPS;
-}
-
-
-bool has_same_ends(point_t a, point_t b, point_t c, point_t d)
-{
-    bool a_c = is_too_close(a, c);
-    bool a_d = is_too_close(a, d);
-    bool b_c = is_too_close(b, c);
-    bool b_d = is_too_close(b, d);
-
-    return a_c || a_d || b_c || b_d;
-}
-
-
-bool in_between(point_t a, point_t b, point_t c)
-{
-    point_t v = subtract(b, a);
-    point_t u = subtract(c, a);
-
-    bool xx = (c.x - a.x) * (c.x - b.x) < 0;
-    bool yy = (c.y - a.y) * (c.y - b.y) < 0;
-    
-    return fabsf(slant_product(u, v)) < EPS && xx && yy;
-}
-
-
-/**
- * Checks if points c and d lays on different sides of line ab
- */
-bool intersect_line(point_t a, point_t b, point_t c, point_t d)
-{
-    point_t v1 = subtract(b, a);
-    point_t v2 = subtract(c, a);
-    point_t v3 = subtract(d, a);
-
-    float s1 = slant_product(v2, v1);
-    float s2 = slant_product(v1, v3);
-
-    return s1 * s2 > 0;
-}
-
-
-bool input_point(point_t *p)
+bool input_points(vec2_t arr[], const int size)
 {
     char c;
-    int argc = scanf("%f%c%f%c", &p->x, &c, &p->y, &c);
-    return argc < 3 || (argc == 4 && c != '\n' && c != ' ');
+    int argc;
+
+    for(int i = 0; i < size; i++)
+    {
+        argc = scanf("%f%c%f%c", &(arr[i].x), &c, &(arr[i].y), &c);
+        if (argc < 3 || (argc == 4 && c != '\n' && c != ' '))
+            return true;
+    }
+
+    return false;
 }
 
 
 int main()
 {
-    point_t a, b, c, d;
-    bool res;
+    vec2_t a, b, c, d;
+    vec2_t arr[4];
+    bool res = false;
 
-    //printf("Input point A(x, y): ");
-
-    if (input_point(&a))
+    if (input_points(arr, 4))
     {
-        printf("Incorrect input. Closing program...\n");
+        printf("Invalid input. Closing program...\n");
         return 1;
     }
 
-    //printf("Input point B(x, y): ");
+    a = arr[0]; b = arr[1]; c = arr[2]; d = arr[3];
 
-    if (input_point(&b))
+    vec_printf(a);
+    vec_printf(b);
+    vec_printf(c);
+    vec_printf(d);
+
+    mat2x2_t mat = mat_from_vec2(vec_sub(b, a), vec_sub(d, c));
+
+    mat_printf(mat);
+
+    float det = mat_det(mat);
+
+    if (fabsf(det) > _MAT_EPS)
     {
-        printf("Incorrect input. Closing program...\n");
-        return 1;
+        vec2_t st = mat_apply(mat_inverse(mat), vec_sub(c, a));
+
+        vec_printf(st);
+
+        res = ((-_MAT_EPS < st.x && st.x < 1 + _MAT_EPS) &&
+            (-1 - _MAT_EPS < st.y && st.y < _MAT_EPS)) ||
+                ((-_MAT_EPS < st.y && st.y < 1 + _MAT_EPS) &&
+                    (-1 - _MAT_EPS < st.x && st.x < _MAT_EPS));
     }
-
-    //printf("Input point C(x, y): ");
-
-    if (input_point(&c))
-    {
-        printf("Incorrect input. Closing program...\n");
-        return 1;
-    }
-
-    //printf("Input point D(x, y): ");
-
-    if (input_point(&d))
-    {
-        printf("Incorrect input. Closing program...\n");
-        return 1;
-    }
-
-    res = has_same_ends(a, b, c, d);
-
-    if (!res)
-    {
-        res = in_between(a, b, c) || in_between(a, b, d);
-        res = res || in_between(c, d, a) || in_between(c, d, b);
-    }
-
-    if (!res)
-        res = intersect_line(a, b, c, d) && intersect_line(c, d, a, b);
 
     printf("%d", res);
 
