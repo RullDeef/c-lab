@@ -92,10 +92,10 @@ mat2x2_t mat_inverse(mat2x2_t mat)
     }
     else
     {
-        res.data[0] =  mat.data[3] / det;
+        res.data[0] = mat.data[3] / det;
         res.data[1] = -mat.data[1] / det;
         res.data[2] = -mat.data[2] / det;
-        res.data[3] =  mat.data[0] / det;
+        res.data[3] = mat.data[0] / det;
     }
     
     return res;

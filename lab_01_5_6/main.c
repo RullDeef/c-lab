@@ -20,7 +20,7 @@ bool input_points(vec2_t arr[], const int size)
     char c;
     int argc;
 
-    for(int i = 0; i < size; i++)
+    for (int i = 0; i < size; i++)
     {
         argc = scanf("%f%c%f%c", &(arr[i].x), &c, &(arr[i].y), &c);
         if (argc < 3 || (argc == 4 && c != '\n' && c != ' '))
@@ -67,7 +67,7 @@ int main()
     else if (fabsf(det) < _MAT_EPS)
     {
         // printf("Lines are parallel.");
-        return 1;
+        printf("0");
     }
     else
     {
@@ -78,6 +78,7 @@ int main()
             (in_range(st.x, -1, 0) && in_range(st.y, 0, 1));
         
         printf("%d", res);
-        return 0;
     }
+
+    return 0;
 }
