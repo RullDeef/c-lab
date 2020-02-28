@@ -15,6 +15,13 @@ bool in_range(float x, float a, float b)
 }
 
 
+bool eq(float a, float b)
+{
+    float diff = a - b;
+    return -_MAT_EPS < diff && diff < _MAT_EPS;
+}
+
+
 bool input_points(vec2_t arr[], const int size)
 {
     char c;
@@ -67,6 +74,12 @@ int main()
     else if (fabsf(det) < _MAT_EPS)
     {
         // printf("Lines are parallel.");
+        printf("0");
+    }
+    else if (eq(mat_det(mat_from_vec2(u, vec_sub(c, a))), 0) ||
+        eq(mat_det(mat_from_vec2(v, vec_sub(d, b))), 0))
+    {
+        // check for collision (not intersection)
         printf("0");
     }
     else
