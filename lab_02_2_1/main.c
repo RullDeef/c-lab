@@ -1,0 +1,94 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+
+#define MAX_CAPACITY 10
+
+
+int input(int *n, int array[]);
+int has_neg_num(int array[], const int n);
+double get_average(int array[], const int n);
+
+
+int main(void)
+{
+    int array[MAX_CAPACITY];
+    int n;
+    
+    double average;
+    
+    if (input(&n, array))
+    {
+        printf("incorrect input\n");
+        return EXIT_FAILURE;
+    }
+    
+    // check if there is any negative number
+    if (!has_neg_num(array, n))
+    {
+        printf("no negative numbers\n");
+        return EXIT_FAILURE;
+    }
+    
+    // count average among negatives
+    average = get_average(array, n);
+    printf("%.6f\n", average);
+    
+    return EXIT_SUCCESS;
+}
+
+
+int input(int *n, int array[])
+{
+    char tmp;
+    
+    if (scanf("%d", n) != 1)
+    {
+        return -1;
+    }
+    
+    for (int i = 0; i < *n; i++)
+    {
+        if (scanf("%d%c", array + sizeof(int) * i, &tmp) != 2)
+        {
+            return -1;
+        }
+    }
+    
+    return 0;
+}
+
+
+int has_neg_num(int array[], const int n)
+{
+    int result = 0;
+    
+    for (int i = 0; i < n; i++)
+    {
+        if (array[i] < 0)
+        {
+            result = 1;
+            break;
+        }
+    }
+    
+    return result;
+}
+
+
+double get_average(int array[], const int n)
+{
+    int amount = 0;
+    int total = 0;
+    
+    for (int i = 0; i < n; i++)
+    {
+        if (array[i] < 0)
+        {
+            total += array[i];
+            amount++;
+        }
+    }
+    
+    return (double)total / amount;
+}
