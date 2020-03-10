@@ -49,21 +49,19 @@ int main(void)
 
 int input(int *n, int array[])
 {
-    char tmp;
-    
-    if (scanf("%d%c", n, &tmp) != 2 || (tmp != ' ' && tmp != '\n'))
+    if (scanf("%d", n) != 1)
     {
         return EXIT_FAILURE;
     }
     
-    if (*n <= 0)
+    if (*n <= 0 || *n > MAX_CAPACITY)
     {
         return EXIT_FAILURE;
     }
     
     for (int i = 0; i < *n; i++)
     {
-        if (scanf("%d%c", &array[i], &tmp) != 2 || (tmp != ' ' && tmp != '\n'))
+        if (scanf("%d", &array[i]) != 1)
         {
             return EXIT_FAILURE;
         }
