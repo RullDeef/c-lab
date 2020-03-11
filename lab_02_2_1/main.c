@@ -32,7 +32,7 @@ int main(void)
     
     // count average among negatives
     average = get_average(array, n);
-    printf("%.6f\n", average);
+    printf("%f", average);
     
     return EXIT_SUCCESS;
 }
@@ -40,22 +40,17 @@ int main(void)
 
 int input(int *n, int array[])
 {
-    char tmp;
-    
     if (scanf("%d", n) != 1)
-    {
-        return -1;
-    }
+        return EXIT_FAILURE;
+
+    if (*n <= 0 || *n > MAX_CAPACITY)
+        return EXIT_FAILURE;
     
     for (int i = 0; i < *n; i++)
-    {
-        if (scanf("%d%c", array + sizeof(int) * i, &tmp) != 2)
-        {
-            return -1;
-        }
-    }
+        if (scanf("%d", array + sizeof(int) * i) != 1)
+            return EXIT_FAILURE;
     
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 
