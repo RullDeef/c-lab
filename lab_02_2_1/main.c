@@ -47,7 +47,7 @@ int input(int *n, int array[])
         return EXIT_FAILURE;
     
     for (int i = 0; i < *n; i++)
-        if (scanf("%d", array + sizeof(int) * i) != 1)
+        if (scanf("%d", array + i) != 1)
             return EXIT_FAILURE;
     
     return EXIT_SUCCESS;
