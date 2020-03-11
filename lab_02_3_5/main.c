@@ -29,9 +29,8 @@ int main(void)
 int input(int **begin, int **end)
 {
     int n;
-    char tmp;
 
-    if (scanf("%d%c", &n, &tmp) != 2 || (tmp != ' ' && tmp != '\n'))
+    if (scanf("%d", &n) != 1)
     {
         return EXIT_FAILURE;
     }
@@ -52,7 +51,7 @@ int input(int **begin, int **end)
 
     while (n-- > 0)
     {
-        if (scanf("%d%c", *end, &tmp) != 2 || (tmp != ' ' && tmp != '\n'))
+        if (scanf("%d", *end) != 1)
         {
             free(*begin);
             return EXIT_FAILURE;

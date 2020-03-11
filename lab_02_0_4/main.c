@@ -26,25 +26,15 @@ int main(void)
 
 int input(int *n, int array[])
 {
-    char tmp;
-
-    if (scanf("%d%c", n, &tmp) != 2 || (tmp != ' ' && tmp != '\n'))
-    {
+    if (scanf("%d", n) != 1)
         return EXIT_FAILURE;
-    }
 
-    if (*n > MAX_CAPACITY)
-    {
+    if (*n <= 0 || *n > MAX_CAPACITY)
         return EXIT_FAILURE;
-    }
 
     for (int i = 0; i < *n; i++)
-    {
-        if (scanf("%d%c", &array[i], &tmp) != 2 || (tmp != ' ' && tmp != '\n'))
-        {
+        if (scanf("%d", array + i) != 1)
             return EXIT_FAILURE;
-        }
-    }
 
     return EXIT_SUCCESS;
 }
@@ -69,13 +59,10 @@ void output(int array[], const int n)
 {
     for (int i = 0; i < n; i++)
     {
-        if (i != n - 1)
-        {
+        if (i < n - 1)
             printf("%d ", array[i]);
-        }
+        
         else
-        {
             printf("%d\n", array[i]);
-        }
     }
 }

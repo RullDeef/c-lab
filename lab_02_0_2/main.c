@@ -61,7 +61,7 @@ int input(int *n, int array[])
     
     for (int i = 0; i < *n; i++)
     {
-        if (scanf("%d", &array[i]) != 1)
+        if (scanf("%d", array + i) != 1)
         {
             return EXIT_FAILURE;
         }

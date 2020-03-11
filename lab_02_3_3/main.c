@@ -8,6 +8,7 @@
 int input(int *n, int array[]);
 void inserter(int array[], int *n);
 int reverse(int num);
+void output(int array[], const int n);
 
 
 int main(void)
@@ -22,21 +23,7 @@ int main(void)
     }
 
     inserter(array, &n);
-
-    // print results
-    for (int i = 0; i < n; i++)
-    {
-        printf("%d", array[i]);
-
-        if (i < n - 1)
-        {
-            printf(" ");
-        }
-        else
-        {
-            printf("\n");
-        }
-    }
+    output(array, n); // print results
 
     return EXIT_SUCCESS;
 }
@@ -44,25 +31,15 @@ int main(void)
 
 int input(int *n, int array[])
 {
-    char tmp;
-
-    if (scanf("%d%c", n, &tmp) != 2 || (tmp != ' ' && tmp != '\n'))
-    {
+    if (scanf("%d", n) != 1)
         return EXIT_FAILURE;
-    }
     
     if (*n <= 0 || MAX_CAPACITY < *n)
-    {
         return EXIT_FAILURE;
-    }
 
     for (int i = 0; i < *n; i++)
-    {
-        if (scanf("%d%c", &array[i], &tmp) != 2 || (tmp != ' ' && tmp != '\n'))
-        {
+        if (scanf("%d", array + i) != 1)
             return EXIT_FAILURE;
-        }
-    }
 
     return EXIT_SUCCESS;
 }
@@ -76,9 +53,7 @@ void inserter(int array[], int *n)
         {
             // shift everything in front
             for (int j = *n; j > i; j--)
-            {
                 array[j] = array[j - 1];
-            }
 
             *n += 1;
 
@@ -100,4 +75,17 @@ int reverse(int num)
     }
 
     return result;
+}
+
+
+void output(int array[], const int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        if (i < n - 1)
+            printf("%d ", array[i]);
+        
+        else
+            printf("%d\n", array[i]);
+    }
 }
