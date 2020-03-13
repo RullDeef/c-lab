@@ -28,7 +28,11 @@ int main(void)
     average = get_average(array, n);
 
     // filter all numbers in array
-    filter(array, n, average, &m);
+    if (filter(array, n, average, &m))
+    {
+        printf("empty array\n");
+        return EXIT_FAILURE;
+    }
 
     for (int i = 0; i < m; i++)
     {
