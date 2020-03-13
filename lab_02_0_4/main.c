@@ -61,7 +61,6 @@ void output(int array[], const int n)
     {
         if (i < n - 1)
             printf("%d ", array[i]);
-        
         else
             printf("%d\n", array[i]);
     }
