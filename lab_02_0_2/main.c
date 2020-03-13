@@ -7,7 +7,7 @@
 
 int input(int *n, int array[]);
 double get_average(int array[], const int n);
-int filter(int inbuf[], int outbuf[], const int n, double average, int *m);
+int filter(int array[], const int n, double average, int *m);
 
 
 int main(void)
@@ -28,7 +28,7 @@ int main(void)
     average = get_average(array, n);
 
     // filter all numbers in array
-    filter(array, array, n, average, &m);
+    filter(array, n, average, &m);
 
     for (int i = 0; i < m; i++)
     {
@@ -84,15 +84,15 @@ double get_average(int array[], const int n)
 }
 
 
-int filter(int inbuf[], int outbuf[], const int n, double average, int *m)
+int filter(int array[], const int n, double average, int *m)
 {
     *m = 0;
     
     for (int i = 0; i < n; i++)
     {
-        if (inbuf[i] < average)
+        if (array[i] > average)
         {
-            outbuf[*m] = inbuf[i];
+            array[*m] = array[i];
             *m += 1;
         }
     }

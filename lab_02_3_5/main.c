@@ -5,11 +5,13 @@
 #define MEMORY_ERROR -2
 
 int input(int **begin, int **end);
-int cumsum(int *begin, int *end);
+int minfunc(int *begin, int *end);
 
 int main(void)
 {
-    int *begin, *end;
+    int array[MAX_CAPACITY];
+    int *begin = array;
+    int *end = array;
 
     if (input(&begin, &end))
     {
@@ -17,11 +19,9 @@ int main(void)
         return EXIT_FAILURE;
     }
 
-    int sum = cumsum(begin, end);
+    int sum = minfunc(begin, end);
 
     printf("%d\n", sum);
-
-    free(begin);
 
     return EXIT_SUCCESS;
 }
@@ -35,25 +35,15 @@ int input(int **begin, int **end)
         return EXIT_FAILURE;
     }
 
-    if (n < 0 || n > MAX_CAPACITY)
+    if (n < 1 || n > MAX_CAPACITY)
     {
         return EXIT_FAILURE;
     }
-
-    *begin = calloc(n, sizeof(int));
-
-    if (*begin == NULL)
-    {
-        return MEMORY_ERROR;
-    }
-
-    *end = *begin;
 
     while (n-- > 0)
     {
         if (scanf("%d", *end) != 1)
         {
-            free(*begin);
             return EXIT_FAILURE;
         }
 
@@ -63,24 +53,20 @@ int input(int **begin, int **end)
     return EXIT_SUCCESS;
 }
 
-int cumsum(int *begin, int *end)
+int minfunc(int *begin, int *end)
 {
-    int current = *begin;
-    int sum = current;
+    int prev = *begin;
+    int curr = *++begin;
+    int min = prev * curr;
 
-    if (current > 0)
+    while (begin != end)
     {
-        for (begin++; begin != end; begin++)
-        {
-            current *= *begin;
-            sum += current;
+        prev = curr;
+        curr = *begin++;
 
-            if (*begin < 0)
-            {
-                break;
-            }
-        }
+        if (prev * curr < min)
+            min = prev * curr;
     }
 
-    return sum;
+    return min;
 }
