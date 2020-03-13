@@ -35,7 +35,7 @@ int input(int **begin, int **end)
         return EXIT_FAILURE;
     }
 
-    if (n < 1 || n > MAX_CAPACITY)
+    if (n < 2 || n > MAX_CAPACITY)
     {
         return EXIT_FAILURE;
     }
