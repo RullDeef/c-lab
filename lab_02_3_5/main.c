@@ -1,11 +1,22 @@
 #include <stdio.h>
-#include <stdlib.h>
+
 
 #define MAX_CAPACITY 10
-#define MEMORY_ERROR -2
 
-int input(int **begin, int **end);
+
+typedef enum
+{
+    EXIT_SUCCESS,
+    EXIT_FAILURE,
+    INVALID_ARRAY_LENGTH
+} status_code_t;
+
+typedef int *int_ptr_t;
+
+
+status_code_t input(int_ptr_t *begin, int_ptr_t *end);
 int minfunc(int *begin, int *end);
+
 
 int main(void)
 {
@@ -26,32 +37,24 @@ int main(void)
     return EXIT_SUCCESS;
 }
 
-int input(int **begin, int **end)
+
+status_code_t input(int_ptr_t *begin, int_ptr_t *end)
 {
     int n;
 
     if (scanf("%d", &n) != 1)
-    {
         return EXIT_FAILURE;
-    }
 
     if (n < 2 || n > MAX_CAPACITY)
-    {
-        return EXIT_FAILURE;
-    }
+        return INVALID_ARRAY_LENGTH;
 
     while (n-- > 0)
-    {
-        if (scanf("%d", *end) != 1)
-        {
+        if (scanf("%d", (*end)++) != 1)
             return EXIT_FAILURE;
-        }
-
-        *end += 1;
-    }
 
     return EXIT_SUCCESS;
 }
+
 
 int minfunc(int *begin, int *end)
 {

@@ -1,11 +1,21 @@
 #include <stdio.h>
-#include <stdlib.h>
+
 
 #define MAX_CAPACITY 10
 
-int input(int *n, int array[]);
+
+typedef enum
+{
+    EXIT_SUCCESS,
+    EXIT_FAILURE,
+    INVALID_ARRAY_LENGTH
+} status_code_t;
+
+
+status_code_t input(int *n, int array[]);
 void sort(int array[], const int n);
 void output(int array[], const int n);
+
 
 int main(void)
 {
@@ -24,13 +34,14 @@ int main(void)
     return EXIT_SUCCESS;
 }
 
-int input(int *n, int array[])
+
+status_code_t input(int *n, int array[])
 {
     if (scanf("%d", n) != 1)
         return EXIT_FAILURE;
 
     if (*n <= 0 || *n > MAX_CAPACITY)
-        return EXIT_FAILURE;
+        return INVALID_ARRAY_LENGTH;
 
     for (int i = 0; i < *n; i++)
         if (scanf("%d", array + i) != 1)
@@ -39,21 +50,23 @@ int input(int *n, int array[])
     return EXIT_SUCCESS;
 }
 
+
+void swap(int *a, int *b)
+{
+    int t = *a;
+    *a = *b;
+    *b = t;
+}
+
+
 void sort(int array[], const int n)
 {
     for (int i = 1; i < n; i++)
-    {
         for (int j = i; j > 0; j--)
-        {
             if (array[j] < array[j - 1])
-            {
-                int temp = array[j];
-                array[j] = array[j - 1];
-                array[j - 1] = temp;
-            }
-        }
-    }
+                swap(&array[j - 1], &array[j]);
 }
+
 
 void output(int array[], const int n)
 {

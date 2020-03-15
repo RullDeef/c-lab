@@ -1,13 +1,21 @@
 #include <stdio.h>
-#include <stdlib.h>
 
 
 #define MAX_CAPACITY 10
 
 
-int input(int *n, int array[]);
-double get_average(int array[], const int n);
-int filter(int array[], const int n, double average, int *m);
+typedef enum
+{
+    EXIT_SUCCESS,
+    EXIT_FAILURE,
+    INVALID_ARRAY_LENGTH
+} status_code_t;
+
+
+status_code_t input(int *n, int array[]);
+double get_average(const int array[], const int n);
+status_code_t filter(int array[], const int n, double average, int *m);
+void print_array(const int *array, const int n);
 
 
 int main(void)
@@ -34,77 +42,62 @@ int main(void)
         return EXIT_FAILURE;
     }
 
-    for (int i = 0; i < m; i++)
-    {
-        printf("%d", array[i]);
-        if (i != m - 1)
-        {
-            printf(" ");
-        }
-        else
-        {
-            printf("\n");
-        }
-    }
+    print_array(array, m);
     
     return EXIT_SUCCESS;
 }
 
 
-int input(int *n, int array[])
+status_code_t input(int *n, int array[])
 {
     if (scanf("%d", n) != 1)
-    {
         return EXIT_FAILURE;
-    }
     
     if (*n <= 0 || *n > MAX_CAPACITY)
-    {
-        return EXIT_FAILURE;
-    }
+        return INVALID_ARRAY_LENGTH;
     
     for (int i = 0; i < *n; i++)
-    {
         if (scanf("%d", array + i) != 1)
-        {
             return EXIT_FAILURE;
-        }
-    }
     
     return EXIT_SUCCESS;
 }
 
 
-double get_average(int array[], const int n)
+double get_average(const int array[], const int n)
 {
     double result = 0.0;
     
     for (int i = 0; i < n; i++)
-    {
         result += (double)array[i];
-    }
     
     return result / n;
 }
 
 
-int filter(int array[], const int n, double average, int *m)
+status_code_t filter(int array[], const int n, double average, int *m)
 {
     *m = 0;
     
     for (int i = 0; i < n; i++)
-    {
         if (array[i] > average)
-        {
-            array[*m] = array[i];
-            *m += 1;
-        }
-    }
+            array[(*m)++] = array[i];
     
     if (*m == 0)
-    {
         return EXIT_FAILURE;
-    }
     
     return EXIT_SUCCESS;
+}
+
+
+void print_array(const int *array, const int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        printf("%d", array[i]);
+        if (i != n - 1)
+            printf(" ");
+        else
+            printf("\n");
+    }
 }

@@ -1,11 +1,18 @@
 #include <stdio.h>
-#include <stdlib.h>
 
 
 #define MAX_CAPACITY 10
 
 
-int input(int *n, int array[]);
+typedef enum
+{
+    EXIT_SUCCESS,
+    EXIT_FAILURE,
+    INVALID_ARRAY_LENGTH
+} status_code_t;
+
+
+status_code_t input(int *n, int array[]);
 void inserter(int array[], int *n);
 int reverse(int num);
 void output(int array[], const int n);
@@ -23,22 +30,22 @@ int main(void)
     }
 
     inserter(array, &n);
-    output(array, n); // print results
+    output(array, n);
 
     return EXIT_SUCCESS;
 }
 
 
-int input(int *n, int array[])
+status_code_t input(int *n, int array[])
 {
     if (scanf("%d", n) != 1)
         return EXIT_FAILURE;
     
-    if (*n <= 0 || MAX_CAPACITY < *n)
-        return EXIT_FAILURE;
+    if (*n <= 0 || *n > MAX_CAPACITY)
+        return INVALID_ARRAY_LENGTH;
 
     for (int i = 0; i < *n; i++)
-        if (scanf("%d", array + i) != 1)
+        if (scanf("%d", &array[i]) != 1)
             return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
@@ -51,7 +58,6 @@ void inserter(int array[], int *n)
     {
         if (array[i] > 0)
         {
-            // shift everything in front
             for (int j = *n; j > i; j--)
                 array[j] = array[j - 1];
 
