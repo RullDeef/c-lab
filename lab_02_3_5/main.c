@@ -6,9 +6,9 @@
 
 typedef enum
 {
-    EXIT_SUCCESS,
-    EXIT_FAILURE,
-    INVALID_ARRAY_LENGTH
+    exit_success,
+    exit_failure,
+    invalid_array_length
 } status_code_t;
 
 typedef int *int_ptr_t;
@@ -27,14 +27,14 @@ int main(void)
     if (input(&begin, &end))
     {
         printf("incorrect input\n");
-        return EXIT_FAILURE;
+        return exit_failure;
     }
 
     int sum = minfunc(begin, end);
 
     printf("%d\n", sum);
 
-    return EXIT_SUCCESS;
+    return exit_success;
 }
 
 
@@ -43,16 +43,16 @@ status_code_t input(int_ptr_t *begin, int_ptr_t *end)
     int n;
 
     if (scanf("%d", &n) != 1)
-        return EXIT_FAILURE;
+        return exit_failure;
 
     if (n < 2 || n > MAX_CAPACITY)
-        return INVALID_ARRAY_LENGTH;
+        return invalid_array_length;
 
     while (n-- > 0)
         if (scanf("%d", (*end)++) != 1)
-            return EXIT_FAILURE;
+            return exit_failure;
 
-    return EXIT_SUCCESS;
+    return exit_success;
 }
 
 

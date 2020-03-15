@@ -6,9 +6,9 @@
 
 typedef enum
 {
-    EXIT_SUCCESS,
-    EXIT_FAILURE,
-    INVALID_ARRAY_LENGTH
+    exit_success,
+    exit_failure,
+    invalid_array_length
 } status_code_t;
 
 
@@ -29,7 +29,7 @@ int main(void)
     if (input(&n, array))
     {
         printf("incorrect input\n");
-        return EXIT_FAILURE;
+        return exit_failure;
     }
     
     // find average
@@ -39,28 +39,28 @@ int main(void)
     if (filter(array, n, average, &m))
     {
         printf("empty array\n");
-        return EXIT_FAILURE;
+        return exit_failure;
     }
 
     print_array(array, m);
     
-    return EXIT_SUCCESS;
+    return exit_success;
 }
 
 
 status_code_t input(int *n, int array[])
 {
     if (scanf("%d", n) != 1)
-        return EXIT_FAILURE;
+        return exit_failure;
     
     if (*n <= 0 || *n > MAX_CAPACITY)
-        return INVALID_ARRAY_LENGTH;
+        return invalid_array_length;
     
     for (int i = 0; i < *n; i++)
         if (scanf("%d", array + i) != 1)
-            return EXIT_FAILURE;
+            return exit_failure;
     
-    return EXIT_SUCCESS;
+    return exit_success;
 }
 
 
@@ -84,9 +84,9 @@ status_code_t filter(int array[], const int n, double average, int *m)
             array[(*m)++] = array[i];
     
     if (*m == 0)
-        return EXIT_FAILURE;
+        return exit_failure;
     
-    return EXIT_SUCCESS;
+    return exit_success;
 }
 
 
