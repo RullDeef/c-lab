@@ -4,3 +4,15 @@ lab_01_*_*
 
 */build
 */debug
+
+*.exe
+*.o
+
+*.cflags
+*.config
+*.creator
+*.user
+*.cxxflags
+*.files
+*.includes
+
