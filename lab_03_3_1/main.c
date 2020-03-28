@@ -21,7 +21,7 @@ typedef enum
 status_code_t input_data(matrix_t matrix, size_t *rows, size_t *columns);
 bool is_valid_dims(size_t rows, size_t columns);
 void print_error_msg(status_code_t status_code);
-int is_mono_seq(array_t array, size_t size);
+bool is_mono_seq(array_t array, size_t size);
 void print_mono_seqs(matrix_t matrix, size_t rows, size_t columns);
 
 
@@ -91,11 +91,11 @@ void print_error_msg(status_code_t status_code)
 }
 
 
-int is_mono_seq(array_t array, size_t size)
+bool is_mono_seq(array_t array, size_t size)
 {
     int delta_1;
     int delta_2;
-    int result = array[0] != array[1];
+    bool result = array[0] != array[1];
 
     if (size > 2)
     {
@@ -103,9 +103,9 @@ int is_mono_seq(array_t array, size_t size)
         {
             delta_1 = array[i - 1] - array[i - 2];
             delta_2 = array[i] - array[i - 1];
-            if (delta_1 * delta_2 <= 0)
+            if (delta_1 * delta_2 < 0)
             {
-                result = 0;
+                result = false;
                 break;
             }
         }
@@ -119,9 +119,8 @@ void print_mono_seqs(matrix_t matrix, size_t rows, size_t columns)
 {
     for (size_t row = 0; row < rows; row++)
     {
-        int mono = is_mono_seq(matrix[row], columns);
-        printf("%d", mono);
-
+        bool mono = is_mono_seq(matrix[row], columns);
+        printf(mono ? "1" : "0");
         printf(row == rows - 1 ? "\n" : " ");
     }
 }

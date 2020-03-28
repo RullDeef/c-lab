@@ -66,12 +66,17 @@ bool is_prime(int number)
 {
     bool result = true;
 
-    for (int i = 2; i * i <= number; i++)
+    if (number == 1)
+        result = false;
+    else
     {
-        if (number % i == 0)
+        for (int i = 2; i * i <= number; i++)
         {
-            result = false;
-            break;
+            if (number % i == 0)
+            {
+                result = false;
+                break;
+            }
         }
     }
 

@@ -101,18 +101,29 @@ void sort_matrix_rows(matrix_t matrix, size_t rows, size_t columns)
 {
     int min_el_1;
     int min_el_2;
+    bool was_swap;
 
-    for (size_t row_1 = 0; row_1 + 1 < rows; row_1++)
+    do
     {
-        min_el_1 = get_min_element(matrix[row_1], columns);
-        for (size_t row_2 = row_1 + 1; row_2 < rows; row_2++)
+        was_swap = false;
+        min_el_2 = get_min_element(matrix[0], columns);
+
+        for (size_t row = 0; row + 1 < rows; row++)
         {
-            min_el_2 = get_min_element(matrix[row_2], columns);
-            if (min_el_1 < min_el_2) // do stable sort here
-                for (size_t row_3 = row_1; row_3 < row_2; row_3++)
-                    swap_arrays(matrix[row_3], matrix[row_3 + 1], columns);
+            min_el_1 = min_el_2;
+            min_el_2 = get_min_element(matrix[row + 1], columns);
+
+            if (min_el_1 < min_el_2)
+            {
+                swap_arrays(matrix[row], matrix[row + 1], columns);
+                min_el_2 = get_min_element(matrix[row + 1], columns);
+                was_swap = true;
+            }
         }
     }
+    while (was_swap);
+
+    return;
 }
 
 
