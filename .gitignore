@@ -1,5 +1,10 @@
 .vscode
 
+lab_01_*_*
+
+*/build
+*/debug
+
 *.exe
 *.o
 

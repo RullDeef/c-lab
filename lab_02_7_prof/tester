@@ -1,0 +1,91 @@
+gcc main.c -o main.exe -std=c99 -pg -DMAX_CAPACITY=10000 -O0
+builder.py 10000
+main.exe < data.txt > /dev/null
+echo "10000" > out0.txt
+echo "" >> out0.txt
+gprof -b --no-graph main.exe >> out0.txt
+
+gcc main.c -o main.exe -std=c99 -pg -DMAX_CAPACITY=50000 -O0
+builder.py 50000
+main.exe < data.txt > /dev/null
+echo "" >> out0.txt
+echo "50000" >> out0.txt
+echo "" >> out0.txt
+gprof -b --no-graph main.exe >> out0.txt
+
+gcc main.c -o main.exe -std=c99 -pg -DMAX_CAPACITY=100000 -O0
+builder.py 100000
+main.exe < data.txt > /dev/null
+echo "" >> out0.txt
+echo "100000" >> out0.txt
+echo "" >> out0.txt
+gprof -b --no-graph main.exe >> out0.txt
+
+gcc main.c -o main.exe -std=c99 -pg -DMAX_CAPACITY=10000 -O1
+builder.py 10000
+main.exe < data.txt > /dev/null
+echo "10000" > out1.txt
+echo "" >> out1.txt
+gprof -b --no-graph main.exe >> out1.txt
+
+gcc main.c -o main.exe -std=c99 -pg -DMAX_CAPACITY=50000 -O1
+builder.py 50000
+main.exe < data.txt > /dev/null
+echo "" >> out1.txt
+echo "50000" >> out1.txt
+echo "" >> out1.txt
+gprof -b --no-graph main.exe >> out1.txt
+
+gcc main.c -o main.exe -std=c99 -pg -DMAX_CAPACITY=100000 -O1
+builder.py 100000
+main.exe < data.txt > /dev/null
+echo "" >> out1.txt
+echo "100000" >> out1.txt
+echo "" >> out1.txt
+gprof -b --no-graph main.exe >> out1.txt
+
+gcc main.c -o main.exe -std=c99 -pg -DMAX_CAPACITY=10000 -O2
+builder.py 10000
+main.exe < data.txt > /dev/null
+echo "10000" > out2.txt
+echo "" >> out2.txt
+gprof -b --no-graph main.exe >> out2.txt
+
+gcc main.c -o main.exe -std=c99 -pg -DMAX_CAPACITY=50000 -O2
+builder.py 50000
+main.exe < data.txt > /dev/null
+echo "" >> out2.txt
+echo "50000" >> out2.txt
+echo "" >> out2.txt
+gprof -b --no-graph main.exe >> out2.txt
+
+gcc main.c -o main.exe -std=c99 -pg -DMAX_CAPACITY=100000 -O2
+builder.py 100000
+main.exe < data.txt > /dev/null
+echo "" >> out2.txt
+echo "100000" >> out2.txt
+echo "" >> out2.txt
+gprof -b --no-graph main.exe >> out2.txt
+
+gcc main.c -o main.exe -std=c99 -pg -DMAX_CAPACITY=10000 -O3
+builder.py 10000
+main.exe < data.txt > /dev/null
+echo "10000" > out3.txt
+echo "" >> out3.txt
+gprof -b --no-graph main.exe >> out3.txt
+
+gcc main.c -o main.exe -std=c99 -pg -DMAX_CAPACITY=50000 -O3
+builder.py 50000
+main.exe < data.txt > /dev/null
+echo "" >> out3.txt
+echo "50000" >> out3.txt
+echo "" >> out3.txt
+gprof -b --no-graph main.exe >> out3.txt
+
+gcc main.c -o main.exe -std=c99 -pg -DMAX_CAPACITY=100000 -O3
+builder.py 100000
+main.exe < data.txt > /dev/null
+echo "" >> out3.txt
+echo "100000" >> out3.txt
+echo "" >> out3.txt
+gprof -b --no-graph main.exe >> out3.txt
