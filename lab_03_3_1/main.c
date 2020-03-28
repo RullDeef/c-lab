@@ -93,25 +93,19 @@ void print_error_msg(status_code_t status_code)
 
 bool is_mono_seq(array_t array, size_t size)
 {
-    int delta_1;
-    int delta_2;
-    bool result = array[0] != array[1];
+    bool inc_seq = true;
+    bool dec_seq = true;
 
-    if (size > 2)
+    for (size_t i = 0; i + 1 < size; i++)
     {
-        for (size_t i = 2; i < size; i++)
-        {
-            delta_1 = array[i - 1] - array[i - 2];
-            delta_2 = array[i] - array[i - 1];
-            if (delta_1 * delta_2 < 0)
-            {
-                result = false;
-                break;
-            }
-        }
+        inc_seq = inc_seq && (array[i] <= array[i + 1]);
+        dec_seq = dec_seq && (array[i] >= array[i + 1]);
+
+        if (!(inc_seq || dec_seq))
+            break;
     }
 
-    return result;
+    return inc_seq || dec_seq;
 }
 
 
