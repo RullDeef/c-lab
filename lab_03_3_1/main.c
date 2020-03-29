@@ -74,8 +74,8 @@ status_code_t input_data(matrix_t matrix, size_t *rows, size_t *columns)
 
 bool is_valid_dims(size_t rows, size_t columns)
 {
-    bool rows_valid = 0 < rows && rows < MAX_CAPACITY;
-    bool columns_valid = 1 < columns && columns < MAX_CAPACITY;
+    bool rows_valid = 0 < rows && rows <= MAX_CAPACITY;
+    bool columns_valid = 1 < columns && columns <= MAX_CAPACITY;
     return rows_valid && columns_valid;
 }
 
