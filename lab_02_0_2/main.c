@@ -70,8 +70,8 @@ status_code_t input(int *size, int array[])
         {
             if (scanf("%d", &array[i]) != 1)
             {
-                 result = invalid_input;
-                 break;
+                result = invalid_input;
+                break;
             }
 
             if (i == 0)
