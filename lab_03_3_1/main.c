@@ -75,7 +75,7 @@ status_code_t input_data(matrix_t matrix, size_t *rows, size_t *columns)
 bool is_valid_dims(size_t rows, size_t columns)
 {
     bool rows_valid = 0 < rows && rows <= MAX_CAPACITY;
-    bool columns_valid = 1 < columns && columns <= MAX_CAPACITY;
+    bool columns_valid = 0 < columns && columns <= MAX_CAPACITY;
     return rows_valid && columns_valid;
 }
 
@@ -98,8 +98,8 @@ bool is_mono_seq(array_t array, size_t size)
 
     for (size_t i = 0; i + 1 < size; i++)
     {
-        inc_seq = inc_seq && (array[i] <= array[i + 1]);
-        dec_seq = dec_seq && (array[i] >= array[i + 1]);
+        inc_seq = inc_seq && (array[i] < array[i + 1]);
+        dec_seq = dec_seq && (array[i] > array[i + 1]);
 
         if (!(inc_seq || dec_seq))
             break;
