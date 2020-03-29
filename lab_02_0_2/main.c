@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 
 
 #define MAX_CAPACITY 10
@@ -7,97 +8,140 @@
 typedef enum
 {
     exit_success,
-    exit_failure,
-    invalid_array_length
+    invalid_input,
+    invalid_array_length,
+    invalid_array_struct
 } status_code_t;
 
 
-status_code_t input(int *n, int array[]);
-double get_average(const int array[], const int n);
-status_code_t filter(int array[], const int n, double average, int *m);
-void print_array(const int *array, const int n);
+status_code_t input(int *size, int array[]);
+bool is_arr_size_valid(int size);
+double get_average(int array[], int size);
+void filter_gt_average(int array[], int size, double average, int new_array[], int *new_size);
+void print_array(int array[], int size);
+void print_err_msg(status_code_t status_code);
 
 
 int main(void)
 {
-    int n;
     int array[MAX_CAPACITY];
+    int size;
     
     double average;
-    int m;
-    
-    if (input(&n, array))
-    {
-        printf("incorrect input\n");
-        return exit_failure;
-    }
-    
-    // find average
-    average = get_average(array, n);
 
-    // filter all numbers in array
-    if (filter(array, n, average, &m))
+    int new_array[MAX_CAPACITY];
+    int new_size;
+    
+    status_code_t result = exit_success;
+
+    if ((result = input(&size, array)) != exit_success)
     {
-        printf("empty array\n");
-        return exit_failure;
+        print_err_msg(result);
+    }
+    else
+    {
+        average = get_average(array, size);
+        filter_gt_average(array, size, average, new_array, &new_size);
+        print_array(new_array, new_size);
     }
 
-    print_array(array, m);
-    
-    return exit_success;
+    return result;
 }
 
 
-status_code_t input(int *n, int array[])
+status_code_t input(int *size, int array[])
 {
-    if (scanf("%d", n) != 1)
-        return exit_failure;
+    status_code_t result = exit_success;
+
+    if (scanf("%d", size) != 1)
+    {
+        result = invalid_input;
+    }
+    else if (!is_arr_size_valid(*size))
+    {
+        result = invalid_array_length;
+    }
+    else
+    {
+        int first_num;
+        bool all_nums_are_same = true;
+
+        for (int i = 0; i < *size; i++)
+        {
+            if (scanf("%d", &array[i]) != 1)
+            {
+                 result = invalid_input;
+                 break;
+            }
+
+            if (i == 0)
+                first_num = array[0];
+            else
+                all_nums_are_same = all_nums_are_same && first_num == array[i];
+        }
+
+        if (result == exit_success && all_nums_are_same)
+            result = invalid_array_struct;
+    }
     
-    if (*n <= 0 || *n > MAX_CAPACITY)
-        return invalid_array_length;
-    
-    for (int i = 0; i < *n; i++)
-        if (scanf("%d", array + i) != 1)
-            return exit_failure;
-    
-    return exit_success;
+    return result;
 }
 
 
-double get_average(const int array[], const int n)
+bool is_arr_size_valid(int size)
+{
+    return 0 < size && size <= MAX_CAPACITY;
+}
+
+
+double get_average(int array[], int size)
 {
     double result = 0.0;
     
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < size; i++)
         result += (double)array[i];
     
-    return result / n;
+    return result / size;
 }
 
 
-status_code_t filter(int array[], const int n, double average, int *m)
+void filter_gt_average(int array[], const int size, double average, int new_array[], int *new_size)
 {
-    *m = 0;
+    *new_size = 0;
     
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < size; i++)
+    {
         if (array[i] > average)
-            array[(*m)++] = array[i];
-    
-    if (*m == 0)
-        return exit_failure;
-    
-    return exit_success;
+        {
+            new_array[*new_size] = array[i];
+            *new_size += 1;
+        }
+    }
 }
 
 
-void print_array(const int *array, const int n)
+void print_array(int array[], int n)
 {
     for (int i = 0; i < n; i++)
     {
         printf("%d", array[i]);
-        if (i != n - 1)
-            printf(" ");
-        else
-            printf("\n");
+        printf(i + 1 != n ? " " : "\n");
+    }
+}
+
+
+void print_err_msg(status_code_t status_code)
+{
+    if (status_code == invalid_input)
+    {
+        printf("incorrect input.\n");
+    }
+    else if (status_code == invalid_array_length)
+    {
+        printf("incorrect array length.\n");
+    }
+    else if (status_code == invalid_array_struct)
+    {
+        printf("incorrect array struct.\n");
     }
 }

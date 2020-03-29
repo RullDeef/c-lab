@@ -7,15 +7,14 @@
 typedef enum
 {
     exit_success,
-    exit_failure,
+    invalid_input,
     invalid_array_length
 } status_code_t;
 
-typedef int *int_ptr_t;
 
-
-status_code_t input(int_ptr_t *begin, int_ptr_t *end);
-int minfunc(int *begin, int *end);
+status_code_t input(int **end);
+int min_neighbour_prod(int *begin, int *end);
+void print_err_msg(status_code_t status_code);
 
 
 int main(void)
@@ -24,39 +23,53 @@ int main(void)
     int *begin = array;
     int *end = array;
 
-    if (input(&begin, &end))
+    status_code_t result = exit_success;
+
+    if ((result = input(&end)) != exit_success)
     {
-        printf("incorrect input\n");
-        return exit_failure;
+        print_err_msg(result);
+    }
+    else
+    {
+        int prod = min_neighbour_prod(begin, end);
+        printf("%d\n", prod);
     }
 
-    int sum = minfunc(begin, end);
-
-    printf("%d\n", sum);
-
-    return exit_success;
+    return result;
 }
 
 
-status_code_t input(int_ptr_t *begin, int_ptr_t *end)
+status_code_t input(int **end)
 {
-    int n;
+    int size;
 
-    if (scanf("%d", &n) != 1)
-        return exit_failure;
+    status_code_t result = exit_success;
 
-    if (n < 2 || n > MAX_CAPACITY)
-        return invalid_array_length;
+    if (scanf("%d", &size) != 1)
+    {
+        result = invalid_input;
+    }
+    else if (size < 2 || size > MAX_CAPACITY)
+    {
+        result = invalid_array_length;
+    }
+    else
+    {
+        while (size-- > 0)
+        {
+            if (scanf("%d", (*end)++) != 1)
+            {
+                result = invalid_input;
+                break;
+            }
+        }
+    }
 
-    while (n-- > 0)
-        if (scanf("%d", (*end)++) != 1)
-            return exit_failure;
-
-    return exit_success;
+    return result;
 }
 
 
-int minfunc(int *begin, int *end)
+int min_neighbour_prod(int *begin, int *end)
 {
     int prev = *begin;
     int curr = *++begin;
@@ -72,4 +85,17 @@ int minfunc(int *begin, int *end)
     }
 
     return min;
+}
+
+
+void print_err_msg(status_code_t status_code)
+{
+    if (status_code == invalid_input)
+    {
+        printf("incorrect input.\n");
+    }
+    else if (status_code == invalid_array_length)
+    {
+        printf("incorrect array length.\n");
+    }
 }
