@@ -98,14 +98,14 @@ bool is_mono_seq(array_t array, size_t size)
 
     for (size_t i = 0; i + 1 < size; i++)
     {
-        inc_seq = inc_seq && (array[i] < array[i + 1]);
-        dec_seq = dec_seq && (array[i] > array[i + 1]);
+        inc_seq = inc_seq && (array[i] <= array[i + 1]);
+        dec_seq = dec_seq && (array[i] >= array[i + 1]);
 
         if (!(inc_seq || dec_seq))
             break;
     }
 
-    return inc_seq || dec_seq;
+    return (inc_seq || dec_seq) && (size > 1);
 }
 
 
