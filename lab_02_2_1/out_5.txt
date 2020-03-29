@@ -1,1 +1,1 @@
-incorrect input
+incorrect array length.
