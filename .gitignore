@@ -1,7 +1,6 @@
 .vscode
 
-lab_01_*_*
-
+# prevent saving my own shell scripts
 */build
 */debug
 
