@@ -33,7 +33,7 @@ int main(void)
 
     status_code_t result = exit_success;
 
-    if ((result = input_data(matrix, &rows, &columns)))
+    if ((result = input_data(matrix, &rows, &columns)) != exit_success)
         print_error_msg(result);
     else
         print_mono_seqs(matrix, rows, columns);
