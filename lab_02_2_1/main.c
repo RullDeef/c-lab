@@ -1,82 +1,91 @@
+#define __USE_MINGW_ANSI_STDIO 1
 #include <stdio.h>
+#include <stdbool.h>
 
 
 #define MAX_CAPACITY 10
+typedef int array_t[MAX_CAPACITY];
 
 
 typedef enum
 {
     exit_success,
-    exit_failure,
-    invalid_array_length
+    invalid_input,
+    invalid_array_length,
+    invalid_array_struct
 } status_code_t;
 
 
-status_code_t input(int *n, int array[]);
-status_code_t check_neg_num(int array[], const int n);
-double get_average(int array[], const int n);
+status_code_t input(array_t array, size_t *size);
+double get_neg_average(array_t array, size_t size);
+void print_array(array_t array, size_t size);
+void print_err_msg(status_code_t status_code);
 
 
 int main(void)
 {
-    int array[MAX_CAPACITY];
-    int n;
+    array_t array;
+    size_t size;
     
     double average;
+
+    status_code_t result = exit_success;
     
-    if (input(&n, array))
+    if ((result = input(array, &size)) != exit_success)
     {
-        printf("incorrect input\n");
-        return exit_failure;
+        print_err_msg(result);
+    }
+    else
+    {
+        average = get_neg_average(array, size);
+        printf("%lf", average);
+    }
+
+    return result;
+}
+
+
+status_code_t input(array_t array, size_t *size)
+{
+    status_code_t result = exit_success;
+
+    if (scanf("%zu", size) != 1)
+    {
+        result = invalid_input;
+    }
+    else if (*size <= 0 || *size > MAX_CAPACITY)
+    {
+        result = invalid_array_length;
+    }
+    else
+    {
+        bool has_neg_num = false;
+
+        for (int i = 0; i < *size; i++)
+        {
+            if (scanf("%d", &array[i]) != 1)
+            {
+                result = invalid_input;
+                break;
+            }
+
+            has_neg_num = has_neg_num || array[i] < 0;
+        }
+
+        if (result == exit_success && !has_neg_num)
+            result = invalid_array_struct;
     }
     
-    // check if there is any negative number
-    if (check_neg_num(array, n))
-    {
-        printf("no negative numbers\n");
-        return exit_failure;
-    }
-    
-    // count average among negatives
-    average = get_average(array, n);
-    printf("%f", average);
-    
-    return exit_success;
+    return result;
 }
 
 
-status_code_t input(int *n, int array[])
-{
-    if (scanf("%d", n) != 1)
-        return exit_failure;
-
-    if (*n <= 0 || *n > MAX_CAPACITY)
-        return invalid_array_length;
-    
-    for (int i = 0; i < *n; i++)
-        if (scanf("%d", array + i) != 1)
-            return exit_failure;
-    
-    return exit_success;
-}
-
-
-status_code_t check_neg_num(int array[], const int n)
-{
-    for (int i = 0; i < n; i++)
-        if (array[i] < 0)
-            return exit_success;
-    
-    return exit_failure;
-}
-
-
-double get_average(int array[], const int n)
+double get_neg_average(array_t array, size_t size)
 {
     int amount = 0;
     int total = 0;
     
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < size; i++)
     {
         if (array[i] < 0)
         {
@@ -86,4 +95,21 @@ double get_average(int array[], const int n)
     }
     
     return (double)total / amount;
+}
+
+
+void print_err_msg(status_code_t status_code)
+{
+    if (status_code == invalid_input)
+    {
+        printf("incorrect input.\n");
+    }
+    else if (status_code == invalid_array_length)
+    {
+        printf("incorrect array length.\n");
+    }
+    else if (status_code == invalid_array_struct)
+    {
+        printf("incorrect array struct.\n");
+    }
 }
