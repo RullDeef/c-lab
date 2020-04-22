@@ -12,8 +12,8 @@ int input_str(input_str_t str)
 
     while (1)
     {
-        wchar_t c = str[i] = (wchar_t)fgetwc(stdin);
-        if (c == L'\n' || c == L'\0')
+        char c = str[i] = (char)getchar();
+        if (c == '\n' || c == '\0')
         {
             if (i == 0)
                 result = EXIT_FAILURE;
@@ -27,7 +27,7 @@ int input_str(input_str_t str)
     }
 
     if (result == EXIT_SUCCESS)
-        str[i] = L'\0';
+        str[i] = '\0';
     return result;
 }
 
@@ -42,10 +42,10 @@ void sort_lex(word_array_t word_array, const size_t size)
 void output(word_array_t word_array, const size_t size)
 {
     printf("Result:");
-    printf("%ls", word_array[0]);
+    printf("%s", word_array[0]);
 
     for (size_t i = 1; i < size; i++)
-        printf(" %ls", word_array[i]);
+        printf(" %s", word_array[i]);
 }
 
 int main(void)
