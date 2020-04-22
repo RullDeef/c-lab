@@ -12,13 +12,13 @@ int test_pass_fail(const test_data_t test_data);
 int main(void)
 {
     test_data_t tests_data[TESTS_AMOUNT] = {
-        {"", "", ""},
-        {"", "abc", ""},
-        {"aef", "", "aef"},
-        {"abc", "ca", "bc"},
-        {"vbb", "qwe", "vbb"},
-        {"xzzs", "xz", "s"},
-        {"tttrt", "rrt", ""}
+        { "", "", "" },
+        { "", "abc", "" },
+        { "aef", "", "aef" },
+        { "abc", "ca", "bc" },
+        { "vbb", "qwe", "vbb" },
+        { "xzzs", "xz", "s" },
+        { "tttrt", "rrt", "" }
     };
 
     int error_amount = 0;

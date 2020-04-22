@@ -6,8 +6,8 @@
 
 size_t my_strspn(const char *str1, const char *str2)
 {
-    size_t len1 = wcslen(str1);
-    size_t len2 = wcslen(str2);
+    size_t len1 = strlen(str1);
+    size_t len2 = strlen(str2);
 
     size_t i, j;
     int flag;
@@ -33,8 +33,8 @@ size_t my_strspn(const char *str1, const char *str2)
 
 size_t my_strcspn(const char *str1, const char *str2)
 {
-    size_t len1 = wcslen(str1);
-    size_t len2 = wcslen(str2);
+    size_t len1 = strlen(str1);
+    size_t len2 = strlen(str2);
 
     size_t i, j;
     int flag;
@@ -60,7 +60,7 @@ size_t my_strcspn(const char *str1, const char *str2)
 
 int split_str(const input_str_t str, word_array_t word_array, size_t *size)
 {
-    size_t str_len = wcslen(str);
+    size_t str_len = strlen(str);
     size_t word_len;
     size_t str_i = 0;
     size_t word_i = 0;
@@ -81,7 +81,7 @@ int split_str(const input_str_t str, word_array_t word_array, size_t *size)
             break;
         }
 
-        wcsncpy(word_array[word_i], str + str_i, word_len);
+        strncpy(word_array[word_i], str + str_i, word_len);
         word_array[word_i][word_len] = '\0';
         str_i += word_len;
         word_i++;
@@ -96,7 +96,7 @@ int split_str(const input_str_t str, word_array_t word_array, size_t *size)
 
 void word_assign(word_t dest, const word_t src)
 {
-    size_t len = wcslen(src);
+    size_t len = strlen(src);
     for (size_t i = 0; i < len; i++)
         dest[i] = src[i];
     dest[len] = '\0';
@@ -113,7 +113,7 @@ void swap_word(word_t word1, word_t word2)
 void remove_repititions(word_t word)
 {
     word_t mask;
-    size_t len = wcslen(word);
+    size_t len = strlen(word);
 
     for (size_t i = 0; i < len; i++)
         mask[i] = 1;
