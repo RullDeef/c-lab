@@ -13,7 +13,7 @@ int input_str(input_str_t str)
     while (1)
     {
         char c = str[i] = (char)getchar();
-        if (c == '\n' || c == '\0')
+        if (c == '\n' || c == '\0' || c == EOF)
         {
             if (i == 0)
                 result = EXIT_FAILURE;

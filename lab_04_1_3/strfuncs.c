@@ -88,7 +88,7 @@ int split_str(const input_str_t str, word_array_t word_array, size_t *size)
     }
 
     *size = word_i;
-    if (*size == 0)
+    if (*size <= 1)
         result = EXIT_FAILURE;
 
     return result;

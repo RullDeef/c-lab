@@ -1,3 +1,4 @@
+#define __USE_MINGW_ANSI_STDIO 1
 #include <stdio.h>
 #include <string.h>
 
@@ -19,14 +20,14 @@ int main(void)
         { "vbb", "qwe", "vbb" },
         { "xzzs", "xz", "s" },
         { "tttrt", "rrt", "" }
-    };
+        };
 
     int error_amount = 0;
 
     for (size_t i = 0; i < TESTS_AMOUNT; i++)
     {
         int failed = test_pass_fail(tests_data[i]);
-        printf("running test #%d: %s\n", i + 1, failed ? "failed" : "passed");
+        printf("running test #%zu: %s\n", i + 1, failed ? "failed" : "passed");
         error_amount += failed;
     }
 
