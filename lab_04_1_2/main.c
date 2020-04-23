@@ -31,6 +31,24 @@ int input_str(input_str_t str)
     return result;
 }
 
+void remove_repititions(word_array_t word_array, size_t *size)
+{
+    for (size_t i = 0; i + 1 < *size; i++)
+    {
+        for (size_t j = i + 1; j < *size; j++)
+        {
+            if (strcmp(word_array[i], word_array[j]) == 0)
+            {
+                for (size_t k = j + 1; k < *size; k++)
+                    word_assign(word_array[k - 1], word_array[k]);
+                --j;
+                --*size;
+                continue;
+            }
+        }
+    }
+}
+
 void sort_lex(word_array_t word_array, const size_t size)
 {
     for (size_t i = 0; i + 1 < size; i++)
@@ -60,6 +78,7 @@ int main(void)
     {
         if ((result = split_str(str, word_array, &size)) == EXIT_SUCCESS)
         {
+            remove_repititions(word_array, &size);
             sort_lex(word_array, size);
             output(word_array, size);
         }

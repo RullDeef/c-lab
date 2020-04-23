@@ -52,7 +52,7 @@ int main(void)
     {
         if ((result = split_str(str, word_array, &size)) == EXIT_SUCCESS)
         {
-            size--;
+            remove_same_as_last(word_array, &size);
             for (size_t i = 0; i < size; i++)
                 remove_repititions(word_array[i]);
             

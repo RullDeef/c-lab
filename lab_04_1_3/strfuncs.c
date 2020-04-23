@@ -110,6 +110,23 @@ void swap_word(word_t word1, word_t word2)
     word_assign(word2, temp);
 }
 
+void remove_same_as_last(word_array_t word_array, size_t *size)
+{
+    word_t last_word;
+    word_assign(last_word, word_array[--*size]);
+
+    for (size_t i = 0; i < *size; i++)
+    {
+        if (strcmp(word_array[i], last_word) == 0)
+        {
+            for (size_t j = i + 1; j < *size; j++)
+                word_assign(word_array[j - 1], word_array[j]);
+            --*size;
+            --i;
+        }
+    }
+}
+
 void remove_repititions(word_t word)
 {
     word_t mask;
