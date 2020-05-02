@@ -113,13 +113,21 @@ void delete_array_element(array_t array, size_t *size, size_t i)
     *size -= 1;
 }
 
+bool is_divisiable(int a, int b)
+{
+    int base = b;
+    while (base < a)
+        base += b;
+    return base == a || a == 0;
+}
+
 void remove_every_2nd_num(array_t array, size_t *size, const int num_to_remove)
 {
     bool is_2nd = false;
 
     for (size_t i = 0; i < *size; i++)
     {
-        if (array[i] == num_to_remove)
+        if (is_divisiable(array[i], num_to_remove))
         {
             if (is_2nd)
             {
