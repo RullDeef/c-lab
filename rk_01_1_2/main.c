@@ -90,7 +90,7 @@ location_t get_location(const size_t size, const size_t diag_index, const size_t
     size_t diag_number = size - 1 - col + row;
     location_t location;
 
-    if (diag_number < diag_index)
+    if (diag_number > diag_index)
         location = UPPER;
     
     else if (diag_number == diag_index)
@@ -102,8 +102,9 @@ location_t get_location(const size_t size, const size_t diag_index, const size_t
     return location;
 }
 
-int get_sum_in_location(matrix_t matrix, const size_t size, const size_t diag_index, location_t loc)
+int get_sum_in_location(matrix_t matrix, const size_t size, const size_t diag_index, location_t _loc)
 {
+    location_t loc;
     int sum = 0;
 
     for (size_t row = 0; row < size; row++)
@@ -112,7 +113,7 @@ int get_sum_in_location(matrix_t matrix, const size_t size, const size_t diag_in
         {
             loc = get_location(size, diag_index, row, col);
 
-            if (col == LOWER)
+            if (loc == _loc)
                 sum += matrix[row][col];
         }
     }
