@@ -1,0 +1,72 @@
+cd testenv/
+rm -f *.exe *.gcov *.gcda *.gcno
+
+cd ../
+gcc -std=c99 -pedantic -Wall -Wvla -Werror -Wfloat-equal -Wfloat-conversion -O0 --coverage -o testenv/main.exe *.c
+
+cd testenv/
+
+# special case tests for command line arguments
+echo
+echo "  [Special test cases]"
+
+echo
+echo "    [shared]"
+
+actual=$(main.exe)
+if [ "$actual" = "" ]; then
+  echo "Empty arg list test:      passed"
+else
+  echo "Empty arg list test:      failed"
+fi
+
+actual=$(main.exe p file.bin)
+if [ "$actual" = "" ]; then
+  echo "Empty file print test:    passed"
+else
+  echo "Empty file print test:    failed"
+fi
+
+# end of special test cases
+
+echo
+echo "  [Functional test cases]"
+
+# tests counters
+declare -i total=$(ls -1q in_*.bin | wc -l)
+declare -i passed=0
+
+for ((i=1;i<=total;i++)); do
+  # gather expected and actual strings
+  expected=$(cat out_${i}.txt)
+  actual=$(main.exe p in_${i}.bin)
+
+  # call sort also
+  main.exe s in_${i}.bin
+
+  if [ "$expected" = "$actual" ]; then
+    passed=$(( passed + 1 ))
+    echo "Test #${i}: Passed."
+  else
+    echo "Test #${i}: Failed."
+  fi
+done
+
+echo
+echo "Tests: ${total} total, ${passed} passed, $(( total - passed )) failed."
+
+echo
+echo "Gathering code coverage info..."
+
+cd ../
+
+declare -i percentage=0
+declare -i amount=$(ls -1q *.c | wc -l)
+for f in *.c; do
+  percentage_i=`gcov $f | grep -E -o "[0-9]+" | head -1`
+  percentage=$(( percentage + percentage_i / amount ))
+done
+echo "Code executed: ${percentage}%"
+
+# clean up everything except *.c.gcov
+rm -f testenv/main.exe *.gcno *.gcda
