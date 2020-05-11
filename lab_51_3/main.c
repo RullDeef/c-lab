@@ -171,7 +171,7 @@ status_code_t print_file(const char *fname)
     number_t number;
     status_code_t status_code = exit_success;
 
-    FILE *file = fopen(fname, "r+b");
+    FILE *file = fopen(fname, "rb");
 
     if (file == NULL)
         status_code = invalid_file_name;

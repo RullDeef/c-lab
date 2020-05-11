@@ -14,10 +14,31 @@ echo
 echo "    [shared]"
 
 actual=$(main.exe)
-if [ "$actual" = "" ]; then
+if [ "$actual" = "" -a $? -ne 0 ]; then
   echo "Empty arg list test:      passed"
 else
   echo "Empty arg list test:      failed"
+fi
+
+actual=$(main.exe nocmd)
+if [ "$actual" = "" -a $? -ne 0 ]; then
+  echo "Unknown cmd test:         passed"
+else
+  echo "Unknown cmd test:         failed"
+fi
+
+actual=$(main.exe a nocmd huh)
+if [ "$actual" = "" -a $? -ne 0 ]; then
+  echo "Unknown cmd test #2:      passed"
+else
+  echo "Unknown cmd test #2:      failed"
+fi
+
+actual=$(main.exe in_1.bin p)
+if [ "$actual" = "" -a $? -ne 0 ]; then
+  echo "Wrong order test:         passed"
+else
+  echo "Wrond order test:         failed"
 fi
 
 actual=$(main.exe p file.bin)
@@ -43,6 +64,9 @@ for ((i=1;i<=total;i++)); do
 
   # call sort also
   main.exe s in_${i}.bin
+
+  # call create also
+  main.exe c out_4.bin 20
 
   if [ "$expected" = "$actual" ]; then
     passed=$(( passed + 1 ))

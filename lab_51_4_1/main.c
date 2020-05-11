@@ -25,7 +25,7 @@ status_code_t get_next_number(int numbers[NUM_CHUNK_LENGTH])
     // try to read and push back new number
     int readed = fscanf(stdin, "%d", &numbers[NUM_CHUNK_LENGTH - 1]);
     
-    if (readed == 1) // successfully readed 1 number from stdin
+    if (readed == 1)
         status_code = exit_success;
     else
         status_code = end_of_input;
