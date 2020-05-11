@@ -29,7 +29,6 @@ int main(int argc, char *argv[])
 
         if (file == NULL)
             status_code = file_not_found;
-        
         else
         {
             status_code = process(file, &numbers_amount);
@@ -51,7 +50,6 @@ status_code_t extract_file_name(int argc, char *argv[], char **fname)
 
     if (argc != 2)
         status_code = invalid_argc;
-
     else
         *fname = argv[1];
 
@@ -87,7 +85,6 @@ status_code_t process(FILE *file, size_t *numbers_amount)
 
     if (scan_status != EOF || first_number_readed)
         status_code = invalid_file_format;
-    
     else
     {
         rewind(file);

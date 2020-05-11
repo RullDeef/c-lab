@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-typedef int16_t number_t;
+typedef int32_t number_t;
 
 typedef enum
 {
@@ -12,7 +12,8 @@ typedef enum
     invalid_args_count,
     invalid_command,
     invalid_file_name,
-    invalid_file_format
+    invalid_file_format,
+    empty_file
 } status_code_t;
 
 typedef enum
@@ -44,11 +45,9 @@ int main(int argc, char *argv[])
             case create_file_command:
                 status_code = create_file(argv);
                 break;
-            
             case print_file_command:
                 status_code = print_file(argv[2]);
                 break;
-            
             case sort_file_command:
                 status_code = sort_file(argv[2]);
                 break;
@@ -66,7 +65,6 @@ status_code_t parse_command_type(int argc, char *argv[], command_t *command)
     {
         if (strcmp(argv[1], "c") * strcmp(argv[2], "c") * strcmp(argv[3], "c") == 0)
             *command = create_file_command;
-        
         else
             status_code = invalid_command;
     }
@@ -74,10 +72,8 @@ status_code_t parse_command_type(int argc, char *argv[], command_t *command)
     {
         if (strcmp(argv[1], "p") == 0)
             *command = print_file_command;
-        
         else if (strcmp(argv[1], "s") == 0)
             *command = sort_file_command;
-        
         else
             status_code = invalid_command;
     }
@@ -131,7 +127,7 @@ status_code_t check_file_format(FILE *file)
     actual_size = ftell(file);
     fseek(file, 0, SEEK_SET);
 
-    if (actual_size / sizeof(number_t) * sizeof(number_t) != actual_size)
+    if (actual_size / sizeof(number_t) * sizeof(number_t) != actual_size || actual_size == 0)
         status_code = invalid_file_format;
 
     return status_code;
@@ -155,7 +151,6 @@ status_code_t create_file(char *argv[])
 
             if (file == NULL)
                 status_code = invalid_file_name;
-            
             else
             {
                 for (size_t i = 0; i < size; i++)
@@ -177,11 +172,10 @@ status_code_t print_file(const char *fname)
     number_t number;
     status_code_t status_code = exit_success;
 
-    FILE *file = fopen(fname, "r+b");
+    FILE *file = fopen(fname, "rb");
 
     if (file == NULL)
         status_code = invalid_file_name;
-    
     else
     {
         status_code = check_file_format(file);
@@ -218,7 +212,6 @@ status_code_t sort_file(const char *fname)
 
     if (file == NULL)
         status_code = invalid_file_name;
-    
     else
     {
         status_code = check_file_format(file);
@@ -230,7 +223,7 @@ status_code_t sort_file(const char *fname)
 
             for (size_t i = 0; i + 1 < size; i++)
             {
-                for (size_t j =  i + 1; j < size; j++)
+                for (size_t j = i + 1; j < size; j++)
                 {
                     number_i = get_number_by_pos(file, i);
                     number_j = get_number_by_pos(file, j);
