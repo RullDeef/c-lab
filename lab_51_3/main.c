@@ -12,7 +12,8 @@ typedef enum
     invalid_args_count,
     invalid_command,
     invalid_file_name,
-    invalid_file_format
+    invalid_file_format,
+    empty_file
 } status_code_t;
 
 typedef enum
@@ -126,7 +127,7 @@ status_code_t check_file_format(FILE *file)
     actual_size = ftell(file);
     fseek(file, 0, SEEK_SET);
 
-    if (actual_size / sizeof(number_t) * sizeof(number_t) != actual_size)
+    if (actual_size / sizeof(number_t) * sizeof(number_t) != actual_size || actual_size == 0)
         status_code = invalid_file_format;
 
     return status_code;
