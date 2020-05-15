@@ -1,0 +1,96 @@
+Серия тестов для проверки работоспособности программы
+
+Формат тестов:
+TEST#n: [test desc.]
+  - [cmd line args]
+  - [files content desc.]
+  - [expected files output]
+  - [expected return value]
+
+TEST#1: empty cmd line args
+  - main.exe
+  - -
+  - -
+  - !0
+
+TEST#2: invalid args amount
+  - main.exe sb in_2.bin in_2_2.bin
+  - -
+  - -
+  - !0
+
+TEST#3: sort empty or nonexistent file
+  - main.exe sb in_3.bin
+  - in_3.bin: empty file
+  - -
+  - !0
+
+TEST#4: print out empty or nonexistent file
+  - main.exe pb in_4.bin out_4.bin "Ca"
+  - in_4.bin: empty file
+  - -
+  - !0
+
+TEST#5: sort incorrect formatted file
+  - main.exe sb in_5.bin
+  - in_5.bin: "Vasovsky" "Mark" 4 3 5 5 "Pet" "Ivan"
+  - -
+  - !0
+
+TEST#6: print incorrect formatted file
+  - main.exe pb in_6.bin out_6.bin "Ma"
+  - in_6.bin: "Vasovsky" "Mark" 4 3 5 5 "Pet" "Ivan"
+  - -
+  - !0
+
+TEST#7: sort correct file
+  - main.exe sb in_7.bin
+  - in_7.bin: "Vasovsky" "Mark" 4 3 5 5
+              "Pet" "Ivan" 2 4 5 5
+              "Vasovsky" "Anton" 2 5 3 5
+  - in_7.bin: "Pet" "Ivan" 2 4 5 5
+              "Vasovsky" "Anton" 2 5 3 5
+              "Vasovsky" "Mark" 4 3 5 5
+  - 0
+
+TEST#8: print correct file (students founded)
+  - main.exe pb in_8.bin out_8.bin "Vas"
+  - in_8.bin:  "Vasovsky" "Mark" 4 3 5 5
+               "Pet" "Ivan" 2 4 5 5
+               "Vasovsky" "Anton" 2 5 3 5
+  - out_8.bin: "Vasovsky" "Anton" 2 5 3 5
+               "Vasovsky" "Mark" 4 3 5 5
+  - 0
+
+TEST#9: print correct file (students not founded)
+  - main.exe bp in_9.bin out_9.bin "Ca"
+  - in_9.bin:  "Vasovsky" "Mark" 4 3 5 5
+               "Pet" "Ivan" 2 4 5 5
+               "Vasovsky" "Anton" 2 5 3 5
+  - out_9.bin: ""
+  - !0
+
+TEST#10: delete students with same mean
+  - main.exe db in_10.bin
+  - in_10.bin: "Vasovsky" "Mark" 4 3 5 5
+               "Pet" "Ivan" 5 4 5 3
+               "Vasovsky" "Anton" 4 5 3 5
+  - in_10.bin: "Vasovsky" "Mark" 4 3 5 5
+               "Pet" "Ivan" 5 4 5 3
+               "Vasovsky" "Anton" 4 5 3 5
+  - 0
+
+TEST#11: delete students with different mean
+  - main.exe db in_11.bin
+  - in_11.bin: "Vasovsky" "Mark" 5 4 3 5
+               "Pet" "Ivan" 2 4 3 2
+               "Vasovsky" "Anton" 2 3 3 5
+  - in_11.bin: "Vasovsky" "Mark" 5 4 3 5
+               "Vasovsky" "Anton" 2 3 3 5
+  - 0
+
+TEST#12: unknown command
+  - main.exe pb tmp.bin
+  - -
+  - -
+  - !0

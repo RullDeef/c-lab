@@ -6,54 +6,146 @@ gcc -std=c99 -pedantic -Wall -Wvla -Werror -Wfloat-equal -Wfloat-conversion -O0 
 
 cd testenv/
 
-# special case tests for command line arguments
-echo
-echo "  [Special test cases]"
-
-echo
-echo "    [shared]"
-
-actual=$(main.exe)
-if [ "$actual" = "" ]; then
-  echo "Empty arg list test:      passed"
-else
-  echo "Empty arg list test:      failed"
-fi
-
-actual=$(main.exe p file.bin)
-if [ "$actual" = "" ]; then
-  echo "Empty file print test:    passed"
-else
-  echo "Empty file print test:    failed"
-fi
-
-# end of special test cases
-
-echo
-echo "  [Functional test cases]"
-
 # tests counters
-declare -i total=$(ls -1q in_*.bin | wc -l)
+declare -i total=12
 declare -i passed=0
 
-for ((i=1;i<=total;i++)); do
-  # gather expected and actual strings
-  expected=$(cat out_${i}.txt)
-  actual=$(main.exe p in_${i}.bin)
+# TEST #1 ================================================
 
-  # call sort also
-  main.exe s in_${i}.bin
+actual=$(main.exe)
+if [ $? -ne 0 ]; then
+  printf "%-40s %s\n" "Empty arg list test" "passed"
+  passed=$((passed + 1))
+else
+  printf "%-40s %s\n" "Empty arg list test" "failed"
+fi
 
-  if [ "$expected" = "$actual" ]; then
-    passed=$(( passed + 1 ))
-    echo "Test #${i}: Passed."
-  else
-    echo "Test #${i}: Failed."
-  fi
-done
+# TEST #2 ================================================
+
+cp in_2.bin in_2.bin.cpy
+actual=$(main.exe sb in_2.bin.cpy in_2_2.bin)
+if [ $? -ne 0 ]; then
+  printf "%-40s %s\n" "Invalid args amount test" "passed"
+  passed=$((passed + 1))
+else
+  printf "%-40s %s\n" "Invalid args amount test" "failed"
+fi
+rm in_2.bin.cpy
+
+# TEST #3 ================================================
+
+actual=$(main.exe sb in_3.bin)
+if [ $? -ne 0 ]; then
+  printf "%-40s %s\n" "Sort empty or nonexistent file test" "passed"
+  passed=$((passed + 1))
+else
+  printf "%-40s %s\n" "Sort empty or nonexistent file test" "failed"
+fi
+
+# TEST #4 ================================================
+
+cp in_4.bin in_4.bin.cpy
+actual=$(main.exe pb in_4.bin.cpy out_4.bin "Ca")
+if [ $? -ne 0 ]; then
+  printf "%-40s %s\n" "Print out empty or nonexistent file test" "passed"
+  passed=$((passed + 1))
+else
+  printf "%-40s %s\n" "Print out empty or nonexistent file test" "failed"
+fi
+rm in_4.bin.cpy
+
+# TEST #5 ================================================
+
+cp in_5.bin in_5.bin.cpy
+actual=$(main.exe sb in_5.bin.cpy)
+if [ $? -ne 0 ]; then
+  printf "%-40s %s\n" "Sort incorrect formatted file test" "passed"
+  passed=$((passed + 1))
+else
+  printf "%-40s %s\n" "Sort incorrect formatted file test" "failed"
+fi
+rm in_5.bin.cpy
+
+# TEST #6 ================================================
+
+actual=$(main.exe fb in_6.bin out_6.bin "Ma")
+if [ $? -ne 0 ]; then
+  printf "%-40s %s\n" "Print incorrect formatted file test" "passed"
+  passed=$((passed + 1))
+else
+  printf "%-40s %s\n" "Print incorrect formatted file test" "failed"
+fi
+
+# TEST #7 ================================================
+
+cp in_7.bin in_7.bin.cpy
+actual=$(main.exe sb in_7.bin.cpy)
+if [ $? -eq 0 ]; then
+  printf "%-40s %s\n" "Sort correct file test" "passed"
+  passed=$((passed + 1))
+else
+  printf "%-40s %s\n" "Sort correct file test" "failed"
+fi
+rm in_7.bin.cpy
+
+# TEST #8 ================================================
+
+actual=$(main.exe fb in_8.bin out_8.bin Vas)
+if [ $? -eq 0 ]; then
+  printf "%-40s %s\n" "Print correct file test" "passed"
+  passed=$((passed + 1))
+else
+  printf "%-40s %s\n" "Print correct file test" "failed"
+fi
+
+# TEST #9 ================================================
+
+actual=$(main.exe fb in_9.bin out_9.bin Ca)
+if [ $? -eq 0 ]; then
+  printf "%-40s %s\n" "Print correct file test #2" "passed"
+  passed=$((passed + 1))
+else
+  printf "%-40s %s\n" "Print correct file test #2" "failed"
+fi
+
+# TEST #10 ===============================================
+
+cp in_10.bin in_10.bin.cpy
+actual=$(main.exe db in_10.bin.cpy)
+if [ $? -eq 0 ]; then
+  printf "%-40s %s\n" "Delete students with same mean" "passed"
+  passed=$((passed + 1))
+else
+  printf "%-40s %s\n" "Delete students with same mean" "failed"
+fi
+rm in_10.bin.cpy
+
+# TEST #11 ===============================================
+
+cp in_11.bin in_11.bin.cpy
+actual=$(main.exe db in_11.bin.cpy)
+if [ $? -eq 0 ]; then
+  printf "%-40s %s\n" "Delete students with diff mean" "passed"
+  passed=$((passed + 1))
+else
+  printf "%-40s %s\n" "Delete students with diff mean" "failed"
+fi
+rm in_11.bin.cpy
+
+# TEST #12 ===============================================
+
+actual=$(main.exe pb in_12.bin)
+if [ $? -ne 0 ]; then
+  printf "%-40s %s\n" "Unknown command test" "passed"
+  passed=$((passed + 1))
+else
+  printf "%-40s %s\n" "Unknown command test" "failed"
+fi
+
+# end of special test cases ==============================
 
 echo
-echo "Tests: ${total} total, ${passed} passed, $(( total - passed )) failed."
+echo "Tests: ${total} total, ${passed} passed, $((total - passed)) failed."
 
 echo
 echo "Gathering code coverage info..."
@@ -64,8 +156,10 @@ declare -i percentage=0
 declare -i amount=$(ls -1q *.c | wc -l)
 for f in *.c; do
   percentage_i=`gcov $f | grep -E -o "[0-9]+" | head -1`
+  printf "%-20s %s%%\n" $f $percentage_i
   percentage=$(( percentage + percentage_i / amount ))
 done
+echo
 echo "Code executed: ${percentage}%"
 
 # clean up everything except *.c.gcov
