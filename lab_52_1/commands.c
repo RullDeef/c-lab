@@ -102,7 +102,7 @@ status_code_t command_delete_func(const char *fname)
     return status_code;
 }
 
-status_code_t validate_file_size(FILE* file, size_t* size)
+status_code_t validate_file_size(FILE *file, size_t *size)
 {
     fseek(file, 0L, SEEK_END);
     *size = ftell(file);
@@ -128,16 +128,15 @@ status_code_t command_sort_func_binary(FILE *file)
         size /= sizeof(student_t);
         for (size_t i = 0; i + 1 < size; i++)
         {
-            student_read_binary(file, i, &student_i);
-            for (size_t j = i + 1; j < size; j++)
+            for (size_t j = i; j + 1 < size; j++)
             {
-                student_read_binary(file, j, &student_j);
-
+                student_read_binary(file, j, &student_i);
+                student_read_binary(file, j + 1, &student_j);
+                
                 if (student_compare((const void *)&student_i, (const void *)&student_j) > 0)
                 {
-                    student_write_binary(file, i, &student_j);
-                    student_write_binary(file, j, &student_i);
-                    //student_i = student_j;
+                    student_write_binary(file, j, &student_j);
+                    student_write_binary(file, j + 1, &student_i);
                 }
             }
         }

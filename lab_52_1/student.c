@@ -61,13 +61,13 @@ status_code_t student_write_text(FILE *file, const student_t *student)
 
 void student_read_binary(FILE *file, size_t pos, student_t *student)
 {
-    fseek(file, (long)pos * sizeof(student_t), SEEK_SET);
+    fseek(file, pos * sizeof(student_t), SEEK_SET);
     fread(student, sizeof(student_t), 1, file);
 }
 
 void student_write_binary(FILE *file, size_t pos, const student_t *student)
 {
-    fseek(file, (long)pos * sizeof(student_t), SEEK_SET);
+    fseek(file, pos * sizeof(student_t), SEEK_SET);
     fwrite(student, sizeof(student_t), 1, file);
 }
 

@@ -15,11 +15,9 @@ int main(int argc, char *argv[])
             case command_sort:
                 status_code = command_sort_func(argv[2]);
                 break;
-            
             case command_find:
                 status_code = command_find_func(argv[2], argv[3], argv[4]);
                 break;
-            
             case command_delete:
                 status_code = command_delete_func(argv[2]);
                 break;
