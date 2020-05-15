@@ -3,6 +3,7 @@
 #include "defs.h"
 #include "student.h"
 
+/*
 void remove_newline(char *str)
 {
     size_t len = strlen(str);
@@ -30,7 +31,7 @@ status_code_t student_read_text(FILE *file, student_t *student)
 
         for (size_t i = 0; i < MARKS_AMOUNT; i++)
         {
-            int res = fscanf(file, "%d", &(student->marks[i]));
+            int res = fscanf(file, "%ud", &(student->marks[i]));
             if (res == EOF || res != 1)
             {
                 status_code = invalid_file_format;
@@ -51,10 +52,23 @@ status_code_t student_write_text(FILE *file, const student_t *student)
     fprintf(file, "%s\n%s\n", student->surname, student->first_name);
 
     for (size_t i = 0; i < MARKS_AMOUNT; i++)
-        fprintf(file, " %d" + (i == 0), student->marks[i]);
+        fprintf(file, " %ud" + (i == 0), student->marks[i]);
     fprintf(file, "\n");
     
     return status_code;
+}
+*/
+
+void student_read_binary(FILE *file, size_t pos, student_t *student)
+{
+    fseek(file, (long)pos * sizeof(student_t), SEEK_SET);
+    fread(student, sizeof(student_t), 1, file);
+}
+
+void student_write_binary(FILE *file, size_t pos, const student_t *student)
+{
+    fseek(file, (long)pos * sizeof(student_t), SEEK_SET);
+    fwrite(student, sizeof(student_t), 1, file);
 }
 
 int student_compare(const void *st_1, const void *st_2)
@@ -64,6 +78,11 @@ int student_compare(const void *st_1, const void *st_2)
     if (strcmp(student_1->surname, student_2->surname) == 0)
         return strcmp(student_1->first_name, student_2->first_name);
     return strcmp(student_1->surname, student_2->surname);
+}
+
+bool student_startswith(student_t *student, const char *substr)
+{
+    return strstr(student->surname, substr) != NULL;
 }
 
 float student_mean(const student_t *student)

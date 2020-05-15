@@ -31,8 +31,9 @@ typedef enum
 
 typedef enum
 {
-    mode_text = 0,
-    mode_binary
-} mode_t;
+    mode_binary_read = 0,
+    mode_binary_write,
+    mode_binary_read_write
+} fmode_t;
 
 #endif

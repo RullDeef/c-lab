@@ -4,7 +4,7 @@
 int main(int argc, char *argv[])
 {
     command_t command;
-    mode_t mode;
+    fmode_t mode;
     status_code_t status_code = exit_success;
 
     status_code = parse_command(argc, argv, &command, &mode);
