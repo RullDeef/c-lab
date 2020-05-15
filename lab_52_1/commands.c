@@ -71,14 +71,6 @@ FILE *fopen_with_mode(const char *fname, fmode_t mode)
 
     switch (mode)
     {
-        /*
-        case mode_text:
-            file = fopen(fname, "r+t");
-            break;
-        case mode_binary:
-            file = fopen(fname, "r+b");
-            break;
-        */
         case mode_binary_read:
             file = fopen(fname, "rb");
             break;
@@ -98,26 +90,10 @@ status_code_t command_sort_func(const fmode_t mode, const char *fname)
     FILE *file;
     status_code_t status_code = exit_success;
 
-    file = fopen_with_mode(fname, mode);
+    file = fopen_with_mode(fname, mode_binary_read_write);
 
-    if (file == NULL)
-        status_code = invalid_file_name;
-    else
-    {
-        /*
-        switch (mode)
-        {
-            case mode_text:
-                status_code = command_sort_func_text(file);
-                break;
-            case mode_binary:
-                status_code = command_sort_func_binary(file);
-                break;
-        }
-        */
-        status_code = command_sort_func_binary(file);
-        fclose(file);
-    }
+    status_code = command_sort_func_binary(file);
+    fclose(file);
 
     return status_code;
 }
@@ -140,25 +116,8 @@ status_code_t command_find_func(const fmode_t mode, const char *fin_name, const 
         {
             file_out = fopen_with_mode(fout_name, mode_binary_write);
 
-            if (file_out == NULL)
-                status_code = invalid_file_name;
-            else
-            {
-                /*
-                switch (mode)
-                {
-                    case mode_text:
-                        command_find_func_text(file_in, file_out, substr);
-                        break;
-                    case mode_binary:
-                        command_find_func_binary(file_in, file_out, substr);
-                        break;
-                }
-                */
-                status_code = command_find_func_binary(file_in, file_out, substr);
-                fclose(file_out);
-            }
-
+            status_code = command_find_func_binary(file_in, file_out, substr);
+            fclose(file_out);
             fclose(file_in);
         }
     }
@@ -173,25 +132,8 @@ status_code_t command_delete_func(const fmode_t mode, const char *fname)
 
     file = fopen_with_mode(fname, mode);
 
-    if (file == NULL)
-        status_code = invalid_file_name;
-    else
-    {
-        /*
-        switch (mode)
-        {
-        case mode_text:
-            status_code = command_delete_func_text(file);
-            break;
-
-        case mode_binary:
-            status_code = command_delete_func_binary(file);
-            break;
-        }
-        */
-        status_code = command_delete_func_binary(file);
-        fclose(file);
-    }
+    status_code = command_delete_func_binary(file);
+    fclose(file);
 
     return status_code;
 }
