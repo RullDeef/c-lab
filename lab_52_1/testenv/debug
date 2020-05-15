@@ -7,7 +7,7 @@ gcc -std=c99 -pedantic -Wall -Wvla -Werror -Wfloat-equal -Wfloat-conversion -O0 
 cd testenv/
 
 # tests counters
-declare -i total=12
+declare -i total=17
 declare -i passed=0
 
 # TEST #1 ================================================
@@ -142,6 +142,60 @@ else
   printf "%-40s %s\n" "Unknown command test" "failed"
 fi
 
+# TEST #13 ===============================================
+
+actual=$(main.exe sb file.bin)
+if [ $? -ne 0 ]; then
+  printf "%-40s %s\n" "Sort unknown file test" "passed"
+  passed=$((passed + 1))
+else
+  printf "%-40s %s\n" "Sort unknown file test" "failed"
+fi
+rm -f file.bin
+
+# TEST #14 ===============================================
+
+actual=$(main.exe fb in_14.bin file.bin Vas)
+if [ $? -ne 0 ]; then
+  printf "%-40s %s\n" "Print unknown file #1" "passed"
+  passed=$((passed + 1))
+else
+  printf "%-40s %s\n" "Print unknown file #1" "failed"
+fi
+rm -f file.bin
+
+# TEST #15 ===============================================
+
+actual=$(main.exe fb file.bin file.bun Vas)
+if [ $? -ne 0 ]; then
+  printf "%-40s %s\n" "Print unknown file #2" "passed"
+  passed=$((passed + 1))
+else
+  printf "%-40s %s\n" "Print unknown file #2" "failed"
+fi
+
+# TEST #16 ===============================================
+
+actual=$(main.exe db file.bin)
+if [ $? -ne 0 ]; then
+  printf "%-40s %s\n" "Delete unknown file test" "passed"
+  passed=$((passed + 1))
+else
+  printf "%-40s %s\n" "Delete unknown file test" "failed"
+fi
+rm -f file.bin
+
+# TEST #17 ===============================================
+
+actual=$(main.exe fb file.bin file.bin Vas)
+if [ $? -ne 0 ]; then
+  printf "%-40s %s\n" "Print same in out files" "passed"
+  passed=$((passed + 1))
+else
+  printf "%-40s %s\n" "Print mase in out files" "failed"
+fi
+rm -f file.bin
+
 # end of special test cases ==============================
 
 echo
@@ -157,10 +211,10 @@ declare -i amount=$(ls -1q *.c | wc -l)
 for f in *.c; do
   percentage_i=`gcov $f | grep -E -o "[0-9]+" | head -1`
   printf "%-20s %s%%\n" $f $percentage_i
-  percentage=$(( percentage + percentage_i / amount ))
+  percentage=$((percentage + percentage_i))
 done
 echo
-echo "Code executed: ${percentage}%"
+echo "Code executed: $((percentage / amount))%"
 
 # clean up everything except *.c.gcov
 rm -f testenv/main.exe *.gcno *.gcda

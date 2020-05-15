@@ -84,13 +84,43 @@ TEST#11: delete students with different mean
   - main.exe db in_11.bin
   - in_11.bin: "Vasovsky" "Mark" 5 4 3 5
                "Pet" "Ivan" 2 4 3 2
-               "Vasovsky" "Anton" 2 3 3 5
+               "Vasovsky" "Anton" 5 3 3 5
   - in_11.bin: "Vasovsky" "Mark" 5 4 3 5
-               "Vasovsky" "Anton" 2 3 3 5
+               "Vasovsky" "Anton" 5 3 3 5
   - 0
 
 TEST#12: unknown command
   - main.exe pb tmp.bin
+  - -
+  - -
+  - !0
+
+TEST#13: sort unknown file
+  - main.exe sb file.bin
+  - -
+  - -
+  - !0
+
+TEST#14: print unknown file #1
+  - main.exe fb in_14.bin file.bin "Vas"
+  - in_14.bin: empty file
+  - -
+  - !0
+
+TEST#15: print unknown file #2
+  - main.exe fb file.bin file.bin "Vas"
+  - -
+  - -
+  - !0
+
+TEST#16: delete unknown file
+  - main.exe db file.bin
+  - -
+  - -
+  - !0
+
+TEST#17: print same in out files
+  - main.exe fb file.bin file.bin "Vas"
   - -
   - -
   - !0
