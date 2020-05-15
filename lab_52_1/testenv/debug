@@ -101,7 +101,7 @@ fi
 # TEST #9 ================================================
 
 actual=$(main.exe fb in_9.bin out_9.bin Ca)
-if [ $? -eq 0 ]; then
+if [ $? -ne 0 ]; then
   printf "%-40s %s\n" "Print correct file test #2" "passed"
   passed=$((passed + 1))
 else

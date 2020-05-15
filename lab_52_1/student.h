@@ -22,8 +22,6 @@ typedef struct
     mark_t marks[MARKS_AMOUNT];
 } student_t;
 
-// status_code_t student_read_text(FILE *file, student_t *student);
-// status_code_t student_write_text(FILE *file, const student_t *student);
 void student_read_binary(FILE *file, size_t pos, student_t *student);
 void student_write_binary(FILE *file, size_t pos, const student_t *student);
 int student_compare(const void *st_1, const void *st_2);
