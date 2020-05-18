@@ -11,7 +11,7 @@ int input_str(char *str)
 
     while (1)
     {
-        char c = str[i] = (char)getchar();
+        char c = str[i] = getchar();
         if (c == '\n' || c == '\0' || c == EOF)
         {
             if (i == 0)
