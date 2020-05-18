@@ -3,62 +3,6 @@
 #include "defs.h"
 #include "student.h"
 
-/*
-void remove_newline(char *str)
-{
-    size_t len = strlen(str);
-    if (str[len - 1] == '\n')
-        str[len - 1] = '\0';
-}
-
-status_code_t student_read_text(FILE *file, student_t *student)
-{
-    char marks_buffer[MAX_MARKS_LINE_LENGTH];
-    status_code_t status_code = exit_success;
-
-    if (fgets(student->surname, MAX_SURNAME_LENGTH, file) != student->surname)
-        status_code = end_of_file;
-    else if (fgets(student->first_name, MAX_FIRST_NAME_LENGTH, file) != student->first_name)
-        status_code = invalid_file_format;
-    else if (strlen(student->surname) > MAX_SURNAME_LENGTH)
-        status_code = too_long_surname;
-    else if (strlen(student->first_name) > MAX_FIRST_NAME_LENGTH)
-        status_code = too_long_first_name;
-    else
-    {
-        remove_newline(student->surname);
-        remove_newline(student->first_name);
-
-        for (size_t i = 0; i < MARKS_AMOUNT; i++)
-        {
-            int res = fscanf(file, "%ud", &(student->marks[i]));
-            if (res == EOF || res != 1)
-            {
-                status_code = invalid_file_format;
-                break;
-            }
-        }
-
-        fgets(marks_buffer, MAX_MARKS_LINE_LENGTH, file);
-    }
-
-    return status_code;
-}
-
-status_code_t student_write_text(FILE *file, const student_t *student)
-{
-    status_code_t status_code = exit_success;
-
-    fprintf(file, "%s\n%s\n", student->surname, student->first_name);
-
-    for (size_t i = 0; i < MARKS_AMOUNT; i++)
-        fprintf(file, " %ud" + (i == 0), student->marks[i]);
-    fprintf(file, "\n");
-    
-    return status_code;
-}
-*/
-
 void student_read_binary(FILE *file, size_t pos, student_t *student)
 {
     fseek(file, pos * sizeof(student_t), SEEK_SET);

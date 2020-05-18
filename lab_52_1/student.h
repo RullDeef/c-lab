@@ -5,15 +5,11 @@
 #include <stdbool.h>
 #include "defs.h"
 
-#define MAX_SURNAME_LENGTH (25 + 3)
-#define MAX_FIRST_NAME_LENGTH (10 + 2)
-#define MAX_MARKS_LINE_LENGTH 255
+#define MAX_SURNAME_LENGTH (25 + 1)
+#define MAX_FIRST_NAME_LENGTH (10 + 1)
+#define MARKS_AMOUNT 4
 
 typedef uint32_t mark_t;
-
-#define MARKS_AMOUNT 4
-#define MIN_MARK 2
-#define MAX_MARK 5
 
 typedef struct
 {
