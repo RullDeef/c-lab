@@ -7,202 +7,94 @@ gcc -std=c99 -pedantic -Wall -Wvla -Werror -Wfloat-equal -Wfloat-conversion -O0 
 cd testenv/
 
 # tests counters
-declare -i total=17
+declare -i total=0
 declare -i passed=0
 
-# TEST #1 ================================================
+# test function
+# functest "test name" "cmd line" "expect result status"
+function functest {
+  total=$((total + 1))
+  actual=$($2)
+  result=$?
+  if [ "$3" = "0" -a $result -eq 0 ] || [ "$3" != "0" -a $result -ne 0 ]
+  then
+    printf "%2d: %-40s %s\n" $total "$1" "passed"
+    passed=$((passed + 1))
+  else
+    printf "%2d: %-40s %s\n" $total "$1" "failed"
+  fi
+}
 
-actual=$(main.exe)
-if [ $? -ne 0 ]; then
-  printf "%-40s %s\n" "Empty arg list test" "passed"
-  passed=$((passed + 1))
-else
-  printf "%-40s %s\n" "Empty arg list test" "failed"
-fi
+# TEST #1 ================================================
+functest "Empty arg list" "main.exe" !0
 
 # TEST #2 ================================================
-
 cp in_2.bin in_2.bin.cpy
-actual=$(main.exe sb in_2.bin.cpy in_2_2.bin)
-if [ $? -ne 0 ]; then
-  printf "%-40s %s\n" "Invalid args amount test" "passed"
-  passed=$((passed + 1))
-else
-  printf "%-40s %s\n" "Invalid args amount test" "failed"
-fi
+functest "Invalid args amount" "main.exe sb in_2.bin.cpy in_2_2.bin" !0
 rm in_2.bin.cpy
 
 # TEST #3 ================================================
-
-actual=$(main.exe sb in_3.bin)
-if [ $? -ne 0 ]; then
-  printf "%-40s %s\n" "Sort empty or nonexistent file test" "passed"
-  passed=$((passed + 1))
-else
-  printf "%-40s %s\n" "Sort empty or nonexistent file test" "failed"
-fi
+functest "Sort empty or nonexistent file" "main.exe sb in_3.bin" !0
 
 # TEST #4 ================================================
-
 cp in_4.bin in_4.bin.cpy
-actual=$(main.exe pb in_4.bin.cpy out_4.bin "Ca")
-if [ $? -ne 0 ]; then
-  printf "%-40s %s\n" "Print out empty or nonexistent file test" "passed"
-  passed=$((passed + 1))
-else
-  printf "%-40s %s\n" "Print out empty or nonexistent file test" "failed"
-fi
+functest "Print out empty or nonexistent file" "main.exe pb in_4.bin.cpy out_4.bin \"Ca\"" !0
 rm in_4.bin.cpy
 
 # TEST #5 ================================================
-
 cp in_5.bin in_5.bin.cpy
-actual=$(main.exe sb in_5.bin.cpy)
-if [ $? -ne 0 ]; then
-  printf "%-40s %s\n" "Sort incorrect formatted file test" "passed"
-  passed=$((passed + 1))
-else
-  printf "%-40s %s\n" "Sort incorrect formatted file test" "failed"
-fi
+functest "Sort incorrect formatted file" "main.exe sb in_5.bin.cpy" !0
 rm in_5.bin.cpy
 
 # TEST #6 ================================================
-
-actual=$(main.exe fb in_6.bin out_6.bin "Ma")
-if [ $? -ne 0 ]; then
-  printf "%-40s %s\n" "Print incorrect formatted file test" "passed"
-  passed=$((passed + 1))
-else
-  printf "%-40s %s\n" "Print incorrect formatted file test" "failed"
-fi
+functest "Print incorrect formatted file" "main.exe fb in_6.bin out_6.bin \"Ma\"" !0
 
 # TEST #7 ================================================
-
 cp in_7.bin in_7.bin.cpy
-actual=$(main.exe sb in_7.bin.cpy)
-if [ $? -eq 0 ]; then
-  printf "%-40s %s\n" "Sort correct file test" "passed"
-  passed=$((passed + 1))
-else
-  printf "%-40s %s\n" "Sort correct file test" "failed"
-fi
+functest "Sort correct file" "main.exe sb in_7.bin.cpy" 0
 rm in_7.bin.cpy
 
 # TEST #8 ================================================
-
-actual=$(main.exe fb in_8.bin out_8.bin Vas)
-if [ $? -eq 0 ]; then
-  printf "%-40s %s\n" "Print correct file test" "passed"
-  passed=$((passed + 1))
-else
-  printf "%-40s %s\n" "Print correct file test" "failed"
-fi
+functest "Print correct file #1" "main.exe fb in_8.bin out_8.bin Vas" 0
 
 # TEST #9 ================================================
-
-actual=$(main.exe fb in_9.bin out_9.bin Ca)
-if [ $? -ne 0 ]; then
-  printf "%-40s %s\n" "Print correct file test #2" "passed"
-  passed=$((passed + 1))
-else
-  printf "%-40s %s\n" "Print correct file test #2" "failed"
-fi
+functest "Print correct file #2" "main.exe fb in_9.bin out_9.bin Ca" !0
 
 # TEST #10 ===============================================
-
 cp in_10.bin in_10.bin.cpy
-actual=$(main.exe db in_10.bin.cpy)
-if [ $? -eq 0 ]; then
-  printf "%-40s %s\n" "Delete students with same mean" "passed"
-  passed=$((passed + 1))
-else
-  printf "%-40s %s\n" "Delete students with same mean" "failed"
-fi
+functest "Delete students with same mean" "main.exe db in_10.bin.cpy" 0
 rm in_10.bin.cpy
 
 # TEST #11 ===============================================
-
 cp in_11.bin in_11.bin.cpy
-actual=$(main.exe db in_11.bin.cpy)
-if [ $? -eq 0 ]; then
-  printf "%-40s %s\n" "Delete students with diff mean" "passed"
-  passed=$((passed + 1))
-else
-  printf "%-40s %s\n" "Delete students with diff mean" "failed"
-fi
+functest "Delete students with diff mean" "main.exe db in_11.bin.cpy" 0
 rm in_11.bin.cpy
 
 # TEST #12 ===============================================
-
-actual=$(main.exe pb in_12.bin)
-if [ $? -ne 0 ]; then
-  printf "%-40s %s\n" "Unknown command test" "passed"
-  passed=$((passed + 1))
-else
-  printf "%-40s %s\n" "Unknown command test" "failed"
-fi
+functest "Unknown command" "main.exe pb in_12.bin" !0
 
 # TEST #13 ===============================================
-
-actual=$(main.exe sb file.bin)
-if [ $? -ne 0 ]; then
-  printf "%-40s %s\n" "Sort unknown file test" "passed"
-  passed=$((passed + 1))
-else
-  printf "%-40s %s\n" "Sort unknown file test" "failed"
-fi
+functest "Sort unknown file" "main.exe sb file.bin" !0
 rm -f file.bin
 
 # TEST #14 ===============================================
-
-actual=$(main.exe fb in_14.bin file.bin Vas)
-if [ $? -ne 0 ]; then
-  printf "%-40s %s\n" "Print unknown file #1" "passed"
-  passed=$((passed + 1))
-else
-  printf "%-40s %s\n" "Print unknown file #1" "failed"
-fi
-rm -f file.bin
+functest "Print unknown file #1" "main.exe fb in_14.bin file?.bin Vas" !0
 
 # TEST #15 ===============================================
-
-actual=$(main.exe fb file.bin file.bun Vas)
-if [ $? -ne 0 ]; then
-  printf "%-40s %s\n" "Print unknown file #2" "passed"
-  passed=$((passed + 1))
-else
-  printf "%-40s %s\n" "Print unknown file #2" "failed"
-fi
+functest "Print unknown file #2" "main.exe fb file.bin file.bun Vas" !0
 
 # TEST #16 ===============================================
-
-actual=$(main.exe db file.bin)
-if [ $? -ne 0 ]; then
-  printf "%-40s %s\n" "Delete unknown file test" "passed"
-  passed=$((passed + 1))
-else
-  printf "%-40s %s\n" "Delete unknown file test" "failed"
-fi
+functest "Delete unknown file" "main.exe db file.bin" !0
 rm -f file.bin
 
 # TEST #17 ===============================================
-
-actual=$(main.exe fb file.bin file.bin Vas)
-if [ $? -ne 0 ]; then
-  printf "%-40s %s\n" "Print same in out files" "passed"
-  passed=$((passed + 1))
-else
-  printf "%-40s %s\n" "Print mase in out files" "failed"
-fi
+functest "Print same in out files" "main.exe fb file.bin file.bin Vas" !0
 rm -f file.bin
 
 # end of special test cases ==============================
-
-echo
-echo "Tests: ${total} total, ${passed} passed, $((total - passed)) failed."
-
-echo
-echo "Gathering code coverage info..."
+failed=$((total - passed))
+printf "\nTests: %d total, %d passed, %d failed\n\n" $total $passed $failed
+printf "  Gathering code coverage info...\n\n"
 
 cd ../
 

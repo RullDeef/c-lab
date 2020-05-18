@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdbool.h>
 #include "defs.h"
 #include "student.h"
 #include "commands.h"
@@ -126,17 +127,20 @@ status_code_t command_sort_func_binary(FILE *file)
     if (status_code == exit_success)
     {
         size /= sizeof(student_t);
-        for (size_t i = 0; i + 1 < size; i++)
+        bool swapped = true;
+        while (swapped)
         {
-            for (size_t j = i; j + 1 < size; j++)
+            swapped = false;
+            for (size_t i = 0, j = 1; j < size; i++, j++)
             {
-                student_read_binary(file, j, &student_i);
-                student_read_binary(file, j + 1, &student_j);
+                student_read_binary(file, i, &student_i);
+                student_read_binary(file, j, &student_j);
                 
                 if (student_compare((const void *)&student_i, (const void *)&student_j) > 0)
                 {
-                    student_write_binary(file, j, &student_j);
-                    student_write_binary(file, j + 1, &student_i);
+                    student_write_binary(file, i, &student_j);
+                    student_write_binary(file, j, &student_i);
+                    swapped = true;
                 }
             }
         }

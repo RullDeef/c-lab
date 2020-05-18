@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
                 break;
         }
     }
-    else // to be sure we return 53 on any unrecognized command line arguments
+    else 
         status_code = invalid_command_line_args;
 
     return status_code;
