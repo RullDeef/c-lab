@@ -10,7 +10,6 @@ typedef enum
     invalid_file_format,
     end_of_file,
     same_input_output_file,
-    same_students,
     no_students_found,
     invalid_command_line_args = 53
 } status_code_t;
