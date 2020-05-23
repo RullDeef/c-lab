@@ -8,7 +8,9 @@
 #define INPUT_FILE_NAME "in.txt"
 #define OUTPUT_FILE_NAME "out.txt"
 
-#define MAX_CITY_NAME_LENGTH (100 + 1)
+#define MAX_CITY_NAME_LENGTH (100 + 3)
+#define MAX_YEAR_LENGTH (4 + 3)
+#define MAX_POPULATION_LENGTH (10 + 3)
 
 typedef enum
 {
@@ -28,16 +30,16 @@ typedef struct
 {
     char name[MAX_CITY_NAME_LENGTH];
     int year;
-    size_t population;
+    long long population;
 } city_t;
 
 status_code_t open_files(FILE **fin, FILE **fout);
 status_code_t process(FILE *fin, FILE *fout);
 status_code_t close_files(FILE *fin, FILE *fout);
 
-status_code_t get_population_of_longest_city(FILE *fin, size_t *population);
-status_code_t get_average_population(FILE *fin, size_t *population);
-status_code_t write_difference(FILE *fout, size_t population_1, size_t population_2);
+status_code_t get_population_of_longest_city(FILE *fin, long long *population);
+status_code_t get_average_population(FILE *fin, long long *population);
+status_code_t write_difference(FILE *fout, long long population_1, long long population_2);
 
 status_code_t read_next_city(FILE *fin, city_t *city);
 bool city_is_longer(city_t city_1, city_t city_2);
@@ -75,8 +77,8 @@ status_code_t open_files(FILE **fin, FILE **fout)
 
 status_code_t process(FILE *fin, FILE *fout)
 {
-    size_t longest_city_population;
-    size_t average_population;
+    long long longest_city_population;
+    long long average_population;
     status_code_t status_code = EXIT_GOOD;
 
     status_code = get_population_of_longest_city(fin, &longest_city_population);
@@ -98,7 +100,7 @@ status_code_t close_files(FILE *fin, FILE *fout)
         fclose(fout);
 }
 
-status_code_t get_population_of_longest_city(FILE *fin, size_t *population)
+status_code_t get_population_of_longest_city(FILE *fin, long long *population)
 {
     city_t current_city;
     city_t longest_city;
@@ -107,7 +109,7 @@ status_code_t get_population_of_longest_city(FILE *fin, size_t *population)
     status_code_t status_code = EXIT_GOOD;
 
     fseek(fin, 0L, SEEK_SET);
-    *population = 0;
+    *population = 0L;
 
     while ((status_code = read_next_city(fin, &current_city)) == EXIT_GOOD)
     {
@@ -125,44 +127,48 @@ status_code_t get_population_of_longest_city(FILE *fin, size_t *population)
 
     if (!any_city_readed)
         status_code = NO_CITIES_READED;
+    
+    else if (status_code == END_OF_FILE)
+        status_code = EXIT_GOOD;
 
     return status_code;
 }
 
-status_code_t get_average_population(FILE *fin, size_t *population)
+status_code_t get_average_population(FILE *fin, long long *population)
 {
     city_t city;
     size_t cities_amount = 0;
+    long double precise_population = 0.0;
     status_code_t status_code = EXIT_GOOD;
 
     fseek(fin, 0L, SEEK_SET);
-    *population = 0;
 
     while ((status_code = read_next_city(fin, &city)) == EXIT_GOOD)
     {
-        *population = (*population * cities_amount + city.population) / (cities_amount + 1);
+        precise_population += (long double)city.population;
         cities_amount++;
     }
 
     if (cities_amount == 0)
         status_code = NO_CITIES_READED;
 
+    else if (status_code == END_OF_FILE)
+        status_code = EXIT_GOOD;
+
+    *population = precise_population / cities_amount;
     return status_code;
 }
 
-status_code_t write_difference(FILE *fout, size_t population_1, size_t population_2)
+status_code_t write_difference(FILE *fout, long long population_1, long long population_2)
 {
-    size_t diff = population_1 - population_2;
-    int wroted = fprintf(fout, "%zu", diff);
+    long long diff = population_1 - population_2;
+    int wroted = fprintf(fout, "%lld", diff);
 
     if (wroted != 1)
         return UNABLE_TO_WRITE_OUTPUT;
     
     return EXIT_GOOD;
 }
-
-#define MAX_YEAR_LENGTH 7
-#define MAX_POPULATION_LENGTH 10
 
 status_code_t read_next_city(FILE *fin, city_t *city)
 {
@@ -180,7 +186,7 @@ status_code_t read_next_city(FILE *fin, city_t *city)
             city->year = atoi(year_str);
             res = fgets(population_str, MAX_POPULATION_LENGTH, fin);
             if (res != NULL)
-                city->population = atoi(population_str);
+                city->population = atoll(population_str);
             else
                 status_code = UNABLE_TO_READ_CITY_POPULATION;
         }
@@ -188,7 +194,7 @@ status_code_t read_next_city(FILE *fin, city_t *city)
             status_code = UNABLE_TO_READ_CITY_YEAR;
     }
     else
-        status_code = UNABLE_TO_READ_CITY_NAME;
+        status_code = END_OF_FILE;
 
     return status_code;
 }
