@@ -1,0 +1,34 @@
+    По передаваемым аргументам:
+
+  Общие:
+1. main.exe
+2. main.exe nocmd
+3. main.exe a unknowncmd
+4. main.exe wrong.order p
+
+  На создание файла:
+5. main.exe c
+6. main.exe c a.bin
+7. main.exe a.bin c -3
+8. main.exe c wtf a.bin
+9. main.exe c a.bin 10
+
+  На вывод содержания файла:
+10. main.exe p
+11. main.exe a.bin p
+12. main.exe p wtf
+13. main.exe p a.bin too much
+14. main.exe p a.bin
+
+  На сортировку файла:
+15. main.exe s
+16. main.exe a.bin s
+17. main.exe s wtf
+18. main.exe s a.bin too much
+19. main.exe s a.bin
+
+    По содержанию файла:
+20-22. (c,p,s) Файл не существует
+23-25. (c,p,s) Файл существует, но он пуст
+26-27. (p,s) Файл существует, размер не кратен размеру числа
+28-29. (p,s) Файл существует, размер кратен размеру числа
