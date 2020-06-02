@@ -1,0 +1,112 @@
+cd testenv/
+rm -f *.exe *.gcov *.gcda *.gcno
+
+cd ../
+gcc -std=c99 -pedantic -Wall -Wvla -Werror -Wfloat-equal -Wfloat-conversion -O0 --coverage -o testenv/main.exe *.c
+
+cd testenv/
+
+# tests counters
+declare -i total=0
+declare -i passed=0
+
+# test function
+# functest "test name" "cmd line" "expect result status"
+function functest {
+  total=$((total + 1))
+  actual=$($2)
+  result=$?
+  if [ "$3" = "0" -a $result -eq 0 ] || [ "$3" != "0" -a $result -ne 0 ]
+  then
+    printf "%2d: %-40s %s\n" $total "$1" "passed"
+    passed=$((passed + 1))
+  else
+    printf "%2d: %-40s %s\n" $total "$1" "failed"
+  fi
+}
+
+# TEST #1 ================================================
+functest "Empty arg list" "main.exe" !0
+
+# TEST #2 ================================================
+cp in_2.bin in_2.bin.cpy
+functest "Invalid args amount" "main.exe sb in_2.bin.cpy in_2_2.bin" !0
+rm in_2.bin.cpy
+
+# TEST #3 ================================================
+functest "Sort empty or nonexistent file" "main.exe sb in_3.bin" !0
+
+# TEST #4 ================================================
+cp in_4.bin in_4.bin.cpy
+functest "Print out empty or nonexistent file" "main.exe pb in_4.bin.cpy out_4.bin \"Ca\"" !0
+rm in_4.bin.cpy
+
+# TEST #5 ================================================
+cp in_5.bin in_5.bin.cpy
+functest "Sort incorrect formatted file" "main.exe sb in_5.bin.cpy" !0
+rm in_5.bin.cpy
+
+# TEST #6 ================================================
+functest "Print incorrect formatted file" "main.exe fb in_6.bin out_6.bin \"Ma\"" !0
+
+# TEST #7 ================================================
+cp in_7.bin in_7.bin.cpy
+functest "Sort correct file" "main.exe sb in_7.bin.cpy" 0
+rm in_7.bin.cpy
+
+# TEST #8 ================================================
+functest "Print correct file #1" "main.exe fb in_8.bin out_8.bin Vas" 0
+
+# TEST #9 ================================================
+functest "Print correct file #2" "main.exe fb in_9.bin out_9.bin Ca" !0
+
+# TEST #10 ===============================================
+cp in_10.bin in_10.bin.cpy
+functest "Delete students with same mean" "main.exe db in_10.bin.cpy" 0
+rm in_10.bin.cpy
+
+# TEST #11 ===============================================
+cp in_11.bin in_11.bin.cpy
+functest "Delete students with diff mean" "main.exe db in_11.bin.cpy" 0
+rm in_11.bin.cpy
+
+# TEST #12 ===============================================
+functest "Unknown command" "main.exe pb in_12.bin" !0
+
+# TEST #13 ===============================================
+functest "Sort unknown file" "main.exe sb file.bin" !0
+rm -f file.bin
+
+# TEST #14 ===============================================
+functest "Print unknown file #1" "main.exe fb in_14.bin file?.bin Vas" !0
+
+# TEST #15 ===============================================
+functest "Print unknown file #2" "main.exe fb file.bin file.bun Vas" !0
+
+# TEST #16 ===============================================
+functest "Delete unknown file" "main.exe db file.bin" !0
+rm -f file.bin
+
+# TEST #17 ===============================================
+functest "Print same in out files" "main.exe fb file.bin file.bin Vas" !0
+rm -f file.bin
+
+# end of special test cases ==============================
+failed=$((total - passed))
+printf "\nTests: %d total, %d passed, %d failed\n\n" $total $passed $failed
+printf "  Gathering code coverage info...\n\n"
+
+cd ../
+
+declare -i percentage=0
+declare -i amount=$(ls -1q *.c | wc -l)
+for f in *.c; do
+  percentage_i=`gcov $f | grep -E -o "[0-9]+" | head -1`
+  printf "%-20s %s%%\n" $f $percentage_i
+  percentage=$((percentage + percentage_i))
+done
+echo
+echo "Code executed: $((percentage / amount))%"
+
+# clean up everything except *.c.gcov
+rm -f testenv/main.exe *.gcno *.gcda
