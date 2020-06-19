@@ -13,6 +13,9 @@ status_code_t loc_sort_products(FILE *file_in, FILE *file_out);
 void loc_sort_products_array(product_t products_array[], size_t size);
 status_code_t loc_write_products_array(FILE *file, product_t products_array[], size_t size);
 
+bool ends_with(char *str, char *substr);
+status_code_t loc_find_products(FILE *file_in, char *substr);
+
 status_code_t sort_products(char *filename_in, char *filename_out)
 {
     assert(filename_in != NULL && filename_out != NULL);
@@ -35,6 +38,23 @@ status_code_t sort_products(char *filename_in, char *filename_out)
             fclose(file_out);
         }
 
+        fclose(file_in);
+    }
+
+    return status_code;
+}
+
+status_code_t find_products(char *filename_in, char *substr)
+{
+    FILE *file_in;
+    status_code_t status_code;
+
+    file_in = fopen(filename_in, "r");
+    if (file_in == NULL)
+        status_code = cant_open_input_file;
+    else
+    {
+        status_code = loc_find_products(file_in, substr);
         fclose(file_in);
     }
 
@@ -113,6 +133,40 @@ status_code_t loc_write_products_array(FILE *file, product_t products_array[], s
         status_code = product_write(file, &products_array[i]);
         if (status_code != exit_success)
             break;
+    }
+
+    return status_code;
+}
+
+bool ends_with(char *str, char *substr)
+{
+    if (strcmp(str, substr) == 0)
+        return true;
+    else if (strlen(str) > strlen(substr))
+    {
+        int offset = strlen(str) - strlen(substr);
+        if (strcmp(str + offset, substr) == 0)
+            return true;
+        return false;
+    }
+    
+    return false;
+}
+
+status_code_t loc_find_products(FILE *file_in, char *substr)
+{
+    product_t products_array[MAX_PRODUCT_ARRAY_SIZE];
+    size_t size;
+    status_code_t status_code;
+
+    status_code = loc_read_products_array(file_in, products_array, &size);
+    if (status_code == exit_success)
+    {
+        for (size_t i = 0; i < size; i++)
+        {
+            if (ends_with(products_array[i].name, substr))
+                product_write(stdout, &products_array[i]);
+        }
     }
 
     return status_code;

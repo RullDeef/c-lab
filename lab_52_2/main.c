@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
                 status_code = sort_products(argv[2], argv[3]);
                 break;
             case operation_find:
+                status_code = find_products(argv[2], argv[3]);
                 break;
             case operation_insert:
                 break;
@@ -46,6 +47,8 @@ bool is_args_supported(int argc, char *argv[])
     if (argc == 4)
     {
         if (strcmp(argv[1], "st") == 0)
+            return true;
+        else if (strcmp(argv[1], "ft") == 0)
             return true;
     }
     
