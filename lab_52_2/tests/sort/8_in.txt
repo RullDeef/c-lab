@@ -1,0 +1,80 @@
+this is prod 1
+manufacture 1
+10000000
+800
+this is prod 2
+manufacture 2
+20000000
+12000
+this is prod 3
+manufacture 3
+20000000
+12000
+this is prod 4
+manufacture 4
+30000000
+2500
+this is prod 5
+manufacture 5
+10000000
+2500
+this is prod 6
+manufacture 6
+20000000
+2500
+this is prod 7
+manufacture 7
+10000000
+800
+this is prod 8
+manufacture 8
+30000000
+12000
+this is prod 9
+manufacture 9
+20000000
+12000
+this is prod 10
+manufacture 10
+10000000
+2500
+this is prod 11
+manufacture 11
+20000000
+800
+this is prod 12
+manufacture 12
+30000000
+2500
+this is prod 13
+manufacture 13
+20000000
+12000
+this is prod 14
+manufacture 14
+10000000
+12000
+this is prod 15
+manufacture 15
+20000000
+2500
+this is prod 16
+manufacture 16
+10000000
+12000
+this is prod 17
+manufacture 17
+20000000
+12000
+this is prod 18
+manufacture 18
+10000000
+12000
+this is prod 19
+manufacture 19
+30000000
+800
+this is prod 20
+manufacture 20
+20000000
+2500
