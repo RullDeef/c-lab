@@ -13,6 +13,7 @@ typedef enum
     cant_write_product,
     cant_open_input_file,
     cant_open_output_file,
+    cant_find_products,
     unsupported_args = 53
 } status_code_t;
 

@@ -159,15 +159,23 @@ status_code_t loc_find_products(FILE *file_in, char *substr)
     size_t size;
     status_code_t status_code;
 
+    bool was_printed = false;
+
     status_code = loc_read_products_array(file_in, products_array, &size);
     if (status_code == exit_success)
     {
         for (size_t i = 0; i < size; i++)
         {
             if (ends_with(products_array[i].name, substr))
+            {
                 product_write(stdout, &products_array[i]);
+                was_printed = true;
+            }
         }
     }
+
+    if (!was_printed)
+        status_code = cant_find_products;
 
     return status_code;
 }
