@@ -27,13 +27,10 @@ int main(int argc, char *argv[])
             case operation_sort:
                 status_code = sort_products(argv[2], argv[3]);
                 break;
-            
             case operation_find:
                 break;
-            
             case operation_insert:
                 break;
-            
             default:
                 assert(false);
                 status_code = exit_failure;

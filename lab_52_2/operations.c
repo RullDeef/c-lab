@@ -8,10 +8,10 @@
 
 #define MAX_PRODUCT_ARRAY_SIZE 100
 
-status_code_t _read_products_array(FILE *file, product_t products_array[], size_t *size);
-status_code_t _sort_products(FILE *file_in, FILE *file_out);
-void _sort_products_array(product_t products_array[], size_t size);
-status_code_t _write_products_array(FILE *file, product_t products_array[], size_t size);
+status_code_t loc_read_products_array(FILE *file, product_t products_array[], size_t *size);
+status_code_t loc_sort_products(FILE *file_in, FILE *file_out);
+void loc_sort_products_array(product_t products_array[], size_t size);
+status_code_t loc_write_products_array(FILE *file, product_t products_array[], size_t size);
 
 status_code_t sort_products(char *filename_in, char *filename_out)
 {
@@ -31,7 +31,7 @@ status_code_t sort_products(char *filename_in, char *filename_out)
             status_code = cant_open_output_file;
         else
         {
-            status_code = _sort_products(file_in, file_out);
+            status_code = loc_sort_products(file_in, file_out);
             fclose(file_out);
         }
 
@@ -41,7 +41,7 @@ status_code_t sort_products(char *filename_in, char *filename_out)
     return status_code;
 }
 
-status_code_t _read_products_array(FILE *file, product_t products_array[], size_t *size)
+status_code_t loc_read_products_array(FILE *file, product_t products_array[], size_t *size)
 {
     status_code_t status_code = exit_success;
     *size = 0;
@@ -72,7 +72,7 @@ status_code_t _read_products_array(FILE *file, product_t products_array[], size_
     return status_code;
 }
 
-status_code_t _sort_products(FILE *file_in, FILE *file_out)
+status_code_t loc_sort_products(FILE *file_in, FILE *file_out)
 {
     assert(file_in != NULL && file_out != NULL);
 
@@ -80,17 +80,17 @@ status_code_t _sort_products(FILE *file_in, FILE *file_out)
     size_t size;
     status_code_t status_code;
 
-    status_code = _read_products_array(file_in, products_array, &size);
+    status_code = loc_read_products_array(file_in, products_array, &size);
     if (status_code == exit_success)
     {
-        _sort_products_array(products_array, size);
-        status_code = _write_products_array(file_out, products_array, size);
+        loc_sort_products_array(products_array, size);
+        status_code = loc_write_products_array(file_out, products_array, size);
     } 
 
     return status_code;
 }
 
-void _sort_products_array(product_t products_array[], size_t size)
+void loc_sort_products_array(product_t products_array[], size_t size)
 {
     bool was_swap = true;
 
@@ -109,7 +109,7 @@ void _sort_products_array(product_t products_array[], size_t size)
     }
 }
 
-status_code_t _write_products_array(FILE *file, product_t products_array[], size_t size)
+status_code_t loc_write_products_array(FILE *file, product_t products_array[], size_t size)
 {
     status_code_t status_code = exit_success;
 

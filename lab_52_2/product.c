@@ -5,7 +5,7 @@
 #include "product.h"
 #include "operations.h"
 
-status_code_t read_line(char* dest, size_t size, FILE *file)
+status_code_t read_line(char *dest, size_t size, FILE *file)
 {
     assert(dest != NULL && file != NULL);
 
@@ -29,7 +29,7 @@ status_code_t product_read(FILE *file, product_t *product)
     {
         status_code = end_of_file;
     }
-    else if(((status_code = read_line(product->mfr, MAX_MFR_SIZE, file)) != exit_success
+    else if (((status_code = read_line(product->mfr, MAX_MFR_SIZE, file)) != exit_success
         || fscanf(file, "%" SCNu32 "\n%" SCNu32 "\n", &product->price, &product->amount) != 2))
     {
         status_code = cant_read_product;

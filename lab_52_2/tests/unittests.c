@@ -4,7 +4,7 @@
 
 #define TEMP_FILENAME "./tests/.temp"
 
-int testcase_product_read(const char* file_content, status_code_t expected_status, product_t *expected_product);
+int testcase_product_read(const char *file_content, status_code_t expected_status, product_t *expected_product);
 int test_product_read();
 
 int main(void)
@@ -16,7 +16,7 @@ int main(void)
     return failed_count;
 }
 
-int testcase_product_read(const char* file_content, status_code_t expected_status, product_t *expected_product)
+int testcase_product_read(const char *file_content, status_code_t expected_status, product_t *expected_product)
 {
     FILE *temp_file;
 
@@ -58,6 +58,7 @@ int testcase_product_read(const char* file_content, status_code_t expected_statu
 
 int test_product_read()
 {
+    product_t expected_product;
     int failed_count = 0;
 
     failed_count += testcase_product_read("", end_of_file, NULL);
@@ -65,9 +66,8 @@ int test_product_read()
     failed_count += testcase_product_read("name\nmanfr\n", cant_read_product, NULL);
     failed_count += testcase_product_read("name\nmanfr\n100\n", cant_read_product, NULL);
 
-    failed_count += testcase_product_read("name\nmanfr\n100\n20\n", exit_success, &(product_t) {
-        .name = "name", .mfr = "manfr", .price = 100, .amount = 20
-    });
+    expected_product = { .name = "name", .mfr = "manfr", .price = 100, .amount = 20 };
+    failed_count += testcase_product_read("name\nmanfr\n100\n20\n", exit_success, &expected_product);
 
     return failed_count;
 }
