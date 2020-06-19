@@ -16,6 +16,9 @@ status_code_t loc_write_products_array(FILE *file, product_t products_array[], s
 bool ends_with(char *str, char *substr);
 status_code_t loc_find_products(FILE *file_in, char *substr);
 
+void loc_insert_product_in_array(product_t products_array[], size_t size, product_t *new_product);
+status_code_t loc_insert_product(FILE *file);
+
 status_code_t sort_products(char *filename_in, char *filename_out)
 {
     assert(filename_in != NULL && filename_out != NULL);
@@ -56,6 +59,23 @@ status_code_t find_products(char *filename_in, char *substr)
     {
         status_code = loc_find_products(file_in, substr);
         fclose(file_in);
+    }
+
+    return status_code;
+}
+
+status_code_t insert_product(char *filename)
+{
+    FILE *file;
+    status_code_t status_code;
+
+    file = fopen(filename, "rw+");
+    if (file == NULL)
+        status_code = cant_open_input_file;
+    else
+    {
+        status_code = loc_insert_product(file);
+        fclose(file);
     }
 
     return status_code;
@@ -176,6 +196,40 @@ status_code_t loc_find_products(FILE *file_in, char *substr)
 
     if (!was_printed)
         status_code = cant_find_products;
+
+    return status_code;
+}
+
+void loc_insert_product_in_array(product_t products_array[], size_t size, product_t *new_product)
+{
+    while (size > 0 && product_ordered(new_product, &products_array[size - 1]))
+    {
+        products_array[size] = products_array[size - 1];
+        size--;
+    }
+
+    products_array[size] = *new_product;
+}
+
+status_code_t loc_insert_product(FILE *file)
+{
+    product_t products_array[MAX_PRODUCT_ARRAY_SIZE];
+    size_t size;
+    product_t new_product;
+    status_code_t status_code;
+
+    
+    status_code = loc_read_products_array(file, products_array, &size);
+    if (status_code == exit_success)
+    {
+        status_code = product_read(stdin, &new_product);
+        if (status_code == exit_success)
+        {
+            loc_insert_product_in_array(products_array, size, &new_product);
+            rewind(file);
+            loc_write_products_array(file, products_array, size + 1);
+        }
+    }
 
     return status_code;
 }

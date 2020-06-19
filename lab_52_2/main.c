@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
                 status_code = find_products(argv[2], argv[3]);
                 break;
             case operation_insert:
+                status_code = insert_product(argv[2]);
                 break;
             default:
                 assert(false);
@@ -49,6 +50,11 @@ bool is_args_supported(int argc, char *argv[])
         if (strcmp(argv[1], "st") == 0)
             return true;
         else if (strcmp(argv[1], "ft") == 0)
+            return true;
+    }
+    else if (argc == 3)
+    {
+        if (strcmp(argv[1], "at") == 0)
             return true;
     }
     
