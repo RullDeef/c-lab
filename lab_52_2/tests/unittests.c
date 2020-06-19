@@ -66,8 +66,14 @@ int test_product_read()
     failed_count += testcase_product_read("name\nmanfr\n", cant_read_product, NULL);
     failed_count += testcase_product_read("name\nmanfr\n100\n", cant_read_product, NULL);
 
-    expected_product = { .name = "name", .mfr = "manfr", .price = 100, .amount = 20 };
+    expected_product = (product_t) { .name = "name", .mfr = "manfr", .price = 100, .amount = 20 };
     failed_count += testcase_product_read("name\nmanfr\n100\n20\n", exit_success, &expected_product);
+
+    expected_product = (product_t) { .name = "this name is too long to read!", .mfr = "manfr", .price = 100, .amount = 20 };
+    failed_count += testcase_product_read("this name is too long to read!\nmanfr\n100\n20\n", exit_success, &expected_product);
+
+    expected_product = (product_t) { .name = "name", .mfr = "heavyManufacture", .price = 100, .amount = 20 };
+    failed_count += testcase_product_read("name\nheavyManufacture\n100\n20\n", exit_success, &expected_product);
 
     return failed_count;
 }

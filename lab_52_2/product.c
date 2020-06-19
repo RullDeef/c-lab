@@ -5,16 +5,22 @@
 #include "product.h"
 #include "operations.h"
 
+#define MAX_TEMP_STR_SIZE (MAX_NAME_SIZE + 2)
+
 status_code_t read_line(char *dest, size_t size, FILE *file)
 {
     assert(dest != NULL && file != NULL);
 
-    if (fgets(dest, size, file) != dest)
+    char temp[MAX_TEMP_STR_SIZE];
+
+    if (fgets(temp, MAX_TEMP_STR_SIZE, file) != temp)
         return cant_read_line;
     
     // Remove newline chars from the end
-    while (strlen(dest) > 0 && (dest[strlen(dest) - 1] == '\n' || dest[strlen(dest) - 1] == '\r'))
-        dest[strlen(dest) - 1] = '\0';
+    while (strlen(temp) > 0 && (temp[strlen(temp) - 1] == '\n' || temp[strlen(temp) - 1] == '\r'))
+        temp[strlen(temp) - 1] = '\0';
+    
+    strcpy(dest, temp);
 
     return exit_success;
 }
