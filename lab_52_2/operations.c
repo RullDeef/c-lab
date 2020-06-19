@@ -92,18 +92,13 @@ status_code_t loc_sort_products(FILE *file_in, FILE *file_out)
 
 void loc_sort_products_array(product_t products_array[], size_t size)
 {
-    bool was_swap = true;
-
-    while (was_swap)
+    for (size_t j = 0; j < size; j++)
     {
-        was_swap = false;
-
         for (size_t i = 0; i + 1 < size; i++)
         {
             if (!product_ordered(&products_array[i], &products_array[i + 1]))
             {
                 product_swap(&products_array[i], &products_array[i + 1]);
-                was_swap = true;
             }
         }
     }
