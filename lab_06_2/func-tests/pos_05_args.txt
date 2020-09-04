@@ -1,0 +1,1 @@
+./func-tests/pos_05_in.txt kirk
