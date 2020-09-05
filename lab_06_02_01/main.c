@@ -129,7 +129,7 @@ void filter_array(item_t *items, size_t *items_count, const char *prefix)
 bool has_invalid_items(item_t *items, size_t items_count)
 {
     for (int i = 0; i < items_count; i++)
-        if (items[i].volume == 0.0f)
+        if (items[i].mass <= 0.0f || items[i].volume <= 0.0f)
             return true;
     return false;
 }
