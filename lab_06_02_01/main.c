@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 #define MAX_ITEM_NAME_SIZE 26
 #define MAX_ITEMS_AMOUNT 128
@@ -15,7 +16,10 @@ typedef enum
     CANT_READ_ITEMS,
     CANT_PROCESS_ITEMS,
     MAX_ITEMS_AMOUT_REACHED,
+    MAX_ITEM_NAME_SIZE_REACHED,
+    INVALID_ITEM_NAME,
     INVALID_ITEM_VOLUME,
+    INVALID_ITEM,
     END_OF_FILE_REACHED
 } status_code_t;
 
@@ -34,8 +38,9 @@ status_code_t read_cmdline_args(int argc, const char **argv, const char **filena
 
     *filename = argv[1];
     *prefix = argc >= 3 ? argv[2] : NULL;
-    if (*prefix != NULL && (strchr(*prefix, '>') != NULL || strchr(*prefix, '<') != NULL))
-        *prefix = NULL;
+
+    // if (*prefix != NULL && (strchr(*prefix, '>') != NULL || strchr(*prefix, '<') != NULL))
+    //    *prefix = NULL;
 
     return SUCCESS;
 }
@@ -43,17 +48,18 @@ status_code_t read_cmdline_args(int argc, const char **argv, const char **filena
 status_code_t read_next_item_file(FILE *file, item_t *item)
 {
     if (fgets(item->name, MAX_ITEM_NAME_SIZE, file) != item->name)
-        return feof(file) ? END_OF_FILE_REACHED : FAILURE;
-    
+        return feof(file) ? END_OF_FILE_REACHED : MAX_ITEM_NAME_SIZE_REACHED;
+
     // truncate '\n' & '\r' symbols
-    while (item->name[strlen(item->name) - 1] == '\n' || item->name[strlen(item->name) - 1] == '\r')
+    while (strlen(item->name) != 0 && (item->name[strlen(item->name) - 1] == '\n' || item->name[strlen(item->name) - 1] == '\r'))
         item->name[strlen(item->name) - 1] = '\0';
+    
+    // if (strlen(item->name) == 0)
+    //    return INVALID_ITEM_NAME;
 
     int scanned = fscanf(file, "%f %f ", &item->mass, &item->volume);
     if (scanned == 2)
         return SUCCESS;
-    else if (scanned == EOF)
-        return END_OF_FILE_REACHED;
     else
         return FAILURE;
 }
@@ -99,14 +105,6 @@ void swap(item_t *item_1, item_t *item_2)
 
 status_code_t sort_array(item_t *items, size_t items_count)
 {
-    for (size_t i = 0; i < items_count; i++)
-    {
-        if (items[i].volume == 0.0f)
-            return INVALID_ITEM_VOLUME;
-        
-        items[i].density = items[i].mass / items[i].volume;
-    }
-
     for (size_t i = 1; i < items_count; i++)
         for (size_t j = i - 1; j >= 0 && (items[j].density > items[j + 1].density); j--)
             swap(&items[j], &items[j + 1]);
@@ -128,8 +126,27 @@ void filter_array(item_t *items, size_t *items_count, const char *prefix)
             pop_item(items, items_count, i--);
 }
 
-status_code_t process_items(item_t *items, size_t* items_count, const char *prefix)
+bool has_invalid_items(item_t *items, size_t items_count)
 {
+    for (int i = 0; i < items_count; i++)
+        if (items[i].volume == 0.0f)
+            return true;
+    return false;
+}
+
+void calculate_density(item_t *items, size_t items_count)
+{
+    for (size_t i = 0; i < items_count; i++)
+        items[i].density = items[i].mass / items[i].volume;
+}
+
+status_code_t process_items(item_t *items, size_t *items_count, const char *prefix)
+{
+    if (has_invalid_items(items, *items_count))
+        return INVALID_ITEM;
+    
+    calculate_density(items, *items_count);
+
     if (prefix == NULL)
         return sort_array(items, *items_count);
     
