@@ -83,14 +83,21 @@ void swap(item_t *item_1, item_t *item_2)
     *item_2 = temp;
 }
 
-void sort_array(item_t *items, size_t items_count)
+int sort_array(item_t *items, size_t items_count)
 {
     for (size_t i = 0; i < items_count; i++)
+    {
+        if (items[i].volume == 0.0f)
+            return -1;
+        
         items[i].density = items[i].mass / items[i].volume;
+    }
 
     for (size_t i = 1; i < items_count; i++)
         for (size_t j = i - 1; j >= 0 && (items[j].density > items[j + 1].density); j--)
             swap(&items[j], &items[j + 1]);
+    
+    return 0;
 }
 
 void pop_item(item_t *items, size_t *items_count, size_t index)
@@ -107,15 +114,15 @@ void filter_array(item_t *items, size_t *items_count, const char *prefix)
             pop_item(items, items_count, i--);
 }
 
-void process_items(item_t *items, size_t* items_count, const char *prefix)
+int process_items(item_t *items, size_t* items_count, const char *prefix)
 {
     if (prefix == NULL)
-    {
-        // printf("prefix is null!\n");
-        sort_array(items, *items_count);
-    }
+        return sort_array(items, *items_count);
+    
     else if (strcmp(prefix, ALL_PREFIX) != 0)
         filter_array(items, items_count, prefix);
+    
+    return 0;
 }
 
 void print_array(item_t *items, size_t items_count)
@@ -134,15 +141,12 @@ int main(int argc, const char **argv)
     if (read_cmdline_args(argc, argv, &filename, &prefix))
         return -1;
 
-    int e;
-    if ((e = read_items(filename, items, &items_count)))
-    {
-        printf("read items error %d!", e);
+    if (read_items(filename, items, &items_count))
         return -2;
-    }
-
-    process_items(items, &items_count, prefix);
+    
+    if (process_items(items, &items_count, prefix))
+        return -3;
+    
     print_array(items, items_count);
-
     return 0;
 }
