@@ -5,6 +5,20 @@
 #define MAX_ITEMS_AMOUNT 128
 #define ALL_PREFIX "ALL"
 
+typedef enum
+{
+    SUCCESS,
+    FAILURE,
+    TOO_FEW_ARGS,
+    INVALID_ARGS,
+    CANT_OPEN_FILE,
+    CANT_READ_ITEMS,
+    CANT_PROCESS_ITEMS,
+    MAX_ITEMS_AMOUT_REACHED,
+    INVALID_ITEM_VOLUME,
+    END_OF_FILE_REACHED
+} status_code_t;
+
 typedef struct
 {
     char name[MAX_ITEM_NAME_SIZE];
@@ -13,23 +27,23 @@ typedef struct
     float density;
 } item_t;
 
-int read_cmdline_args(int argc, const char **argv, const char **filename, const char **prefix)
+status_code_t read_cmdline_args(int argc, const char **argv, const char **filename, const char **prefix)
 {
     if (argc == 1)
-        return 1;
+        return TOO_FEW_ARGS;
 
     *filename = argv[1];
     *prefix = argc >= 3 ? argv[2] : NULL;
     if (*prefix != NULL && (strchr(*prefix, '>') != NULL || strchr(*prefix, '<') != NULL))
         *prefix = NULL;
 
-    return 0;
+    return SUCCESS;
 }
 
-int read_next_item_file(FILE *file, item_t *item)
+status_code_t read_next_item_file(FILE *file, item_t *item)
 {
     if (fgets(item->name, MAX_ITEM_NAME_SIZE, file) != item->name)
-        return feof(file) ? 1 : -1;
+        return feof(file) ? END_OF_FILE_REACHED : FAILURE;
     
     // truncate '\n' & '\r' symbols
     while (item->name[strlen(item->name) - 1] == '\n' || item->name[strlen(item->name) - 1] == '\r')
@@ -37,40 +51,40 @@ int read_next_item_file(FILE *file, item_t *item)
 
     int scanned = fscanf(file, "%f %f ", &item->mass, &item->volume);
     if (scanned == 2)
-        return 0;
+        return SUCCESS;
     else if (scanned == EOF)
-        return 1;
+        return END_OF_FILE_REACHED;
     else
-        return -1;
+        return FAILURE;
 }
 
-int read_items_file(FILE *file, item_t *items, size_t *items_count)
+status_code_t read_items_file(FILE *file, item_t *items, size_t *items_count)
 {
     *items_count = 0;
-    int result = 0;
+    status_code_t result = SUCCESS;
 
     while (*items_count < MAX_ITEMS_AMOUNT && (result = read_next_item_file(file, &items[*items_count])) == 0)
         (*items_count)++;
 
     if (*items_count == MAX_ITEMS_AMOUNT)
-        return -1;
+        return MAX_ITEMS_AMOUT_REACHED;
 
-    if (result != 1)
-        return -2;
+    if (result != END_OF_FILE_REACHED)
+        return FAILURE;
     
-    return 0;
+    return SUCCESS;
 }
 
-int read_items(const char *filename, item_t *items, size_t *items_count)
+status_code_t read_items(const char *filename, item_t *items, size_t *items_count)
 {
     FILE *file = fopen(filename, "rt");
-    int result = 0;
+    status_code_t result = SUCCESS;
 
     if (!file)
-        return -1;
+        return CANT_OPEN_FILE;
 
     if (read_items_file(file, items, items_count))
-        result = -2;
+        result = CANT_READ_ITEMS;
 
     fclose(file);
     return result;
@@ -83,12 +97,12 @@ void swap(item_t *item_1, item_t *item_2)
     *item_2 = temp;
 }
 
-int sort_array(item_t *items, size_t items_count)
+status_code_t sort_array(item_t *items, size_t items_count)
 {
     for (size_t i = 0; i < items_count; i++)
     {
         if (items[i].volume == 0.0f)
-            return -1;
+            return INVALID_ITEM_VOLUME;
         
         items[i].density = items[i].mass / items[i].volume;
     }
@@ -97,7 +111,7 @@ int sort_array(item_t *items, size_t items_count)
         for (size_t j = i - 1; j >= 0 && (items[j].density > items[j + 1].density); j--)
             swap(&items[j], &items[j + 1]);
     
-    return 0;
+    return SUCCESS;
 }
 
 void pop_item(item_t *items, size_t *items_count, size_t index)
@@ -114,7 +128,7 @@ void filter_array(item_t *items, size_t *items_count, const char *prefix)
             pop_item(items, items_count, i--);
 }
 
-int process_items(item_t *items, size_t* items_count, const char *prefix)
+status_code_t process_items(item_t *items, size_t* items_count, const char *prefix)
 {
     if (prefix == NULL)
         return sort_array(items, *items_count);
@@ -122,7 +136,7 @@ int process_items(item_t *items, size_t* items_count, const char *prefix)
     else if (strcmp(prefix, ALL_PREFIX) != 0)
         filter_array(items, items_count, prefix);
     
-    return 0;
+    return SUCCESS;
 }
 
 void print_array(item_t *items, size_t items_count)
@@ -139,14 +153,14 @@ int main(int argc, const char **argv)
     size_t items_count;
 
     if (read_cmdline_args(argc, argv, &filename, &prefix))
-        return -1;
+        return INVALID_ARGS;
 
     if (read_items(filename, items, &items_count))
-        return -2;
+        return CANT_READ_ITEMS;
     
     if (process_items(items, &items_count, prefix))
-        return -3;
+        return CANT_PROCESS_ITEMS;
     
     print_array(items, items_count);
-    return 0;
+    return SUCCESS;
 }
