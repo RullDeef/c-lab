@@ -76,8 +76,6 @@ echo "Negative tests: ${total_neg} total, ${passed_neg} passed, $(( total_neg - 
 echo
 echo "Gathering code coverage info..."
 
-cd ./src
-
 declare -i percentage=0
 declare -i amount=$(ls -1q ./**.c | wc -l)
 for f in ./**.c; do
@@ -92,6 +90,6 @@ rm -f *.gcno *.gcda
 # move *.c.gcov files to appropriate folder
 for f in $(ls ./**gcov)
 do
-  mkdir --parents ../func-tests/gcov/$(dirname $f)
-  mv $f ../func-tests/gcov/$(basename $f)
+  mkdir --parents ./func-tests/gcov/$(dirname $f)
+  mv $f ./func-tests/gcov/$(basename $f)
 done
