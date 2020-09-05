@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #define MAX_ITEM_NAME_SIZE 26
 #define MAX_ITEMS_AMOUNT 128
@@ -45,23 +46,39 @@ status_code_t read_cmdline_args(int argc, const char **argv, const char **filena
     return SUCCESS;
 }
 
-status_code_t read_next_item_file(FILE *file, item_t *item)
+status_code_t read_next_str(FILE *file, char *str, int size)
 {
-    if (fgets(item->name, MAX_ITEM_NAME_SIZE, file) != item->name)
-        return feof(file) ? END_OF_FILE_REACHED : MAX_ITEM_NAME_SIZE_REACHED;
+    if (fgets(str, size, file) != str)
+        return feof(file) ? END_OF_FILE_REACHED : FAILURE;
 
     // truncate '\n' & '\r' symbols
-    while (strlen(item->name) != 0 && (item->name[strlen(item->name) - 1] == '\n' || item->name[strlen(item->name) - 1] == '\r'))
-        item->name[strlen(item->name) - 1] = '\0';
-    
-    // if (strlen(item->name) == 0)
-    //    return INVALID_ITEM_NAME;
+    while (strlen(str) != 0 && (str[strlen(str) - 1] == '\n' || str[strlen(str) - 1] == '\r'))
+        str[strlen(str) - 1] = '\0';
 
-    int scanned = fscanf(file, "%f %f ", &item->mass, &item->volume);
-    if (scanned == 2)
-        return SUCCESS;
-    else
+    return strlen(str) == 0 ? FAILURE : SUCCESS;
+}
+
+status_code_t read_next_float(FILE *file, float *number)
+{
+    char str[256];
+    if (fgets(str, 256, file) != str)
+        return feof(file) ? END_OF_FILE_REACHED : FAILURE;
+    
+    char *ptr = NULL;
+    *number = strtof(str, &ptr);
+    return ptr == NULL ? FAILURE : SUCCESS;
+}
+
+status_code_t read_next_item_file(FILE *file, item_t *item)
+{
+    status_code_t result;
+    if ((result = read_next_str(file, item->name, MAX_ITEM_NAME_SIZE)) != SUCCESS)
+        return result;
+
+    if (read_next_float(file, &item->mass) || read_next_float(file, &item->volume))
         return FAILURE;
+
+    return SUCCESS;
 }
 
 status_code_t read_items_file(FILE *file, item_t *items, size_t *items_count)
