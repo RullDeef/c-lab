@@ -87,7 +87,7 @@ status_code_t read_next_item_file(FILE *file, item_t *item)
             if (feof(file))
                 result = END_OF_FILE_REACHED;
         }
-        
+
         return result;
     }
 
@@ -118,24 +118,6 @@ status_code_t read_items_file(FILE *file, item_t *items, size_t *items_count)
         items[*items_count] = temp_item;
         (*items_count)++;
     }
-
-    /*
-    while (*items_count < MAX_ITEMS_AMOUNT && (result = read_next_item_file(file, &items[*items_count])) == 0)
-        (*items_count)++;
-
-    if (*items_count == MAX_ITEMS_AMOUNT)
-    {
-        // if file has more data
-        item_t temp_item;
-        if (read_next_item_file(file, &temp_item) != END_OF_FILE_REACHED)
-            return MAX_ITEMS_AMOUT_REACHED;
-    }
-
-    if (result != END_OF_FILE_REACHED)
-        return FAILURE;
-    
-    return SUCCESS;
-    */
 }
 
 status_code_t read_items(const char *filename, item_t *items, size_t *items_count)
@@ -176,11 +158,13 @@ void pop_item(item_t *items, size_t *items_count, size_t index)
     (*items_count)--;
 }
 
-void filter_array(item_t *items, size_t *items_count, const char *prefix)
+status_code_t filter_array(item_t *items, size_t *items_count, const char *prefix)
 {
     for (size_t i = 0; i < *items_count; i++)
         if (strstr(items[i].name, prefix) != items[i].name)
             pop_item(items, items_count, i--);
+    
+    return *items_count > 0 ? SUCCESS : FAILURE;
 }
 
 bool has_invalid_items(item_t *items, size_t items_count)
@@ -208,9 +192,10 @@ status_code_t process_items(item_t *items, size_t *items_count, const char *pref
         return sort_array(items, *items_count);
     
     else if (strcmp(prefix, ALL_PREFIX) != 0)
-        filter_array(items, items_count, prefix);
+        return filter_array(items, items_count, prefix);
     
-    return SUCCESS;
+    else
+        return SUCCESS;
 }
 
 void print_array(item_t *items, size_t items_count)

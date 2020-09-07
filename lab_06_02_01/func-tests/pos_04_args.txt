@@ -1,1 +1,1 @@
-./func-tests/pos_05_in.txt arpk
+./func-tests/pos_04_in.txt kirk

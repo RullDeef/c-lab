@@ -1,1 +1,0 @@
-./func-tests/pos_06_in.txt kirp
