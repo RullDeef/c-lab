@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #define MAX_ITEM_NAME_SIZE 26
-#define MAX_ITEMS_AMOUNT 128
+#define MAX_ITEMS_AMOUNT 15
 #define ALL_PREFIX "ALL"
 
 typedef enum
@@ -46,15 +46,20 @@ status_code_t read_cmdline_args(int argc, const char **argv, const char **filena
     return SUCCESS;
 }
 
+/**
+ *  @return SUCCESS - была успешно считана структура целиком,
+ *          FAILURE - сбой при считывании имени или чисел,
+ *          END_OF_FILE_REACHED - файл уже прочитан полностью.
+ */
 status_code_t read_next_str(FILE *file, char *str, int size)
 {
     if (fgets(str, size, file) != str)
-        return feof(file) ? END_OF_FILE_REACHED : FAILURE;
+        return feof(file) ? FAILURE : END_OF_FILE_REACHED;
 
     // truncate '\n' & '\r' symbols
     while (strlen(str) != 0 && (str[strlen(str) - 1] == '\n' || str[strlen(str) - 1] == '\r'))
         str[strlen(str) - 1] = '\0';
-
+    
     return strlen(str) == 0 ? FAILURE : SUCCESS;
 }
 
@@ -73,7 +78,18 @@ status_code_t read_next_item_file(FILE *file, item_t *item)
 {
     status_code_t result;
     if ((result = read_next_str(file, item->name, MAX_ITEM_NAME_SIZE)) != SUCCESS)
+    {
+        if (result == FAILURE)
+        {
+            // try to detect end of file
+            char temp[256];
+            fgets(temp, 256, file);
+            if (feof(file))
+                result = END_OF_FILE_REACHED;
+        }
+        
         return result;
+    }
 
     if (read_next_float(file, &item->mass) || read_next_float(file, &item->volume))
         return FAILURE;
@@ -83,19 +99,43 @@ status_code_t read_next_item_file(FILE *file, item_t *item)
 
 status_code_t read_items_file(FILE *file, item_t *items, size_t *items_count)
 {
+    item_t temp_item;
     *items_count = 0;
     status_code_t result = SUCCESS;
 
+    while (true)
+    {
+        // try to read next item
+        result = read_next_item_file(file, &temp_item);
+
+        // if max items count is reached and there is no eof - return error code
+        if (*items_count == MAX_ITEMS_AMOUNT && result != END_OF_FILE_REACHED)
+            return MAX_ITEMS_AMOUT_REACHED;
+        else if (result == END_OF_FILE_REACHED)
+            return SUCCESS;
+
+        // assign readen item to items array
+        items[*items_count] = temp_item;
+        (*items_count)++;
+    }
+
+    /*
     while (*items_count < MAX_ITEMS_AMOUNT && (result = read_next_item_file(file, &items[*items_count])) == 0)
         (*items_count)++;
 
     if (*items_count == MAX_ITEMS_AMOUNT)
-        return MAX_ITEMS_AMOUT_REACHED;
+    {
+        // if file has more data
+        item_t temp_item;
+        if (read_next_item_file(file, &temp_item) != END_OF_FILE_REACHED)
+            return MAX_ITEMS_AMOUT_REACHED;
+    }
 
     if (result != END_OF_FILE_REACHED)
         return FAILURE;
     
     return SUCCESS;
+    */
 }
 
 status_code_t read_items(const char *filename, item_t *items, size_t *items_count)
