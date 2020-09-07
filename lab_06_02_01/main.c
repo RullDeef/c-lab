@@ -222,5 +222,5 @@ int main(int argc, const char **argv)
         return CANT_PROCESS_ITEMS;
     
     print_array(items, items_count);
-    return SUCCESS;
+    return items_count > 0 ? SUCCESS : FAILURE;
 }
