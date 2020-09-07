@@ -12,6 +12,7 @@ typedef enum
     SUCCESS,
     FAILURE,
     TOO_FEW_ARGS,
+    TOO_MANY_ARGS,
     INVALID_ARGS,
     CANT_OPEN_FILE,
     CANT_READ_ITEMS,
@@ -36,12 +37,12 @@ status_code_t read_cmdline_args(int argc, const char **argv, const char **filena
 {
     if (argc == 1)
         return TOO_FEW_ARGS;
+    
+    if (argc > 3)
+        return TOO_MANY_ARGS;
 
     *filename = argv[1];
-    *prefix = argc >= 3 ? argv[2] : NULL;
-
-    // if (*prefix != NULL && (strchr(*prefix, '>') != NULL || strchr(*prefix, '<') != NULL))
-    //    *prefix = NULL;
+    *prefix = argc == 3 ? argv[2] : NULL;
 
     return SUCCESS;
 }

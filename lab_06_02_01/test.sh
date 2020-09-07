@@ -17,7 +17,7 @@ do
   n=$(printf "%02d" ${i})
   expected=$(cat "./func-tests/pos_${n}_out.txt")
   args=$(cat "./func-tests/pos_${n}_args.txt")
-  ./bin/app.exe $args 2>.temp_${n} 1>.temp_${n}
+  ./bin/app.exe $args | cat > .temp_${n}
   status=$?
   actual=$(cat .temp_${n})
 
