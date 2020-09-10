@@ -82,7 +82,6 @@ status_code_t process_items(item_t *items, short int *items_count, const char *p
 
     if (prefix == NULL)
         sort_items_array(items, *items_count);
-
     else if (strcmp(prefix, ALL_PREFIX) != 0)
         filter_array(items, items_count, prefix);
 
