@@ -74,21 +74,24 @@ status_code_t __read_items_file(FILE *file, item_t *items, short int *items_coun
 
     *items_count = 0;
 
-    while (true)
+    while (*items_count != MAX_ITEMS_AMOUNT && result != END_OF_FILE_REACHED)
     {
         // try to read next item
         result = __read_next_item_file(file, &temp_item);
 
-        // if max items count is reached and there is no eof - return error code
-        if (*items_count == MAX_ITEMS_AMOUNT && result != END_OF_FILE_REACHED)
-            return MAX_ITEMS_AMOUT_REACHED;
-        else if (result == END_OF_FILE_REACHED)
-            return SUCCESS;
-
-        // assign readen item to items array
-        items[*items_count] = temp_item;
-        (*items_count)++;
+        if (result != END_OF_FILE_REACHED)
+        {
+            // assign readen item to items array
+            items[*items_count] = temp_item;
+            (*items_count)++;
+        }
     }
+
+    // if max items count is reached and there is no eof - return error code
+    if (*items_count == MAX_ITEMS_AMOUNT || result == END_OF_FILE_REACHED)
+        result = result == END_OF_FILE_REACHED ? SUCCESS : MAX_ITEMS_AMOUT_REACHED;
+
+    return result;
 }
 
 status_code_t read_items(const char *filename, item_t *items, short int *items_count)

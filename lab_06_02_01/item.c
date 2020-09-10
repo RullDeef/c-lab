@@ -36,7 +36,7 @@ void sort_items_array(item_t *items, short int items_count)
 {
     for (short int i = 1; i < items_count; i++)
         for (short int j = i - 1; j >= 0 && (items[j].density > items[j + 1].density); j--)
-            __swap_items(&items[j], &items[j + 1]);
+            __swap_items(items + j, items + j + 1);
 }
 
 void filter_array(item_t *items, short int *items_count, const char *prefix)
