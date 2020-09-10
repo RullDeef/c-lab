@@ -13,9 +13,9 @@
  *  @param items - выход для считываемого массива.
  *  @param items_count - размер считанного массива.
  * 
- *  @return SUCCESS - считывание произошло успешно,
- *          CANT_OPEN_FILE - невозможно открыть файл,
- *          MAX_ITEMS_AMOUT_REACHED - слишком много структур в файле.
+ *  @return success - считывание произошло успешно,
+ *          cant_open_file - невозможно открыть файл,
+ *          max_items_amount_reached - слишком много структур в файле.
  */
 status_code_t read_items(const char *filename, item_t *items, short int *items_count);
 

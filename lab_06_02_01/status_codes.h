@@ -3,20 +3,20 @@
 
 typedef enum
 {
-    SUCCESS,
-    FAILURE,
-    TOO_FEW_ARGS,
-    TOO_MANY_ARGS,
-    INVALID_ARGS,
-    CANT_OPEN_FILE,
-    CANT_READ_ITEMS,
-    CANT_PROCESS_ITEMS,
-    MAX_ITEMS_AMOUT_REACHED,
-    MAX_ITEM_NAME_SIZE_REACHED,
-    INVALID_ITEM_NAME,
-    INVALID_ITEM_VOLUME,
-    INVALID_ITEM,
-    END_OF_FILE_REACHED
+    success,
+    failure,
+    too_few_args,
+    too_many_args,
+    invalid_args,
+    cant_open_file,
+    cant_read_items,
+    cant_process_items,
+    max_items_amount_reached,
+    max_item_name_size_reached,
+    invalid_item_name,
+    invalid_item_volume,
+    invalid_item,
+    end_of_file_reached
 } status_code_t;
 
 #endif // _STATUS_CODES_H_

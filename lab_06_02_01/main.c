@@ -19,9 +19,9 @@
  *  @param filename - имя файла для чтения.
  *  @param prefix - подстрока для фильтрации.
  *  
- *  @return SUCCESS - парсинг прошёл успешно,
- *          TOO_FEW_ARGS - недостаточно аргументов командной строки,
- *          TOO_MANY_ARGS - слишком много аргументов командной строки.
+ *  @return success - парсинг прошёл успешно,
+ *          too_few_args - недостаточно аргументов командной строки,
+ *          too_many_args - слишком много аргументов командной строки.
  */
 status_code_t read_cmdline_args(int argc, const char **argv, const char **filename, const char **prefix);
 
@@ -32,9 +32,9 @@ status_code_t read_cmdline_args(int argc, const char **argv, const char **filena
  *  @param items_count - кол-во элементов массива.
  *  @param prefix - подстрока для фильтрации.
  *  
- *  @return SUCCESS - обработка завершена успешно,
- *          FAILURE - после обработки не осталось данных,
- *          INVALID_ITEM - массив содержит некорректные структуры.
+ *  @return success - обработка завершена успешно,
+ *          failure - после обработки не осталось данных,
+ *          invalid_item - массив содержит некорректные структуры.
  */
 status_code_t process_items(item_t *items, short int *items_count, const char *prefix);
 
@@ -46,24 +46,24 @@ int main(int argc, const char **argv)
     short int items_count;
 
     if (read_cmdline_args(argc, argv, &filename, &prefix))
-        return INVALID_ARGS;
+        return invalid_args;
 
     if (read_items(filename, items, &items_count))
-        return CANT_READ_ITEMS;
+        return cant_read_items;
 
     if (process_items(items, &items_count, prefix))
-        return CANT_PROCESS_ITEMS;
+        return cant_process_items;
 
     print_array(items, items_count);
-    return SUCCESS;
+    return success;
 }
 
 status_code_t read_cmdline_args(int argc, const char **argv, const char **filename, const char **prefix)
 {
-    status_code_t result = SUCCESS;
+    status_code_t result = success;
 
     if (argc == 1 || argc > 3)
-        result = argc == 1 ? TOO_FEW_ARGS : TOO_MANY_ARGS;
+        result = argc == 1 ? too_few_args : too_many_args;
     else
     {
         *filename = argv[1];
@@ -76,7 +76,7 @@ status_code_t read_cmdline_args(int argc, const char **argv, const char **filena
 status_code_t process_items(item_t *items, short int *items_count, const char *prefix)
 {
     if (has_invalid_items(items, *items_count))
-        return INVALID_ITEM;
+        return invalid_item;
 
     calculate_density(items, *items_count);
 
@@ -86,5 +86,5 @@ status_code_t process_items(item_t *items, short int *items_count, const char *p
     else if (strcmp(prefix, ALL_PREFIX) != 0)
         filter_array(items, items_count, prefix);
 
-    return *items_count > 0 ? SUCCESS : FAILURE;
+    return *items_count > 0 ? success : failure;
 }
