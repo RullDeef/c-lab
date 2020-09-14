@@ -6,6 +6,8 @@
 
 #define FILTER_OPT_STR "f"
 
+typedef int (*compar_fn_t)(void *, void *);
+
 int int_comparator(const void *a, const void *b)
 {
     assert(a != NULL);
@@ -58,7 +60,7 @@ int key(const int *begin, const int *end, int **filtered_begin, int **filtered_e
     return 0;
 }
 
-int mysort(void *data_array, size_t num, size_t size, __compar_fn_t comparator)
+int mysort(void *data_array, size_t num, size_t size, compar_fn_t comparator)
 {
     assert(data_array != NULL);
 
