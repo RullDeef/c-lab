@@ -31,5 +31,5 @@ $(OBJECTS) : $(OBJDIR)/%.o : $(SRCDIR)/%.c
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 clean :
-	rm -f **.o *.exe **.gcno **.gcda **.gcov
+	rm -f **/*.o *.exe **/*.gcno **/*.gcda
 	rm -rf ./func_tests/gcov
