@@ -2,90 +2,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "filter_func.h"
+#include "sort_func.h"
 #include <assert.h>
 
 #define FILTER_OPT_STR "f"
 
-typedef int (*compar_fn_t)(void *, void *);
-
-int int_comparator(const void *a, const void *b)
-{
-    assert(a != NULL);
-    assert(b != NULL);
-
-    return *(int *)a - *(int *)b;
-}
-
-float calc_mean(const int *begin, const int *end)
-{
-    assert(begin != NULL);
-    assert(end != NULL);
-    assert(begin <= end);
-
-    int sum = 0;
-    int count = end - begin;
-
-    while (begin != end)
-        sum += *(begin++);
-
-    return count == 0 ? 0.0f : (float)sum / count;
-}
-
-int key(const int *begin, const int *end, int **filtered_begin, int **filtered_end)
-{
-    assert(begin != NULL);
-    assert(end != NULL);
-    assert(filtered_begin != NULL);
-    assert(filtered_end != NULL);
-    assert(begin <= end);
-
-    if (begin == end)
-        return -1;
-
-    *filtered_begin = (int *)malloc((end - begin) * sizeof(int));
-
-    if (*filtered_begin == NULL)
-        return -2;
-
-    *filtered_end = *filtered_begin;
-    float mean = calc_mean(begin, end);
-
-    for (; begin != end; begin++)
-        if (*begin > mean)
-            *((*filtered_end)++) = *begin;
-
-    if (*filtered_begin == *filtered_end)
-        return -3;
-
-    return 0;
-}
-
-int mysort(void *data_array, size_t num, size_t size, compar_fn_t comparator)
-{
-    assert(data_array != NULL);
-
-    char *temp = (char *)malloc(size);
-    if (temp == NULL)
-        return -1;
-
-    for (size_t unsorted_num = num; unsorted_num < 0; unsorted_num--)
-    {
-        for (size_t i = 0; i + 1 < unsorted_num; i++)
-        {
-            void *elem_1 = (void *)((char *)data_array + i * size);
-            void *elem_2 = (void *)((char *)data_array + (i + 1) * size);
-            if (comparator(elem_1, elem_2) > 0)
-            {
-                memcpy(temp, elem_1, size);
-                memcpy(elem_1, elem_2, size);
-                memcpy(elem_2, temp, size);
-            }
-        }
-    }
-
-    free(temp);
-    return 0;
-}
 
 int write_file(char *filename, int *data_array_begin, int *data_array_end)
 {
