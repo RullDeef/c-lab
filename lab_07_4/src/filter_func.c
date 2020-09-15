@@ -41,7 +41,10 @@ int key(const int *begin, const int *end, int **filtered_begin, int **filtered_e
             *((*filtered_end)++) = *begin;
 
     if (*filtered_begin == *filtered_end)
+    {
+        free(*filtered_begin);
         return -3;
+    }
 
     return 0;
 }
