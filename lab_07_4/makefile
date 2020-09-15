@@ -1,6 +1,6 @@
-CC = gcc
+CC = i686-w64-mingw32-gcc.exe
 INCLUDE = inc
-CFLAGS = --std=c99 -Wall -Werror -pedantic -I$(INCLUDE)
+CFLAGS = --std=c99 -static-libgcc -Wall -Werror -pedantic -I$(INCLUDE)
 
 SRCDIR = src
 OBJDIR = obj
@@ -14,7 +14,7 @@ OBJECTS = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SOURCES))
 release : CFLAGS+=-O3
 release : app.exe
 
-debug : CFLAGS+=--coverage -g
+debug : CFLAGS+=--coverage -g -ggdb -fno-inline -fno-omit-frame-pointer
 debug : app.exe tests.exe
 	./func_tests/func_test.sh
 

@@ -1,9 +1,6 @@
 # clean up everything
 rm -f ./**.gcno ./**.gcda ./**.c.gcov
 
-# rebuild app
-# make
-
 # positive tests counters
 declare -i total_pos=$(ls -1q ./func_tests/pos_*_args.txt | wc -l)
 declare -i passed_pos=0
@@ -16,14 +13,12 @@ do
   n=$(printf "%02d" $i)
   expected=$(cat "./func_tests/pos_${n}_out.txt")
   args=$(cat "./func_tests/pos_${n}_args.txt")
-  # ./app.exe $args | cat > .temp_${n}
-  $($args)
-  status=$?
+  status=$(drmemory.exe -batch -ignore_kernel -no_use_stderr -- $args)
   actual=$(cat .temp)
 
-  if [ $status -ne 0 ]
+  if [[ "$status" != "" ]]
   then
-    echo "    Test #$i: Failed with exit code $status" 
+    print "    Test #$i: Failed. DrMemory output:\n\n$status\n"
   else
     $(diff -q "func_tests/pos_${n}_out.txt" ".temp")
     if [ $? -eq 0 ]
@@ -52,13 +47,11 @@ do
   n=$(printf "%02d" $i)
   # expected=$(cat "./func_tests/neg_${n}_out.txt")
   args=$(cat "./func_tests/neg_${n}_args.txt")
-  # ./bin/app.exe $args 2>.temp_${n} 1>.temp_${n}
-  $($args)
-  status=$?
+  status=$(drmemory.exe -batch -ignore_kernel -no_use_stderr -- $args)
 
-  if [ $status = 0 ]
+  if [[ "$status" != "" ]]
   then
-    echo "    Test #$i: Failed with exit code $status" 
+    printf "    Test #$i: Failed. DrMemory output:\n\n$status\n" 
   else
     passed_neg=$(( passed_neg + 1 ))
     echo "    Test #$i: Passed."
