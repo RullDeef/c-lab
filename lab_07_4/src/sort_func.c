@@ -19,7 +19,7 @@ int mysort(void *data_array, size_t num, size_t size, compar_fn_t comparator)
     if (temp == NULL)
         return -1;
 
-    for (size_t unsorted_num = num; unsorted_num < 0; unsorted_num--)
+    for (size_t unsorted_num = num; unsorted_num > 0; unsorted_num--)
     {
         for (size_t i = 0; i + 1 < unsorted_num; i++)
         {

@@ -1,6 +1,6 @@
 CC = i686-w64-mingw32-gcc.exe
 INCLUDE = inc
-CFLAGS = --std=c99 -static-libgcc -Wall -Werror -pedantic -I$(INCLUDE)
+CFLAGS = --std=c99 -Wall -Werror -pedantic -I$(INCLUDE)
 
 SRCDIR = src
 OBJDIR = obj
