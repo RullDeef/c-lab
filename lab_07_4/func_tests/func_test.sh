@@ -13,7 +13,16 @@ do
   n=$(printf "%02d" $i)
   expected=$(cat "./func_tests/pos_${n}_out.txt")
   args=$(cat "./func_tests/pos_${n}_args.txt")
-  status=$(drmemory.exe -batch -ignore_kernel -no_use_stderr -- $args)
+
+  if command -v drmemory &> /dev/null
+  then
+    status=$(drmemory.exe -batch -ignore_kernel -no_use_stderr -- $args)
+  elif command -v valgrind &> /dev/null
+  then
+    status=$(valgrind -q -- $args)
+  else
+    status=$(drmemory.exe -batch -ignore_kernel -no_use_stderr -- $args)
+  fi
   actual=$(cat .temp)
 
   if [[ "$status" != "" ]]
@@ -47,7 +56,15 @@ do
   n=$(printf "%02d" $i)
   # expected=$(cat "./func_tests/neg_${n}_out.txt")
   args=$(cat "./func_tests/neg_${n}_args.txt")
-  status=$(drmemory.exe -batch -ignore_kernel -no_use_stderr -- $args)
+  if command -v drmemory &> /dev/null
+  then
+    status=$(drmemory.exe -batch -ignore_kernel -no_use_stderr -- $args)
+  elif command -v valgrind &> /dev/null
+  then
+    status=$(valgrind -q -- $args)
+  else
+    status=$(drmemory.exe -batch -ignore_kernel -no_use_stderr -- $args)
+  fi
 
   if [[ "$status" != "" ]]
   then
