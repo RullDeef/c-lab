@@ -1,6 +1,6 @@
 CC = gcc
 INCLUDE = inc
-CFLAGS = --std=c99 -Wall -Werror -pedantic -I. -I$(INCLUDE)
+CFLAGS = --std=c99 -Wall -Werror -pedantic -I$(INCLUDE)
 
 SRCDIR = src
 OBJDIR = obj
@@ -23,7 +23,7 @@ release : app.exe
 debug : CFLAGS+=--coverage -g -ggdb -fno-inline -fno-omit-frame-pointer
 debug : app.exe tests.exe
 	./tests.exe
-	# ./func_tests/func_test.sh
+	./func_tests/func_test.sh
 
 app.exe : dir $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $(OBJECTS)

@@ -117,22 +117,25 @@ int apply_filtration(int **begin, int **end)
     assert(end != NULL);
     assert(*begin != NULL);
     assert(*end != NULL);
-    assert(*begin < *end);
+    assert(*begin <= *end);
 
     if (*begin == *end)
         return -1;
 
-    int *filtered_begin = NULL;
-    int *filtered_end = NULL;
-
-    if (key(*begin, *end, &filtered_begin, &filtered_end))
+    if (key(*begin, *end, begin, end))
         return -2;
 
-    // kind of "swap" ...
-    free(*begin);
-    *begin = filtered_begin;
-    *end = filtered_end;
     return 0;
+}
+
+int do_tasks(int *begin, int **end, bool need_filtration)
+{
+    int status_code = 0;
+
+    if (need_filtration)
+        status_code = apply_filtration(&begin, end);
+
+    return status_code || mysort(begin, *end - begin, sizeof(int), int_comparator, int_swapper);
 }
 
 int proccess(char *input_filename, char *output_filename, bool need_filtration)
@@ -142,26 +145,19 @@ int proccess(char *input_filename, char *output_filename, bool need_filtration)
 
     int *data_array_begin = NULL;
     int *data_array_end = NULL;
+    int status_code = 0;
 
     if (read_data_file(input_filename, &data_array_begin, &data_array_end))
-        return -2;
-
-    if (need_filtration && apply_filtration(&data_array_begin, &data_array_end))
+        status_code = -1;
+    else
     {
+        status_code = do_tasks(data_array_begin, &data_array_end, need_filtration)
+            || write_file(output_filename, data_array_begin, data_array_end);
+
         free(data_array_begin);
-        return -3;
     }
 
-    mysort(data_array_begin, data_array_end - data_array_begin, sizeof(int), int_comparator);
-
-    if (write_file(output_filename, data_array_begin, data_array_end))
-    {
-        free(data_array_begin);
-        return -4;
-    }
-
-    free(data_array_begin);
-    return 0;
+    return status_code;
 }
 
 int main(int argc, char **argv)

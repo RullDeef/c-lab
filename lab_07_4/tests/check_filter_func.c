@@ -1,6 +1,6 @@
 #include <check.h>
 #include <stdlib.h>
-#include "./inc/filter_func.h"
+#include "filter_func.h"
 
 
 START_TEST(begin_eq_end)

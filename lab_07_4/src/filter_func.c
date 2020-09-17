@@ -17,7 +17,7 @@ float imp__calc_mean(const int *begin, const int *end)
     return count == 0 ? 0.0f : (float)sum / count;
 }
 
-int key(const int *begin, const int *end, int **filtered_begin, int **filtered_end)
+int key(int *begin, int *end, int **filtered_begin, int **filtered_end)
 {
     assert(begin != NULL);
     assert(end != NULL);
@@ -28,10 +28,8 @@ int key(const int *begin, const int *end, int **filtered_begin, int **filtered_e
     if (begin == end)
         return -1;
 
-    *filtered_begin = (int *)malloc((end - begin) * sizeof(int));
-
-    if (*filtered_begin == NULL)
-        return -2;
+    // *filtered_begin = (int *)malloc((end - begin) * sizeof(int));
+    *filtered_begin = begin;
 
     *filtered_end = *filtered_begin;
     float mean = imp__calc_mean(begin, end);
@@ -41,10 +39,7 @@ int key(const int *begin, const int *end, int **filtered_begin, int **filtered_e
             *((*filtered_end)++) = *begin;
 
     if (*filtered_begin == *filtered_end)
-    {
-        free(*filtered_begin);
-        return -3;
-    }
+        return -2;
 
     return 0;
 }
