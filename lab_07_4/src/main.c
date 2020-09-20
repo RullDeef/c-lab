@@ -14,13 +14,15 @@ int write_file(char *filename, int *data_array_begin, int *data_array_end)
     assert(filename != NULL);
     assert(data_array_begin != NULL);
     assert(data_array_end != NULL);
+    assert(data_array_begin < data_array_end);
 
     FILE *file = fopen(filename, "wt");
     if (file == NULL)
         return -1;
 
-    for (int *iter = data_array_begin; iter != data_array_end; iter++)
-        fprintf(file, "%i\n", *iter);
+    fprintf(file, "%d", *data_array_begin);
+    for (int *iter = data_array_begin + 1; iter != data_array_end; iter++)
+        fprintf(file, " %d", *iter);
 
     fclose(file);
     return 0;

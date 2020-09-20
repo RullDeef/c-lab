@@ -23,7 +23,14 @@ void int_swapper(void *a, void *b)
 
 int mysort(void *data_array, size_t num, size_t size, compar_fn_t comparator, swapper_fn_t swapper)
 {
-    assert(data_array != NULL);
+    if (data_array == NULL)
+        return -1;
+    
+    if (num <= 0)
+        return -2;
+
+    if (size <= 0)
+        return -3;
 
     for (size_t unsorted_num = num; unsorted_num > 0; unsorted_num--)
     {
