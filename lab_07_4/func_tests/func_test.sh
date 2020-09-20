@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # clean up everything
 rm -f ./**.gcno ./**.gcda ./**.c.gcov
 
@@ -29,7 +31,7 @@ do
   then
     print "    Test #$i: Failed. DrMemory output:\n\n$status\n"
   else
-    $(diff -q "func_tests/pos_${n}_out.txt" ".temp")
+    diff -q "func_tests/pos_${n}_out.txt" ".temp"
     if [ $? -eq 0 ]
     then
       passed_pos=$(( passed_pos + 1 ))
@@ -38,6 +40,7 @@ do
       echo "    Test #$i: Failed."
       echo "        Expected output: $expected"
       echo "        Actual output: $actual"
+      exit 0
     fi
   fi
 done
