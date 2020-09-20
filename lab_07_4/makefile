@@ -28,7 +28,7 @@ debug : app.exe
 app.exe : $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $(OBJECTS)
 
-test.exe : $(TEST_OBJECTS)
+unit_tests.exe : $(TEST_OBJECTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(TEST_OBJECTS)
 
 $(OBJECTS) : $(OBJDIR)/%.o : $(SRCDIR)/%.c
@@ -40,8 +40,8 @@ $(TEST_OBJECTS) : $(TEST_OBJDIR)/%.o : $(TEST_SRCDIR)/%.c
 func : app.exe
 	./func_tests/func_test.sh
 
-unit : test.exe
-	./test.exe
+unit : unit_tests.exe
+	./unit_tests.exe
 
 clean :
 	rm -f *.exe **/*.gcno **/*.gcda
