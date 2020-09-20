@@ -12,15 +12,16 @@ SOURCES = $(wildcard $(SRCDIR)/*.c)
 OBJECTS = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SOURCES))
 
 TEST_SOURCES = $(wildcard $(TEST_SRCDIR)/*.c) $(wildcard $(SRCDIR)/*_func.c)
+TEST_SOURCES-= $(TEST_SRCDIR)/main.c
 TEST_OBJECTS = $(patsubst $(TEST_SRCDIR)/%.c,$(TEST_OBJDIR)/%.o,$(TEST_SOURCES))
 
 .PHONY : clean func unit
 .NOTPARALLEL: release debug
 
-release : CFLAGS+=-O3
+release : CFLAGS+= -O3
 release : app.exe
 
-debug : CFLAGS+=--coverage -g -ggdb -fno-inline -fno-omit-frame-pointer
+debug : CFLAGS+= --coverage -g -ggdb -fno-inline -fno-omit-frame-pointer
 debug : app.exe
 
 app.exe : $(OBJECTS)
@@ -30,10 +31,11 @@ tests.exe : $(TEST_OBJECTS)
 	$(CC) $(CFLAGS) -lcheck -o $@ $(TEST_OBJECTS)
 
 $(OBJECTS) : $(OBJDIR)/%.o : $(SRCDIR)/%.c
-	$(CC) $(CFLAGS) -c $^ -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(TEST_OBJECTS) : $(TEST_OBJDIR)/%.o : $(TEST_SRCDIR)/%.c
-	$(CC) $(CFLAGS) -c $^ -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
+
 
 func :
 	./func_tests/func_test.sh

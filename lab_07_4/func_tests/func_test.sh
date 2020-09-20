@@ -29,7 +29,7 @@ do
 
   if [[ "$status" != "" ]]
   then
-    print "    Test #$i: Failed. DrMemory output:\n\n$status\n"
+    printf "    Test #$i: Failed. Memory watcher output:\n\n$status\n"
   else
     diff -q "func_tests/pos_${n}_out.txt" ".temp"
     if [ $? -eq 0 ]

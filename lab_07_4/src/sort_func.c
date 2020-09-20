@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include "inc/sort_func.h"
+#include "sort_func.h"
 #include <assert.h>
 
 int int_comparator(const void *a, const void *b)

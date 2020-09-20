@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "inc/filter_func.h"
+#include "filter_func.h"
 #include <assert.h>
 
 float imp__calc_mean(const int *begin, const int *end)
@@ -17,32 +17,47 @@ float imp__calc_mean(const int *begin, const int *end)
     return count == 0 ? 0.0f : (float)sum / count;
 }
 
-int key(int *begin, int *end, int **filtered_begin, int **filtered_end)
+int imp__count_proper_amount(const int *begin, const int *end, float mean)
 {
-    // assert(begin != NULL);
-    // assert(end != NULL);
-    // assert(filtered_begin != NULL);
-    // assert(filtered_end != NULL);
-    // assert(begin <= end);
+    assert(begin != NULL);
+    assert(end != NULL);
+    assert(begin < end);
 
+    int proper_amount = 0;
+    for (; begin != end; begin++)
+        if (*begin > mean)
+            proper_amount++;
+    
+    return proper_amount;
+}
+
+void imp__copy_proper_values(const int *begin, const int *end, int **filtered_begin, int **filtered_end, float mean)
+{
+    *filtered_end = *filtered_begin;
+
+    for (; begin != end; begin++)
+        if (*begin > mean)
+            *((*filtered_end)++) = *begin;
+}
+
+int key(const int *begin, const int *end, int **filtered_begin, int **filtered_end)
+{
     if (begin == NULL || end == NULL || filtered_begin == NULL || filtered_end == NULL)
         return -1;
 
     if (begin >= end)
         return -2;
-
-    // *filtered_begin = (int *)malloc((end - begin) * sizeof(int));
-    *filtered_begin = begin;
-
-    *filtered_end = *filtered_begin;
+    
     float mean = imp__calc_mean(begin, end);
+    int proper_amount = imp__count_proper_amount(begin, end, mean);
 
-    for (; begin != end; begin++)
-        if (*begin > mean)
-            *((*filtered_end)++) = *begin;
-
-    if (*filtered_begin == *filtered_end)
+    if (proper_amount == 0)
         return -3;
 
+    *filtered_begin = (int*)malloc(proper_amount * sizeof(int));
+    if (*filtered_begin == NULL)
+        return -4;
+    
+    imp__copy_proper_values(begin, end, filtered_begin, filtered_end, mean);
     return 0;
 }

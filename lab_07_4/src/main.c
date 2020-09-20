@@ -38,10 +38,7 @@ int count_elements_in_file(FILE *file)
     while ((rc = fscanf(file, "%i ", &temp)) == 1)
         elements_count++;
 
-    if (rc != EOF)
-        return -2;
-
-    return elements_count;
+    return rc != EOF ? -1 : elements_count;
 }
 
 void read_elements_from_file(FILE *file, int **begin, int **end, int elements_count)
@@ -64,6 +61,8 @@ int read_data_file(char *filename, int **begin, int **end)
     assert(begin != NULL);
     assert(end != NULL);
 
+    int status_code = 0;
+
     FILE *file = fopen(filename, "rt");
     if (file == NULL)
         return -1;
@@ -71,22 +70,24 @@ int read_data_file(char *filename, int **begin, int **end)
     int elements_count = count_elements_in_file(file);
     if (elements_count <= 0)
     {
-        fclose(file);
-        return -2;
+        status_code = -2;
     }
-
-    *begin = (int *)malloc(elements_count * sizeof(int));
-    if (*begin == NULL)
+    else
     {
-        fclose(file);
-        return -3;
+        *begin = (int *)malloc(elements_count * sizeof(int));
+        if (*begin == NULL)
+        {
+            status_code = -3;
+        }
+        else
+        {
+            // actually read data from file (cant raise exceptions)
+            read_elements_from_file(file, begin, end, elements_count);
+        }
     }
-
-    // actually read data from file (cant raise exceptions)
-    read_elements_from_file(file, begin, end, elements_count);
 
     fclose(file);
-    return 0;
+    return status_code;
 }
 
 int parse_args(int argc, char **argv, char **input_filename, char **output_filename, bool *need_filtration)
@@ -113,31 +114,28 @@ int parse_args(int argc, char **argv, char **input_filename, char **output_filen
     return 0;
 }
 
-int apply_filtration(int **begin, int **end)
-{
-    assert(begin != NULL);
-    assert(end != NULL);
-    assert(*begin != NULL);
-    assert(*end != NULL);
-    assert(*begin <= *end);
-
-    if (*begin == *end)
-        return -1;
-
-    if (key(*begin, *end, begin, end))
-        return -2;
-
-    return 0;
-}
-
-int do_tasks(int *begin, int **end, bool need_filtration)
+int do_tasks(int **begin, int **end, bool need_filtration)
 {
     int status_code = 0;
 
     if (need_filtration)
-        status_code = apply_filtration(&begin, end);
+    {
+        int *filtered_begin;
+        int *filtered_end;
+        
+        status_code = key(*begin, *end, &filtered_begin, &filtered_end);
+        if (status_code == 0)
+        {
+            free(*begin);
+            *begin = filtered_begin;
+            *end = filtered_end;
+        }
+    }
 
-    return status_code || mysort(begin, *end - begin, sizeof(int), int_comparator, int_swapper);
+    if (status_code == 0)
+        status_code = mysort(*begin, *end - *begin, sizeof(int), int_comparator, int_swapper);
+
+    return status_code;
 }
 
 int proccess(char *input_filename, char *output_filename, bool need_filtration)
@@ -153,8 +151,10 @@ int proccess(char *input_filename, char *output_filename, bool need_filtration)
         status_code = -1;
     else
     {
-        status_code = do_tasks(data_array_begin, &data_array_end, need_filtration)
-            || write_file(output_filename, data_array_begin, data_array_end);
+        status_code = do_tasks(&data_array_begin, &data_array_end, need_filtration);
+
+        if (status_code == 0)
+            status_code = write_file(output_filename, data_array_begin, data_array_end);
 
         free(data_array_begin);
     }
