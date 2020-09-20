@@ -31,18 +31,17 @@ tests.exe : $(TEST_OBJECTS)
 	$(CC) $(CFLAGS) -lcheck -o $@ $(TEST_OBJECTS)
 
 $(OBJECTS) : $(OBJDIR)/%.o : $(SRCDIR)/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	mkdir -p $(OBJDIR); $(CC) $(CFLAGS) -c $< -o $@
 
 $(TEST_OBJECTS) : $(TEST_OBJDIR)/%.o : $(TEST_SRCDIR)/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	mkdir -p $(OBJDIR); $(CC) $(CFLAGS) -c $< -o $@
 
-
-func :
+func : app.exe
 	./func_tests/func_test.sh
 
 unit : tests.exe
 	./tests.exe
 
 clean :
-	rm -f **/*.o *.exe **/*.gcno **/*.gcda
-	rm -rf ./func_tests/gcov
+	rm -f *.exe **/*.gcno **/*.gcda
+	rm -rf ./func_tests/gcov $(OBJDIR) $(TEST_OBJDIR)
