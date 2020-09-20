@@ -26,7 +26,7 @@ void imp__swapper(void *a, void *b, size_t size)
     }
 }
 
-int mysort(void *data_array, size_t num, size_t size, compar_fn_t comparator)
+int mysort(void *data_array, int num, int size, compar_fn_t comparator)
 {
     if (data_array == NULL)
         return -1;

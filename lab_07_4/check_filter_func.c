@@ -3,6 +3,12 @@
 #include "filter_func.h"
 
 
+START_TEST(invalid_args)
+{
+    ck_assert_int_ne(key(NULL, NULL, NULL, NULL), 0);
+}
+END_TEST
+
 START_TEST(begin_eq_end)
 {
     int begin[] = { 0, 1, 2, 3, 4 };
@@ -11,6 +17,17 @@ START_TEST(begin_eq_end)
     int *filtered_end;
 
     ck_assert_int_ne(key(begin, begin, &filtered_begin, &filtered_end), 0);
+}
+END_TEST
+
+START_TEST(begin_gt_end)
+{
+    int begin[] = { 0, 1, 2, 3, 4 };
+
+    int *filtered_begin;
+    int *filtered_end;
+
+    ck_assert_int_ne(key(begin + 2, begin, &filtered_begin, &filtered_end), 0);
 }
 END_TEST
 
@@ -44,12 +61,17 @@ START_TEST(base_case)
 
     for (int i = 0; i < expected_size; i++)
         ck_assert_int_eq(filtered_begin[i], expected[i]);
+    
+    // free memory
+    free(filtered_begin);
 }
 END_TEST
 
 void check_filter_func(TCase *tc_core)
 {
+    tcase_add_test(tc_core, invalid_args);
     tcase_add_test(tc_core, begin_eq_end);
+    tcase_add_test(tc_core, begin_gt_end);
     tcase_add_test(tc_core, empty_out);
     tcase_add_test(tc_core, base_case);
 }
