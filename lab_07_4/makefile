@@ -1,6 +1,7 @@
 CC = gcc
 INCLUDE = inc
 CFLAGS = --std=c99 -Wall -Werror -pedantic -I$(INCLUDE)
+LDFLAGS = -lcheck -lpthread -lrt
 
 SRCDIR = src
 OBJDIR = out
@@ -28,7 +29,7 @@ app.exe : $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $(OBJECTS)
 
 test.exe : $(TEST_OBJECTS)
-	$(CC) $(CFLAGS) -lcheck -o $@ $(TEST_OBJECTS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(TEST_OBJECTS)
 
 $(OBJECTS) : $(OBJDIR)/%.o : $(SRCDIR)/%.c
 	mkdir -p $(OBJDIR); $(CC) $(CFLAGS) -c $< -o $@
