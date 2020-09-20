@@ -122,7 +122,7 @@ int do_tasks(int **begin, int **end, bool need_filtration)
     {
         int *filtered_begin;
         int *filtered_end;
-        
+
         status_code = key(*begin, *end, &filtered_begin, &filtered_end);
         if (status_code == 0)
         {
@@ -133,7 +133,7 @@ int do_tasks(int **begin, int **end, bool need_filtration)
     }
 
     if (status_code == 0)
-        status_code = mysort(*begin, *end - *begin, sizeof(int), int_comparator, int_swapper);
+        status_code = mysort(*begin, *end - *begin, sizeof(int), int_comparator);
 
     return status_code;
 }

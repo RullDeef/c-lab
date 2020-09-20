@@ -11,17 +11,22 @@ int int_comparator(const void *a, const void *b)
     return *(int *)a - *(int *)b;
 }
 
-void int_swapper(void *a, void *b)
+void imp__swapper(void *a, void *b, size_t size)
 {
     assert(a != NULL);
     assert(b != NULL);
+    assert(size > 0);
 
-    int temp = *(int*)a;
-    *(int*)a = *(int*)b;
-    *(int*)b = temp;
+    char temp;
+    for (size_t i = 0; i < size; i++)
+    {
+        temp = *((char*)a + i);
+        *((char*)a + i) = *((char*)b + i);
+        *((char*)b + i) = temp;
+    }
 }
 
-int mysort(void *data_array, size_t num, size_t size, compar_fn_t comparator, swapper_fn_t swapper)
+int mysort(void *data_array, size_t num, size_t size, compar_fn_t comparator)
 {
     if (data_array == NULL)
         return -1;
@@ -39,7 +44,7 @@ int mysort(void *data_array, size_t num, size_t size, compar_fn_t comparator, sw
             void *elem_1 = (void *)((char *)data_array + i * size);
             void *elem_2 = (void *)((char *)data_array + (i + 1) * size);
             if (comparator(elem_1, elem_2) > 0)
-                swapper(elem_1, elem_2);
+                imp__swapper(elem_1, elem_2, size);
         }
     }
 
