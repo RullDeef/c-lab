@@ -1,38 +1,43 @@
 #include <check.h>
 #include "sort_func.h"
 
-START_TEST(invalid_array_ptr)
+#define start_test(x) START_TEST(x)
+#define end_test END_TEST
+
+#define tcase TCase
+
+start_test(invalid_array_ptr)
 {
     ck_assert_int_ne(mysort(NULL, 4, sizeof(int), int_comparator), 0);
 }
-END_TEST
+end_test
 
-START_TEST(invalid_array_size)
+start_test(invalid_array_size)
 {
     int array[] = { 10, 20, 14 };
 
     ck_assert_int_ne(mysort(array, -3, sizeof(int), int_comparator), 0);
 }
-END_TEST
+end_test
 
-START_TEST(invalid_element_size)
+start_test(invalid_element_size)
 {
     int array[] = { 10, 20, 14 };
 
     ck_assert_int_ne(mysort(array, 3, 0, int_comparator), 0);
 }
-END_TEST
+end_test
 
-START_TEST(single_element)
+start_test(single_element)
 {
     int array[] = { 24 };
 
     ck_assert_int_eq(mysort(array, 1, sizeof(int), int_comparator), 0);
     ck_assert_int_eq(array[0], 24);
 }
-END_TEST
+end_test
 
-START_TEST(two_elements)
+start_test(two_elements)
 {
     int array[] = { 12, 4 };
 
@@ -40,9 +45,9 @@ START_TEST(two_elements)
     ck_assert_int_eq(array[0], 4);
     ck_assert_int_eq(array[1], 12);
 }
-END_TEST
+end_test
 
-START_TEST(repeating_elements)
+start_test(repeating_elements)
 {
     int array[] = { 15, 15, 15 };
 
@@ -51,9 +56,9 @@ START_TEST(repeating_elements)
     ck_assert_int_eq(array[1], 15);
     ck_assert_int_eq(array[2], 15);
 }
-END_TEST
+end_test
 
-void check_sort_func(TCase *tc_core)
+void check_sort_func(tcase *tc_core)
 {
     tcase_add_test(tc_core, invalid_array_ptr);
     tcase_add_test(tc_core, invalid_array_size);

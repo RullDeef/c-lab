@@ -1,12 +1,16 @@
 #include <check.h>
 
-void check_filter_func(TCase *tc_core);
-void check_sort_func(TCase *tc_core);
+#define srunner SRunner
+#define suite Suite
+#define tcase TCase
 
-Suite *app_suite(void)
+void check_filter_func(tcase *tc_core);
+void check_sort_func(tcase *tc_core);
+
+suite *app_suite(void)
 {
-    Suite *s;
-    TCase *tc_core;
+    suite *s;
+    tcase *tc_core;
 
     s = suite_create("app suite");
     tc_core = tcase_create("core test case");
@@ -21,8 +25,8 @@ Suite *app_suite(void)
 
 int main(void)
 {
-    SRunner *runner;
-    Suite *s = app_suite();
+    srunner *runner;
+    suite *s = app_suite();
 
     runner = srunner_create(s);
 

@@ -2,14 +2,18 @@
 #include <stdlib.h>
 #include "filter_func.h"
 
+#define start_test(x) START_TEST(x)
+#define end_test END_TEST
 
-START_TEST(invalid_args)
+#define tcase TCase
+
+start_test(invalid_args)
 {
     ck_assert_int_ne(key(NULL, NULL, NULL, NULL), 0);
 }
-END_TEST
+end_test
 
-START_TEST(begin_eq_end)
+start_test(begin_eq_end)
 {
     int begin[] = { 0, 1, 2, 3, 4 };
 
@@ -18,9 +22,9 @@ START_TEST(begin_eq_end)
 
     ck_assert_int_ne(key(begin, begin, &filtered_begin, &filtered_end), 0);
 }
-END_TEST
+end_test
 
-START_TEST(begin_gt_end)
+start_test(begin_gt_end)
 {
     int begin[] = { 0, 1, 2, 3, 4 };
 
@@ -29,9 +33,9 @@ START_TEST(begin_gt_end)
 
     ck_assert_int_ne(key(begin + 2, begin, &filtered_begin, &filtered_end), 0);
 }
-END_TEST
+end_test
 
-START_TEST(empty_out)
+start_test(empty_out)
 {
     int begin[] = { 5, 5, 5, 5, 5 };
     int *end = begin + sizeof(begin) / sizeof(int);
@@ -41,9 +45,9 @@ START_TEST(empty_out)
 
     ck_assert_int_ne(key(begin, end, &filtered_begin, &filtered_end), 0);
 }
-END_TEST
+end_test
 
-START_TEST(base_case)
+start_test(base_case)
 {
     int begin[] = { 3, 5, 7, 2, 1, 8, 3 };
     int *end = begin + sizeof(begin) / sizeof(int);
@@ -65,9 +69,9 @@ START_TEST(base_case)
     // free memory
     free(filtered_begin);
 }
-END_TEST
+end_test
 
-void check_filter_func(TCase *tc_core)
+void check_filter_func(tcase *tc_core)
 {
     tcase_add_test(tc_core, invalid_args);
     tcase_add_test(tc_core, begin_eq_end);
