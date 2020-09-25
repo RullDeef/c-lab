@@ -9,24 +9,27 @@
 
 #define FILTER_OPT_STR "f"
 
+void print_array_to_file(FILE *file, int *begin, int *end)
+{
+    fprintf(file, "%d", *begin);
+    for (begin++; begin != end; begin++)
+        fprintf(file, " %d", *begin);
+}
 
-int write_file(char *filename, int *data_array_begin, int *data_array_end)
+int write_file(char *filename, int *begin, int *end)
 {
     assert(filename != NULL);
-    assert(data_array_begin != NULL);
-    assert(data_array_end != NULL);
-    assert(data_array_begin < data_array_end);
+    assert(begin != NULL);
+    assert(end != NULL);
+    assert(begin < end);
 
     FILE *file = fopen(filename, "wt");
     if (file == NULL)
-        return CANT_OPEN_FILE;
+        return cant_open_file;
 
-    fprintf(file, "%d", *data_array_begin);
-    for (int *iter = data_array_begin + 1; iter != data_array_end; iter++)
-        fprintf(file, " %d", *iter);
-
+    print_array_to_file(file, begin, end);
     fclose(file);
-    return SUCCESS;
+    return success;
 }
 
 int count_elements_in_file(FILE *file)
@@ -39,7 +42,7 @@ int count_elements_in_file(FILE *file)
     while ((rc = fscanf(file, "%i ", &temp)) == 1)
         elements_count++;
 
-    return rc != EOF ? -1 : elements_count;
+    return rc == EOF ? elements_count : failure;
 }
 
 void read_elements_from_file(FILE *file, int **begin, int **end, int elements_count)
@@ -62,30 +65,23 @@ int read_data_file(char *filename, int **begin, int **end)
     assert(begin != NULL);
     assert(end != NULL);
 
-    int status_code = SUCCESS;
-
     FILE *file = fopen(filename, "rt");
     if (file == NULL)
-        return CANT_OPEN_FILE;
+        return cant_open_file;
+
+    int status_code = success;
 
     int elements_count = count_elements_in_file(file);
-    if (elements_count <= 0)
-    {
-        status_code = INVALID_ELEMENTS_AMOUNT;
-    }
-    else
+    if (elements_count > 0)
     {
         *begin = (int *)malloc(elements_count * sizeof(int));
-        if (*begin == NULL)
-        {
-            status_code = BAD_ALLOC;
-        }
-        else
-        {
-            // actually read data from file (cant raise exceptions)
+        if (*begin != NULL)
             read_elements_from_file(file, begin, end, elements_count);
-        }
+        else
+            status_code = bad_alloc;
     }
+    else
+        status_code = invalid_elements_amount;
 
     fclose(file);
     return status_code;
@@ -98,7 +94,9 @@ int parse_args(int argc, char **argv, char **input_filename, char **output_filen
     assert(need_filtration != NULL);
 
     if (argc != 3 && argc != 4 && argc != 7)
-        return INVALID_ARGS;
+        return invalid_args;
+
+    int status_code = success;
 
     *input_filename = argv[1];
     *output_filename = argv[2];
@@ -109,15 +107,15 @@ int parse_args(int argc, char **argv, char **input_filename, char **output_filen
         if (strcmp(argv[3], FILTER_OPT_STR) == 0)
             *need_filtration = true;
         else
-            return INVALID_OPT; // unrecognized option
+            status_code = invalid_opt; // unrecognized option
     }
 
-    return SUCCESS;
+    return status_code;
 }
 
 int do_tasks(int **begin, int **end, bool need_filtration)
 {
-    int status_code = SUCCESS;
+    int status_code = success;
 
     if (need_filtration)
     {
@@ -125,7 +123,7 @@ int do_tasks(int **begin, int **end, bool need_filtration)
         int *filtered_end;
 
         status_code = key(*begin, *end, &filtered_begin, &filtered_end);
-        if (status_code == SUCCESS)
+        if (status_code == success)
         {
             free(*begin);
             *begin = filtered_begin;
@@ -133,7 +131,7 @@ int do_tasks(int **begin, int **end, bool need_filtration)
         }
     }
 
-    if (status_code == SUCCESS)
+    if (status_code == success)
         status_code = mysort(*begin, *end - *begin, sizeof(int), int_comparator);
 
     return status_code;
@@ -146,15 +144,15 @@ int proccess(char *input_filename, char *output_filename, bool need_filtration)
 
     int *data_array_begin = NULL;
     int *data_array_end = NULL;
-    int status_code = SUCCESS;
+    int status_code = success;
 
     if (read_data_file(input_filename, &data_array_begin, &data_array_end))
-        status_code = FAILURE;
+        status_code = failure;
     else
     {
         status_code = do_tasks(&data_array_begin, &data_array_end, need_filtration);
 
-        if (status_code == SUCCESS)
+        if (status_code == success)
             status_code = write_file(output_filename, data_array_begin, data_array_end);
 
         free(data_array_begin);
@@ -170,8 +168,10 @@ int main(int argc, char **argv)
 
     bool need_filtration = false;
 
-    if (parse_args(argc, argv, &input_filename, &output_filename, &need_filtration))
-        return FAILURE;
+    int status_code = parse_args(argc, argv, &input_filename, &output_filename, &need_filtration);
 
-    return proccess(input_filename, output_filename, need_filtration);
+    if (status_code == success)
+        status_code = proccess(input_filename, output_filename, need_filtration);
+
+    return status_code;
 }

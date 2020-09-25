@@ -44,21 +44,21 @@ void imp__copy_proper_values(const int *begin, const int *end, int **filtered_be
 int key(const int *begin, const int *end, int **filtered_begin, int **filtered_end)
 {
     if (begin == NULL || end == NULL || filtered_begin == NULL || filtered_end == NULL)
-        return INVALID_ARGS;
+        return invalid_args;
 
     if (begin >= end)
-        return INVALID_PTRS;
+        return invalid_ptrs;
     
     float mean = imp__calc_mean(begin, end);
     int proper_amount = imp__count_proper_amount(begin, end, mean);
 
     if (proper_amount == 0)
-        return INVALID_ELEMENTS_AMOUNT;
+        return invalid_elements_amount;
 
     *filtered_begin = (int*)malloc(proper_amount * sizeof(int));
     if (*filtered_begin == NULL)
-        return BAD_ALLOC;
+        return bad_alloc;
     
     imp__copy_proper_values(begin, end, filtered_begin, filtered_end, mean);
-    return SUCCESS;
+    return success;
 }

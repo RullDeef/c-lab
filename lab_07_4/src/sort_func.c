@@ -30,13 +30,13 @@ void imp__swapper(void *a, void *b, size_t size)
 int mysort(void *data_array, int num, int size, compar_fn_t comparator)
 {
     if (data_array == NULL)
-        return INVALID_ARGS;
+        return invalid_args;
     
     if (num <= 0)
-        return INVALID_ELEMENTS_AMOUNT;
+        return invalid_elements_amount;
 
     if (size <= 0)
-        return INVALID_ELEMENT_SIZE;
+        return invalid_elements_size;
 
     for (size_t unsorted_num = num; unsorted_num > 0; unsorted_num--)
     {
@@ -49,5 +49,5 @@ int mysort(void *data_array, int num, int size, compar_fn_t comparator)
         }
     }
 
-    return SUCCESS;
+    return success;
 }

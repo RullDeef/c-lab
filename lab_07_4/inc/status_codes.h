@@ -1,14 +1,17 @@
 #ifndef STATUS_CODES_H
 #define STATUS_CODES_H
 
-#define SUCCESS                 -0
-#define FAILURE                 -1
-#define INVALID_ELEMENTS_AMOUNT -2
-#define INVALID_ARGS            -3
-#define INVALID_PTRS            -4
-#define BAD_ALLOC               -5
-#define CANT_OPEN_FILE          -6
-#define INVALID_OPT             -7
-#define INVALID_ELEMENT_SIZE    -8
+enum status_codes
+{
+    success = 0,
+    failure = -1,
+    invalid_args = -2,
+    invalid_opt = -3,
+    invalid_ptrs = -4,
+    bad_alloc = -5,
+    cant_open_file = -6,
+    invalid_elements_amount = -7,
+    invalid_elements_size = -8
+};
 
 #endif // STATUS_CODES_H
