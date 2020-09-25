@@ -1,10 +1,11 @@
-#include <stdbool.h>
-#include <string.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <assert.h>
+#include "status_codes.h"
 #include "filter_func.h"
 #include "sort_func.h"
-#include <assert.h>
 
 #define FILTER_OPT_STR "f"
 
@@ -18,14 +19,14 @@ int write_file(char *filename, int *data_array_begin, int *data_array_end)
 
     FILE *file = fopen(filename, "wt");
     if (file == NULL)
-        return -1;
+        return CANT_OPEN_FILE;
 
     fprintf(file, "%d", *data_array_begin);
     for (int *iter = data_array_begin + 1; iter != data_array_end; iter++)
         fprintf(file, " %d", *iter);
 
     fclose(file);
-    return 0;
+    return SUCCESS;
 }
 
 int count_elements_in_file(FILE *file)
@@ -61,23 +62,23 @@ int read_data_file(char *filename, int **begin, int **end)
     assert(begin != NULL);
     assert(end != NULL);
 
-    int status_code = 0;
+    int status_code = SUCCESS;
 
     FILE *file = fopen(filename, "rt");
     if (file == NULL)
-        return -1;
+        return CANT_OPEN_FILE;
 
     int elements_count = count_elements_in_file(file);
     if (elements_count <= 0)
     {
-        status_code = -2;
+        status_code = INVALID_ELEMENTS_AMOUNT;
     }
     else
     {
         *begin = (int *)malloc(elements_count * sizeof(int));
         if (*begin == NULL)
         {
-            status_code = -3;
+            status_code = BAD_ALLOC;
         }
         else
         {
@@ -97,7 +98,7 @@ int parse_args(int argc, char **argv, char **input_filename, char **output_filen
     assert(need_filtration != NULL);
 
     if (argc != 3 && argc != 4 && argc != 7)
-        return -1;
+        return INVALID_ARGS;
 
     *input_filename = argv[1];
     *output_filename = argv[2];
@@ -108,15 +109,15 @@ int parse_args(int argc, char **argv, char **input_filename, char **output_filen
         if (strcmp(argv[3], FILTER_OPT_STR) == 0)
             *need_filtration = true;
         else
-            return -2; // unrecognized option
+            return INVALID_OPT; // unrecognized option
     }
 
-    return 0;
+    return SUCCESS;
 }
 
 int do_tasks(int **begin, int **end, bool need_filtration)
 {
-    int status_code = 0;
+    int status_code = SUCCESS;
 
     if (need_filtration)
     {
@@ -124,7 +125,7 @@ int do_tasks(int **begin, int **end, bool need_filtration)
         int *filtered_end;
 
         status_code = key(*begin, *end, &filtered_begin, &filtered_end);
-        if (status_code == 0)
+        if (status_code == SUCCESS)
         {
             free(*begin);
             *begin = filtered_begin;
@@ -132,7 +133,7 @@ int do_tasks(int **begin, int **end, bool need_filtration)
         }
     }
 
-    if (status_code == 0)
+    if (status_code == SUCCESS)
         status_code = mysort(*begin, *end - *begin, sizeof(int), int_comparator);
 
     return status_code;
@@ -145,15 +146,15 @@ int proccess(char *input_filename, char *output_filename, bool need_filtration)
 
     int *data_array_begin = NULL;
     int *data_array_end = NULL;
-    int status_code = 0;
+    int status_code = SUCCESS;
 
     if (read_data_file(input_filename, &data_array_begin, &data_array_end))
-        status_code = -1;
+        status_code = FAILURE;
     else
     {
         status_code = do_tasks(&data_array_begin, &data_array_end, need_filtration);
 
-        if (status_code == 0)
+        if (status_code == SUCCESS)
             status_code = write_file(output_filename, data_array_begin, data_array_end);
 
         free(data_array_begin);
@@ -170,7 +171,7 @@ int main(int argc, char **argv)
     bool need_filtration = false;
 
     if (parse_args(argc, argv, &input_filename, &output_filename, &need_filtration))
-        return -1;
+        return FAILURE;
 
     return proccess(input_filename, output_filename, need_filtration);
 }

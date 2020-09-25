@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
-#include "sort_func.h"
 #include <assert.h>
+#include "status_codes.h"
+#include "sort_func.h"
 
 int int_comparator(const void *a, const void *b)
 {
@@ -29,13 +30,13 @@ void imp__swapper(void *a, void *b, size_t size)
 int mysort(void *data_array, int num, int size, compar_fn_t comparator)
 {
     if (data_array == NULL)
-        return -1;
+        return INVALID_ARGS;
     
     if (num <= 0)
-        return -2;
+        return INVALID_ELEMENTS_AMOUNT;
 
     if (size <= 0)
-        return -3;
+        return INVALID_ELEMENT_SIZE;
 
     for (size_t unsorted_num = num; unsorted_num > 0; unsorted_num--)
     {
@@ -48,5 +49,5 @@ int mysort(void *data_array, int num, int size, compar_fn_t comparator)
         }
     }
 
-    return 0;
+    return SUCCESS;
 }

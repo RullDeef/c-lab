@@ -1,6 +1,7 @@
 #include <stdlib.h>
-#include "filter_func.h"
 #include <assert.h>
+#include "status_codes.h"
+#include "filter_func.h"
 
 float imp__calc_mean(const int *begin, const int *end)
 {
@@ -43,21 +44,21 @@ void imp__copy_proper_values(const int *begin, const int *end, int **filtered_be
 int key(const int *begin, const int *end, int **filtered_begin, int **filtered_end)
 {
     if (begin == NULL || end == NULL || filtered_begin == NULL || filtered_end == NULL)
-        return -1;
+        return INVALID_ARGS;
 
     if (begin >= end)
-        return -2;
+        return INVALID_PTRS;
     
     float mean = imp__calc_mean(begin, end);
     int proper_amount = imp__count_proper_amount(begin, end, mean);
 
     if (proper_amount == 0)
-        return -3;
+        return INVALID_ELEMENTS_AMOUNT;
 
     *filtered_begin = (int*)malloc(proper_amount * sizeof(int));
     if (*filtered_begin == NULL)
-        return -4;
+        return BAD_ALLOC;
     
     imp__copy_proper_values(begin, end, filtered_begin, filtered_end, mean);
-    return 0;
+    return SUCCESS;
 }
