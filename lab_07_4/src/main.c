@@ -7,7 +7,138 @@
 #include "filter_func.h"
 #include "sort_func.h"
 
+/**
+ * @brief Константа для опции фильтрации, передаваемой через командную строку
+ */
 #define FILTER_OPT_STR "f"
+
+/**
+ * @brief Выводит массив чисел в файл
+ * 
+ * @param file - файл для вывода
+ * @param begin - указатель на начало массива
+ * @param end - указатель на конец массива (элемент за последним)
+ */
+void print_array_to_file(FILE *file, int *begin, int *end);
+
+/**
+ * @brief Выводит массив чисел в файл
+ * 
+ * @param filename - имя файла для записи
+ * @param begin - указатель на начало массива
+ * @param end - указатель на конец массива (элемент за последним)
+ * 
+ * @return  cant_open_file - невозможно открыть файл для записи
+ *          success - успешное выполнение
+ */
+int write_file(char *filename, int *begin, int *end);
+
+/**
+ * @brief Подсчитывает кол-во чисел в файле
+ * 
+ * После работы с файлом, не переводит файловый указатель в начало
+ * 
+ * @param file - файл для чтения
+ * 
+ * @return  -1 - файл имеет некорректную структуру
+ *          elements_count - кол-во чисел в файле
+ */
+int count_elements_in_file(FILE *file);
+
+/**
+ * @brief Считывает elements_count чисел из файла в массив
+ * 
+ * Массив должен быть доступен для использования до вызова функции
+ * 
+ * После работы устанавливает указатель end на конец массива
+ * 
+ * @param file - файл для чтения
+ * @param begin - указатель на начало массива
+ * @param end - указатель на конец массива (элемент за последним)
+ * @param elements_count - кол-во элементов для считывания
+ */
+void read_elements_from_file(FILE *file, int **begin, int **end, int elements_count);
+
+/**
+ * @brief Считывает числа из файла в массив
+ * 
+ * Создает и возвращает динамический массив чисел
+ * 
+ * @param filename - название файла для чтения
+ * @param begin - указатель на начало массива
+ * @param end - указатель на конец массива (на элемент за последним)
+ * 
+ * @return  cant_open_file - невозможно открыть файл
+ *          invalid_elements_amount - неверная структура файла
+ *          bad_alloc - неудачная попытка динамически выделить память
+ *          success - успешное выполнение
+ */
+int read_data_file(char *filename, int **begin, int **end);
+
+/**
+ * @brief Обрабатывает аргументы командной строки
+ * 
+ * @param argc - кол-во аргументов командной строки
+ * @param argv - массив из строк - аргументов командной строки
+ * @param input_filename - имя входного файла
+ * @param output_filename - имя выходного файла
+ * @param need_filtration - флаг необходимости фильтрации
+ * 
+ * @return  invalid_args - неверное кол-во агрументов командной строки
+ *          invalid_opt - невеопознанный аргумент командной строки
+ *          success - успешное выполнение
+ */
+int parse_args(int argc, char **argv, char **input_filename, char **output_filename, bool *need_filtration);
+
+/**
+ * @brief Фильтрует и сортирует массив чисел
+ * 
+ * После фильтрации удаляет старый массив (освобождает память)
+ * и замещает его новым массивом, созданным после фильтрации
+ * 
+ * @param begin - указатель на начало массива
+ * @param end - указатель на конец массива (на элемент за последним)
+ * @param need_filtration - флаг необходимости фильтрации
+ * 
+ * @return  invalid_args - некорректные аргументы функции
+ *          invalid_ptrs - некорректные указатели на начало и конец массива
+ *          invalid_elements_amount - нет оставшихся после фильтрации элементов
+ *          bad_alloc - неудача при попытке динамического выделения памяти
+ *          success - успешное выполнение
+ */
+int do_tasks(int **begin, int **end, bool need_filtration);
+
+/**
+ * @brief Считывает массив чисел из файла, фильтрует и
+ * сортирует его, после чего записывает в выходной файл
+ * 
+ * @param input_filename - имя входного файла
+ * @param output_filename - имя выходного файла
+ * @param need_filtration - флаг необходимости фильтрации
+ * 
+ * @return  failure - неудача при считывании массива чисел из файла
+ *          invalid_args - некорректные аргументы функции
+ *          invalid_ptrs - некорректные указатели на начало и конец массива
+ *          invalid_elements_amount - нет оставшихся после фильтрации элементов
+ *          bad_alloc - неудача при попытке динамического выделения памяти
+ *          success - успешное выполнение
+ */
+int proccess(char *input_filename, char *output_filename, bool need_filtration);
+
+int main(int argc, char **argv)
+{
+    char *input_filename = NULL;
+    char *output_filename = NULL;
+
+    bool need_filtration = false;
+
+    int status_code = parse_args(argc, argv, &input_filename, &output_filename, &need_filtration);
+
+    if (status_code == success)
+        status_code = proccess(input_filename, output_filename, need_filtration);
+
+    return status_code;
+}
 
 void print_array_to_file(FILE *file, int *begin, int *end)
 {
@@ -157,21 +288,6 @@ int proccess(char *input_filename, char *output_filename, bool need_filtration)
 
         free(data_array_begin);
     }
-
-    return status_code;
-}
-
-int main(int argc, char **argv)
-{
-    char *input_filename = NULL;
-    char *output_filename = NULL;
-
-    bool need_filtration = false;
-
-    int status_code = parse_args(argc, argv, &input_filename, &output_filename, &need_filtration);
-
-    if (status_code == success)
-        status_code = proccess(input_filename, output_filename, need_filtration);
 
     return status_code;
 }

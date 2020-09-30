@@ -4,28 +4,14 @@
 #include "status_codes.h"
 #include "sort_func.h"
 
-int int_comparator(const void *a, const void *b)
-{
-    assert(a != NULL);
-    assert(b != NULL);
+int int_comparator(const void *a, const void *b);
 
-    return *(int *)a - *(int *)b;
-}
-
-void imp__swapper(void *a, void *b, size_t size)
-{
-    assert(a != NULL);
-    assert(b != NULL);
-    assert(size > 0);
-
-    char temp;
-    for (size_t i = 0; i < size; i++)
-    {
-        temp = *((char*)a + i);
-        *((char*)a + i) = *((char*)b + i);
-        *((char*)b + i) = temp;
-    }
-}
+/**
+ * @brief Обменивает значениями указатели
+ * 
+ * @param size - размер данных для обмена
+ */
+void imp__swapper(void *a, void *b, size_t size);
 
 int mysort(void *data_array, int num, int size, compar_fn_t comparator)
 {
@@ -50,4 +36,27 @@ int mysort(void *data_array, int num, int size, compar_fn_t comparator)
     }
 
     return success;
+}
+
+int int_comparator(const void *a, const void *b)
+{
+    assert(a != NULL);
+    assert(b != NULL);
+
+    return *(int *)a - *(int *)b;
+}
+
+void imp__swapper(void *a, void *b, size_t size)
+{
+    assert(a != NULL);
+    assert(b != NULL);
+    assert(size > 0);
+
+    char temp;
+    for (size_t i = 0; i < size; i++)
+    {
+        temp = *((char *)a + i);
+        *((char *)a + i) = *((char *)b + i);
+        *((char *)b + i) = temp;
+    }
 }
