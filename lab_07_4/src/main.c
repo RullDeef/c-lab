@@ -150,24 +150,22 @@ void print_array_to_file(FILE *file, int *begin, int *end)
 
 int write_file(char *filename, int *begin, int *end)
 {
-    assert(filename != NULL);
-    assert(begin != NULL);
-    assert(end != NULL);
-    assert(begin < end);
+    int status_code = success;
 
     FILE *file = fopen(filename, "wt");
-    if (file == NULL)
-        return cant_open_file;
+    if (file != NULL)
+    {
+        print_array_to_file(file, begin, end);
+        fclose(file);
+    }
+    else
+        status_code = cant_open_file;
 
-    print_array_to_file(file, begin, end);
-    fclose(file);
-    return success;
+    return status_code;
 }
 
 int count_elements_in_file(FILE *file)
 {
-    assert(file != NULL);
-
     int elements_count = 0;
 
     int temp, rc;
@@ -179,12 +177,6 @@ int count_elements_in_file(FILE *file)
 
 void read_elements_from_file(FILE *file, int **begin, int **end, int elements_count)
 {
-    assert(file != NULL);
-    assert(begin != NULL);
-    assert(end != NULL);
-    assert(*begin != NULL);
-    assert(elements_count > 0);
-
     rewind(file);
     *end = *begin;
     while (*end != *begin + elements_count)
@@ -193,53 +185,50 @@ void read_elements_from_file(FILE *file, int **begin, int **end, int elements_co
 
 int read_data_file(char *filename, int **begin, int **end)
 {
-    assert(filename != NULL);
-    assert(begin != NULL);
-    assert(end != NULL);
+    int status_code = success;
 
     FILE *file = fopen(filename, "rt");
     if (file == NULL)
-        return cant_open_file;
-
-    int status_code = success;
-
-    int elements_count = count_elements_in_file(file);
-    if (elements_count > 0)
-    {
-        *begin = (int *)malloc(elements_count * sizeof(int));
-        if (*begin != NULL)
-            read_elements_from_file(file, begin, end, elements_count);
-        else
-            status_code = bad_alloc;
-    }
+        status_code = cant_open_file;
     else
-        status_code = invalid_elements_amount;
+    {
+        int elements_count = count_elements_in_file(file);
+        if (elements_count <= 0)
+            status_code = invalid_elements_amount;
+        else
+        {
+            *begin = (int *)malloc(elements_count * sizeof(int));
+            if (*begin == NULL)
+                status_code = bad_alloc;
+            else
+                read_elements_from_file(file, begin, end, elements_count);
+        }
 
-    fclose(file);
+        fclose(file);
+    }
+
     return status_code;
 }
 
 int parse_args(int argc, char **argv, char **input_filename, char **output_filename, bool *need_filtration)
 {
-    assert(input_filename != NULL);
-    assert(output_filename != NULL);
-    assert(need_filtration != NULL);
-
-    if (argc != 3 && argc != 4 && argc != 7)
-        return invalid_args;
-
     int status_code = success;
 
-    *input_filename = argv[1];
-    *output_filename = argv[2];
-
-    *need_filtration = false;
-    if (argc == 4)
+    if (argc != 3 && argc != 4)
+        status_code = invalid_args;
+    else
     {
-        if (strcmp(argv[3], FILTER_OPT_STR) == 0)
-            *need_filtration = true;
-        else
-            status_code = invalid_opt; // unrecognized option
+        *input_filename = argv[1];
+        *output_filename = argv[2];
+
+        *need_filtration = false;
+        if (argc == 4)
+        {
+            if (strcmp(argv[3], FILTER_OPT_STR) == 0)
+                *need_filtration = true;
+            else
+                status_code = invalid_opt; // unrecognized option
+        }
     }
 
     return status_code;
@@ -281,9 +270,6 @@ int do_tasks(int **begin, int **end, bool need_filtration)
 
 int proccess(char *input_filename, char *output_filename, bool need_filtration)
 {
-    assert(input_filename != NULL);
-    assert(output_filename != NULL);
-
     int *data_array_begin = NULL;
     int *data_array_end = NULL;
     int status_code = success;
