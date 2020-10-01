@@ -4,8 +4,6 @@
 #include "status_codes.h"
 #include "sort_func.h"
 
-int int_comparator(const void *a, const void *b);
-
 /**
  * @brief Обменивает значениями указатели
  * 
