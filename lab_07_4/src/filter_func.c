@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <assert.h>
 #include "status_codes.h"
 #include "filter_func.h"
 
@@ -39,7 +38,7 @@ void imp__copy_proper_values(const int *begin, const int *end, int **filtered_be
 
 int key(const int *begin, const int *end, int **filtered_begin, int **filtered_end)
 {
-    int satus_code = success;
+    int status_code = success;
 
     if (begin == NULL || end == NULL || filtered_begin == NULL || filtered_end == NULL || begin >= end)
         status_code = invalid_args;

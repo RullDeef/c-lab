@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include "status_codes.h"
 #include "sort_func.h"
 

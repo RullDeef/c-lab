@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <assert.h>
-#include <sys/time.h>
+// #include <sys/time.h>
 #include "status_codes.h"
 #include "filter_func.h"
 #include "sort_func.h"
@@ -254,15 +253,15 @@ int do_tasks(int **begin, int **end, bool need_filtration)
 
     if (status_code == success)
     {
-        struct timeval start_tv, end_tv;
-        struct timezone tz;
-        gettimeofday(&start_tv, &tz);
+        // struct timeval start_tv, end_tv;
+        // struct timezone tz;
+        // gettimeofday(&start_tv, &tz);
         status_code = mysort(*begin, *end - *begin, sizeof(int), int_comparator);
         // qsort(*begin, *end - *begin, sizeof(int), int_comparator);
-        gettimeofday(&end_tv, &tz);
-        unsigned long start_time = 1000000 * start_tv.tv_sec + start_tv.tv_usec;
-        unsigned long end_time = 1000000 * end_tv.tv_sec + end_tv.tv_usec;
-        fprintf(stderr, "%lu\n", end_time - start_time);
+        // gettimeofday(&end_tv, &tz);
+        // unsigned long start_time = 1000000 * start_tv.tv_sec + start_tv.tv_usec;
+        // unsigned long end_time = 1000000 * end_tv.tv_sec + end_tv.tv_usec;
+        // fprintf(stderr, "%lu\n", end_time - start_time);
     }
 
     return status_code;
