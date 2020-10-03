@@ -100,11 +100,13 @@ status_code_t read_items(const char *filename, item_t *items, short int *items_c
     status_code_t result = success;
 
     if (!file)
-        return cant_open_file;
+        result = cant_open_file;
+    else
+    {
+        result = imp__read_items_file(file, items, items_count);
+        fclose(file);
+    }
 
-    result = imp__read_items_file(file, items, items_count);
-
-    fclose(file);
     return result;
 }
 
