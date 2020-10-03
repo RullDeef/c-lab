@@ -1,0 +1,9 @@
+topor
+20
+3400
+pirozhok
+10
+0
+kartoshka
+0.02
+11
