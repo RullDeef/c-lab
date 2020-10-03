@@ -1,4 +1,0 @@
-product
-manufacture
-1000
-1

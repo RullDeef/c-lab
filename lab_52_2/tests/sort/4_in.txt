@@ -1,7 +1,0 @@
-product 1
-manfr 1
-100
-1
-product 2
-manfr 2
-200
