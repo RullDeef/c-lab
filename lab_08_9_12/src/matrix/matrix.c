@@ -35,7 +35,7 @@ matrix_t mat_create(size_t rows, size_t cols)
 
         // fill up row pointers
         for (size_t row = 0; row < rows; row++)
-            matrix.data[row] = matrix.data[rows] + cols * row;
+            matrix.data[row] = (matrix_elem_t *)(matrix.data + rows) + cols * row;
     }
 
     return matrix;

@@ -40,7 +40,7 @@ int mat_io_input_simple(FILE *file, matrix_t *matrix)
                     char *begin_ptr = temp;
                     char *end_ptr = NULL;
 
-                    for (size_t col = 0; col < cols && status_code == mat_io_success; col++)
+                    for (size_t col = 0; col < cols && strlen(begin_ptr) > 0 && status_code == mat_io_success; col++)
                     {
                         matrix_elem_t value = strtol(begin_ptr, &end_ptr, 10);
 
@@ -77,7 +77,7 @@ int mat_io_output_coordinate(FILE *file, const matrix_t *matrix)
     int status_code = mat_io_success;
 
     size_t nonzero_amount = imp__get_nonzero_amount(matrix);
-    fprintf(file, "%lu %lu %lu", matrix->rows, matrix->cols, nonzero_amount);
+    fprintf(file, "%lu %lu %lu\n", matrix->rows, matrix->cols, nonzero_amount);
 
     for (size_t row = 0; row < matrix->rows; row++)
     {
@@ -85,7 +85,7 @@ int mat_io_output_coordinate(FILE *file, const matrix_t *matrix)
         {
             matrix_elem_t value = mat_get(matrix, row, col);
             if (value != 0)
-                fprintf(file, "%lu %lu %lu", row, col, value);
+                fprintf(file, "%lu %lu %ld\n", row + 1, col + 1, value);
         }
     }
 
