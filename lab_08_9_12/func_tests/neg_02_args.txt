@@ -1,0 +1,1 @@
+cmd txt.txt temp_out.txt
