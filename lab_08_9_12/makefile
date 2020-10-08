@@ -24,7 +24,7 @@ test : app.exe
 	./func_tests/test.sh
 
 clean :
-	rm -rf ./obj *.exe *.stackdump ./func_tests/gcov
+	rm -rf ./obj *.exe *.stackdump ./func_tests/gcov ./func_tests/out
 	find . -type f -name "*.gcda" -delete
 	find . -type f -name "*.gcno" -delete
 	find . -type f -name "*.c.gcov" -delete

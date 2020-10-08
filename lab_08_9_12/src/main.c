@@ -11,14 +11,14 @@ status_code_t input_matrix(filename_t filename, matrix_t *matrix, input_fn_t inp
 
     if (!file)
     {
-        fprintf(stderr, "bad input file.\n");
+        // fprintf(stderr, "bad input file.\n");
         status_code = invalid_filename;
     }
     else
     {
         if (input_ft(file, matrix)) // if input failed
         {
-            fprintf(stderr, "input_ft failed.\n");
+            // fprintf(stderr, "input_ft failed.\n");
             status_code = invalid_file;
         }
 
@@ -28,7 +28,7 @@ status_code_t input_matrix(filename_t filename, matrix_t *matrix, input_fn_t inp
     return status_code;
 }
 
-status_code_t output_matrix(filename_t filename, const matrix_t *matrix, output_fn_t output_fn)
+status_code_t output_matrix(filename_t filename, const matrix_t *matrix, output_fn_t output_fn, int precision)
 {
     FILE *file = fopen(filename, "wt");
     status_code_t status_code = success;
@@ -37,7 +37,7 @@ status_code_t output_matrix(filename_t filename, const matrix_t *matrix, output_
         status_code = invalid_filename;
     else
     {
-        if (output_fn(file, matrix)) // if output failed
+        if (output_fn(file, matrix, precision)) // if output failed
             status_code = invalid_file;
 
         fclose(file);
@@ -63,7 +63,7 @@ status_code_t do_mat_bin_op(filename_t ifname_1, filename_t ifname_2, filename_t
         if (bin_op_fn(&mat_1, &mat_2, &res_mat))
             status_code = invalid_mat_dims;
         else // addition was successful
-            status_code = output_matrix(ofname, &res_mat, output_fn);
+            status_code = output_matrix(ofname, &res_mat, output_fn, MAT_IO_INT_PRECISION);
 
         mat_free(&res_mat);
     }
@@ -82,14 +82,32 @@ status_code_t do_ssle(filename_t ifname, filename_t ofname, input_fn_t input_fn,
     status_code_t status_code = success;
 
     matrix_t mat = mat_null();
+    matrix_t res = mat_null();
 
     if ((status_code = input_matrix(ifname, &mat, input_fn)) == success)
     {
-        // solve system of linear equations here
-        assert(NULL); // not implemented
+        // adjust matrix size
+        if (mat_resize(&mat, mat.rows, mat.cols + 1))
+        {
+            fprintf(stderr, "bad resize status.\n");
+            status_code = failure;
+        }
+        else if (mat_solve_sle(&mat, &res)) // solve system of linear equations here
+        {
+            fprintf(stderr, "bad solve sle status.\n");
+            status_code = failure;
+        }
+        else
+        {
+            status_code = output_matrix(ofname, &res, output_fn, MAT_IO_DOUBLE_PRECISION);
+        }
     }
 
+    printf("started free ... \n");
     mat_free(&mat);
+    printf("end.\n");
+    
+    mat_free(&res);
 
     return status_code;
 }
@@ -138,6 +156,23 @@ status_code_t do_main_work(int argc, const char **argv, input_fn_t input_fn, out
 
 int main(int argc, const char **argv)
 {
+    // matrix_t mat = mat_null();
+    // matrix_t res = mat_null();
+
+    // if (!input_matrix("m2x3.txt", &mat, mat_io_input_simple))
+    // {
+    //     printf("Original matrix:\n");
+    //     mat_io_output_simple(stdout, &mat, 3);
+    //     printf("\n");
+    //     
+    //     printf("\nsolve sle status: %d\n", mat_solve_sle(&mat, &res));
+
+    //     printf("result vector:\n");
+    //     mat_io_output_simple(stdout, &res, 3);
+    //     printf("\n");
+    // }
+    // return 0;
+
     input_fn_t input_fn = mat_io_input_simple;
     output_fn_t output_fn = mat_io_output_coordinate;
 

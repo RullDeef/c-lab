@@ -13,6 +13,7 @@ enum
     mat_io_failed,
     mat_io_invalid_input_file,
     mat_io_garbage_in_file,
+    mat_io_bad_precision
 };
 
 static bool imp__has_garbage_next(FILE *file)
@@ -38,7 +39,8 @@ static int imp__read_matrix_row(const char *str, size_t row, matrix_t *matrix)
 
     for (size_t col = 0; col < matrix->cols && strlen(begin_ptr) > 0 && status_code == mat_io_success; col++)
     {
-        matrix_elem_t value = strtol(begin_ptr, &end_ptr, 10);
+        matrix_elem_t value = strtod(begin_ptr, &end_ptr);
+        begin_ptr = end_ptr + 1;
 
         if ((value == 0 && errno == EINVAL) || value == LONG_MAX || value == LONG_MIN)
             status_code = mat_io_invalid_input_file;
@@ -112,20 +114,51 @@ static size_t imp__get_nonzero_amount(const matrix_t *matrix)
     return amount;
 }
 
-int mat_io_output_coordinate(FILE *file, const matrix_t *matrix)
+int mat_io_output_simple(FILE *file, const matrix_t *matrix, int precision)
 {
     int status_code = mat_io_success;
 
-    size_t nonzero_amount = imp__get_nonzero_amount(matrix);
-    fprintf(file, "%lu %lu %lu\n", matrix->rows, matrix->cols, nonzero_amount);
-
-    for (size_t row = 0; row < matrix->rows; row++)
+    if (precision < 0)
+        status_code = mat_io_bad_precision;
+    else
     {
-        for (size_t col = 0; col < matrix->cols; col++)
+        fprintf(file, "%lu %lu\n", matrix->rows, matrix->cols);
+
+        for (size_t row = 0; row < matrix->rows; row++)
         {
-            matrix_elem_t value = mat_get(matrix, row, col);
-            if (value != 0)
-                fprintf(file, "%lu %lu %ld\n", row + 1, col + 1, value);
+            for (size_t col = 0; col < matrix->cols; col++)
+            {
+                matrix_elem_t value = mat_get(matrix, row, col);
+                fprintf(file, "% .*lf", precision, value);
+                if (col + 1 < matrix->cols)
+                    fprintf(file, " ");
+            }
+            fprintf(file, "\n");
+        }
+    }
+
+    return status_code;
+}
+
+int mat_io_output_coordinate(FILE *file, const matrix_t *matrix, int precision)
+{
+    int status_code = mat_io_success;
+
+    if (precision < 0)
+        status_code = mat_io_bad_precision;
+    else
+    {
+        size_t nonzero_amount = imp__get_nonzero_amount(matrix);
+        fprintf(file, "%lu %lu %lu\n", matrix->rows, matrix->cols, nonzero_amount);
+
+        for (size_t row = 0; row < matrix->rows; row++)
+        {
+            for (size_t col = 0; col < matrix->cols; col++)
+            {
+                matrix_elem_t value = mat_get(matrix, row, col);
+                if (value != 0)
+                    fprintf(file, "%lu %lu %.*lf\n", row + 1, col + 1, precision, value);
+            }
         }
     }
 
