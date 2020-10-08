@@ -10,11 +10,17 @@ status_code_t input_matrix(filename_t filename, matrix_t *matrix, input_fn_t inp
     status_code_t status_code = success;
 
     if (!file)
+    {
+        fprintf(stderr, "bad input file.\n");
         status_code = invalid_filename;
+    }
     else
     {
         if (input_ft(file, matrix)) // if input failed
+        {
+            fprintf(stderr, "input_ft failed.\n");
             status_code = invalid_file;
+        }
 
         fclose(file);
     }
@@ -62,6 +68,9 @@ status_code_t do_mat_bin_op(filename_t ifname_1, filename_t ifname_2, filename_t
         mat_free(&res_mat);
     }
 
+    if (status_code != success)
+        fprintf(stderr, "bad in domatbinop status.\n");
+
     mat_free(&mat_1);
     mat_free(&mat_2);
 
@@ -96,7 +105,7 @@ status_code_t do_param_work(app_params_t *app_params, input_fn_t input_fn, outpu
         break;
 
     case command_mult:
-        status_code = do_mat_bin_op(app_params->ifname_1, app_params->ifname_2, app_params->ofname, mat_add, input_fn, output_fn);
+        status_code = do_mat_bin_op(app_params->ifname_1, app_params->ifname_2, app_params->ofname, mat_mult, input_fn, output_fn);
         break;
 
     case command_ssle:
@@ -119,9 +128,11 @@ status_code_t do_main_work(int argc, const char **argv, input_fn_t input_fn, out
     if (!app_params)
         status_code = invalid_app_params;
     else
+    {
         status_code = do_param_work(app_params, input_fn, output_fn);
+        free(app_params);
+    }
 
-    free(app_params);
     return status_code;
 }
 

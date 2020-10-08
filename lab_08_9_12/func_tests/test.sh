@@ -1,26 +1,29 @@
 #!/bin/bash
 
+rm -rf ./func_tests/out
+mkdir -p ./func_tests/out
+
 # positive tests counters
-declare -i total_pos=$(ls -1q ./func_tests/pos_*_args.txt | wc -l)
+declare -i total_pos=$(ls -1q ./func_tests/pos_*_args.txt 2>/dev/null | wc -l)
 declare -i passed_pos=0
 
 # test positive cases
-printf "  Позитивные тесты:\n\n"
+printf "\n  Позитивные тесты:\n\n"
 for ((i = 1; i <= $total_pos; i++))
 do
   # gather expected and actual strings
   n=$(printf "%02d" $i)
   expected=$(cat "./func_tests/pos_${n}_out.txt")
   args=$(cat "./func_tests/pos_${n}_args.txt")
-  ./app.exe $args .temp_$n
+  ./app.exe $args ./func_tests/out/pos_${n}_out_file.txt 1>./func_tests/out/pos_${n}_out.txt 2>./func_tests/out/pos_${n}_err.txt
   status=$?
-  actual=$(cat .temp_$n)
+  actual=$(cat ./func_tests/out/pos_${n}_out_file.txt)
 
   if [ $status -ne 0 ]
   then
     echo "Тест #$i: Упал с кодом $status" 
   else
-    diff -q "./func_tests/pos_${n}_out.txt" ".temp_$n"
+    diff -q "./func_tests/pos_${n}_out.txt" "./func_tests/out/pos_${n}_out_file.txt" >/dev/null
     if [ $? -eq 0 ]
     then
       passed_pos=$(( passed_pos + 1 ))
@@ -33,8 +36,6 @@ do
   fi
 done
 
-# rm -rf ./.temp_*
-
 # negative tests counters
 declare -i total_neg=$(ls -1q ./func_tests/neg_*_args.txt 2>/dev/null | wc -l)
 declare -i passed_neg=0
@@ -45,28 +46,28 @@ for ((i = 1; i <= $total_neg; i++))
 do
   # gather expected and actual strings
   n=$(printf "%02d" $i)
-  expected=$(cat "./func_tests/neg_${n}_out.txt")
+  #expected=$(cat "./func_tests/neg_${n}_out.txt")
   args=$(cat "./func_tests/neg_${n}_args.txt")
-  ./app.exe $args 2>.temp_$n 1>.temp_$n
+  res=$(./app.exe $args ./func_tests/out/neg_${n}_out_file.txt 1>./func_tests/out/neg_${n}_out.txt 2>./func_tests/out/neg_${n}_err.txt)
   status=$?
-  actual=$(cat .temp_$n)
+  #actual=$(cat .temp_$n)
 
-  if [ $status = 0 ]
+  if [[ $status == 0 || "$res" != "" ]]
   then
     echo "Тест #$i: Упал с кодом $status" 
   else
     passed_neg=$(( passed_neg + 1 ))
-    echo "Test #$i: Прошёл."
+    echo "Test #$i: Прошёл с кодом $status"
   fi
 done
 
-rm -rf ./.temp_*
+# rm -rf ./.temp_*
 
 echo
 echo "Позитивных тестов: $total_pos всего, $passed_pos прошло, $(( total_pos - passed_pos )) упало."
 echo "Негативных тестов: $total_neg всего, $passed_neg прошло, $(( total_neg - passed_neg )) упало."
 
-printf "\n  Сбор инормации о покрытии...\n"
+printf "\n  Сбор инормации о покрытии...\n\n"
 
 # move to proper place
 for srcf in $(find ./src/ -name *.c)
