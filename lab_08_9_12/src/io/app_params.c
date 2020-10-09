@@ -59,7 +59,6 @@ app_params_t *parse_app_params(int argc, const char **argv)
         {
             if (imp__parse_app_command(argv[1], &app_params->command) != success)
             {
-                fprintf(stderr, "bad command.\n");
                 free(app_params);
                 app_params = NULL;
             }
