@@ -16,7 +16,7 @@ do
   expected=$(cat "./func_tests/pos_${n}_out.txt")
   args=$(cat "./func_tests/pos_${n}_args.txt")
   
-  if command -v drmemory &> /dev/null
+  if [[ "$(expr substr $(uname -s) 1 6)" != "CYGWIN" && $(command -v drmemory &> /dev/null) ]]
   then
     status=$(drmemory.exe -batch -ignore_kernel -no_use_stderr -- ./app.exe $args ./func_tests/out/pos_${n}_out_file.txt 1>./func_tests/out/pos_${n}_out.txt 2>./func_tests/out/pos_${n}_err.txt)
   elif command -v valgrind &> /dev/null
@@ -59,7 +59,7 @@ do
   #expected=$(cat "./func_tests/neg_${n}_out.txt")
   args=$(cat "./func_tests/neg_${n}_args.txt")
   
-  if command -v drmemory &> /dev/null
+  if [[ "$(expr substr $(uname -s) 1 6)" != "CYGWIN" && $(command -v drmemory &> /dev/null) ]]
   then
     res=$(drmemory.exe -batch -ignore_kernel -no_use_stderr -- ./app.exe $args ./func_tests/out/neg_${n}_out_file.txt 1>./func_tests/out/neg_${n}_out.txt 2>./func_tests/out/neg_${n}_err.txt)
   elif command -v valgrind &> /dev/null

@@ -92,44 +92,43 @@ int mat_resize(matrix_t *matrix, size_t new_rows, size_t new_cols)
 {
     int status_code = mat_success;
 
+    if (mat_is_null(matrix))
+    {
+        *matrix = mat_create(new_rows, new_cols);
+        if (mat_is_null(matrix))
+            status_code = mat_bad_create;
+    }
+
     // действительно нужно что-то делать?
-    if (matrix->rows != new_rows || matrix->cols != new_cols)
+    if (status_code == mat_success && (matrix->rows != new_rows || matrix->cols != new_cols))
     {
         matrix_t old_matrix = *matrix;
         
-        if (mat_is_null(&old_matrix))
-        {
-            // fprintf(stderr, "resize: bad copy.\n");
-            status_code = mat_bad_copy; // bad copy
-        }
-        else
-        {
-            size_t new_size = imp__calc_required_mat_size(new_rows, new_cols);
-            matrix_elem_t **new_data = NULL;
+        size_t new_size = imp__calc_required_mat_size(new_rows, new_cols);
+        matrix_elem_t **new_data = NULL;
 
-            // check if realloc needed
-            if (new_size > matrix->__allocated)
+        // check if realloc needed
+        if (new_size > matrix->__allocated)
+        {
+            // allocate much more
+            new_size = (size_t)((float)new_size * 1.5f);
+            // warning - after realloc will be reading from memory that does not belong us
+            new_data = (matrix_elem_t**)calloc(new_size, sizeof(char));
+
+            if (new_data == NULL)
             {
-                // allocate much more
-                new_size = (size_t)((float)new_size * 1.5f);
-                // warning - after realloc will be reading from memory that does not belong us
-                new_data = (matrix_elem_t**)calloc(new_size, sizeof(char));
+                // fprintf(stderr, "resize: bad realloc for %lu bytes.\n", new_size);
+                status_code = mat_bad_alloc;
+            }
+            else
+            {
+                // fprintf(stderr, "resize: reallocated %lu bytes.\n", new_size);
+                matrix->data = new_data;
 
-                if (new_data == NULL)
-                {
-                    // fprintf(stderr, "resize: bad realloc for %lu bytes.\n", new_size);
-                    status_code = mat_bad_alloc;
-                }
-                else
-                {
-                    // fprintf(stderr, "resize: reallocated %lu bytes.\n", new_size);
-                    matrix->data = new_data;
-
-                    matrix->rows = new_rows;
-                    matrix->cols = new_cols;
-                }
-            } 
-        }
+                matrix->rows = new_rows;
+                matrix->cols = new_cols;
+            }
+        } 
 
         if (status_code == mat_success)
         {
@@ -160,12 +159,12 @@ int mat_resize(matrix_t *matrix, size_t new_rows, size_t new_cols)
 
 void mat_swap_rows(matrix_t *matrix, size_t row_1, size_t row_2)
 {
-    assert(0 <= row_1 && row_1 < matrix->rows);
-    assert(0 <= row_2 && row_2 < matrix->rows);
-
-    matrix_elem_t *temp_row = matrix->data[row_1];
-    matrix->data[row_1] = matrix->data[row_2];
-    matrix->data[row_2] = temp_row;
+    if (0 <= row_1 && row_1 < matrix->rows && 0 <= row_2 && row_2 < matrix->rows)
+    {
+        matrix_elem_t *temp_row = matrix->data[row_1];
+        matrix->data[row_1] = matrix->data[row_2];
+        matrix->data[row_2] = temp_row;
+    }
 }
 
 void mat_add_row(matrix_t *matrix, size_t dest_row, size_t src_row, matrix_elem_t k)
@@ -205,32 +204,30 @@ matrix_t mat_reduced(const matrix_t *matrix, size_t reduce_row, size_t reduce_co
 
 matrix_elem_t mat_get(const matrix_t *matrix, size_t row, size_t col)
 {
-    assert(!mat_is_null(matrix));
-    assert(0 <= row && row < matrix->rows);
-    assert(0 <= col && col < matrix->cols);
-
-    return matrix->data[row][col];
+    if (!mat_is_null(matrix) && 0 <= row && row < matrix->rows && 0 <= col && col < matrix->cols)
+        return matrix->data[row][col];
+    else
+        return 0.0;
 }
 
 void mat_set(matrix_t *matrix, size_t row, size_t col, matrix_elem_t value)
 {
-    assert(!mat_is_null(matrix));
-    assert(0 <= row && row < matrix->rows);
-    assert(0 <= col && col < matrix->cols);
-
-    matrix->data[row][col] = value;
+    if (!mat_is_null(matrix) && 0 <= row && row < matrix->rows && 0 <= col && col < matrix->cols)
+        matrix->data[row][col] = value;
 }
 
 int mat_add(const matrix_t *mat_1, const matrix_t *mat_2, matrix_t *res)
 {
-    assert(!mat_is_null(mat_1) && !mat_is_null(mat_2) && !mat_is_null(res));
+    int status_code = mat_success;
 
-    int status_code = EXIT_SUCCESS;
-
-    if (mat_1->rows != mat_2->rows || mat_1->cols != mat_2->cols ||
-        res->rows != mat_1->rows || res->cols != mat_1->cols)
-        status_code = EXIT_FAILURE;
+    if (mat_is_null(mat_1) || mat_is_null(mat_2))
+        status_code = mat_bad_matrix;
+    else if (mat_1->rows != mat_2->rows || mat_1->cols != mat_2->cols)
+        status_code = mat_bad_dims;
     else
+        status_code = mat_resize(res, mat_1->rows, mat_2->cols);
+
+    if (status_code == mat_success)
     {
         for (size_t row = 0; row < res->rows; row++)
         {
@@ -251,13 +248,16 @@ int mat_add(const matrix_t *mat_1, const matrix_t *mat_2, matrix_t *res)
 
 int mat_mult(const matrix_t *mat_1, const matrix_t *mat_2, matrix_t *res)
 {
-    assert(!mat_is_null(mat_1) && !mat_is_null(mat_2) && !mat_is_null(res));
-
     int status_code = EXIT_SUCCESS;
-
-    if (mat_1->rows != res->rows || mat_1->cols != mat_2->rows || res->cols != mat_2->cols)
-        status_code = EXIT_FAILURE;
+ 
+    if (mat_is_null(mat_1) || mat_is_null(mat_2))
+        status_code = mat_bad_matrix;
+    else if (mat_1->cols != mat_2->rows)
+        status_code = mat_bad_dims;
     else
+        status_code = mat_resize(res, mat_1->rows, mat_2->cols);
+
+    if (status_code == mat_success)
     {
         for (size_t row = 0; row < res->rows; row++)
         {
@@ -301,8 +301,6 @@ static matrix_elem_t imp__get_max_abs(const matrix_t *matrix, size_t *prime_row,
     return prime;
 }
 
-#include "../io/mat_io.h"
-
 // recursive function
 static int imp__gauss_transform(matrix_t *matrix)
 {
@@ -312,8 +310,13 @@ static int imp__gauss_transform(matrix_t *matrix)
     if (matrix->rows == 1)
     {
         // adjust last bias
-        matrix->data[0][1] /= matrix->data[0][0];
-        matrix->data[0][0] = 1.0;
+        if (matrix->data[0][0] == 0.0)
+            status_code = mat_singular_matrix;
+        else
+        {
+            matrix->data[0][1] /= matrix->data[0][0];
+            matrix->data[0][0] = 1.0;
+        }
         return status_code;
     }
 
@@ -421,11 +424,9 @@ int mat_solve_sle(matrix_t *matrix, matrix_t *result)
         status_code = mat_bad_dims;
     else
     {
-        *result = mat_create(matrix->rows, 1);
+        status_code = mat_resize(result, matrix->rows, 1);
 
-        if (mat_is_null(result))
-            status_code = mat_bad_create;
-        else
+        if (status_code == mat_success)
         {
             // создать временную копию матрицы matrix для обработки
             matrix_t temp = mat_copy(matrix);

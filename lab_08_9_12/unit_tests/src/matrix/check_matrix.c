@@ -25,7 +25,7 @@ START_TEST(create_invalid_mat)
 {
     matrix_t mat = mat_null();
     
-    mat_create(0, 10);
+    mat = mat_create(0, 10);
     ck_assert(mat_is_null(&mat));
     
     mat = mat_create(20, 0);
@@ -49,6 +49,9 @@ START_TEST(t_mat_copy)
     matrix_t dst = mat_copy(&src);
     ck_assert(!mat_is_null(&dst));
     ck_assert(src.data != dst.data);
+
+    mat_free(&src);
+    mat_free(&dst);
 }
 END_TEST
 
