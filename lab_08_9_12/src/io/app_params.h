@@ -5,9 +5,9 @@
 
 typedef enum
 {
-    command_add,    // add matrices
-    command_mult,   // multiply matrices
-    command_ssle     // solve system of linear equations
+    command_add,
+    command_mult,
+    command_ssle
 } app_command_t;
 
 typedef char filename_t[MAX_FILENAME_LENGTH];
@@ -20,6 +20,6 @@ typedef struct
     filename_t ofname;
 } app_params_t;
 
-app_params_t* parse_app_params(int argc, const char **argv);
+app_params_t *parse_app_params(int argc, const char **argv);
 
 #endif // __APP_PARAMS_H_

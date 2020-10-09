@@ -40,9 +40,9 @@ static int imp__read_matrix_row(const char *str, size_t row, matrix_t *matrix)
     for (size_t col = 0; col < matrix->cols && strlen(begin_ptr) > 0 && status_code == mat_io_success; col++)
     {
         matrix_elem_t value = strtod(begin_ptr, &end_ptr);
-        begin_ptr = end_ptr + 1;
+        begin_ptr = end_ptr;
 
-        if ((value == 0 && errno == EINVAL) || value == LONG_MAX || value == LONG_MIN)
+        if (errno == ERANGE)
             status_code = mat_io_invalid_input_file;
         else
             mat_set(matrix, row, col, value);
@@ -66,7 +66,7 @@ static int imp__safe_read_mat(FILE *file, matrix_t *matrix)
     }
 
     // check for ongoing garbage in file
-    if (imp__has_garbage_next(file))
+    if (status_code == mat_io_success && imp__has_garbage_next(file))
     {
         // fprintf(stderr, "file has garbage.\n");
         status_code = mat_io_garbage_in_file;

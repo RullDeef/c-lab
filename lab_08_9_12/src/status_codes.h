@@ -8,7 +8,6 @@ typedef enum
     invalid_app_params,
     invalid_filename,
     invalid_file,
-
     invalid_command,
     invalid_mat_dims
 } status_code_t;

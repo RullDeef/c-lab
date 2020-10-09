@@ -11,12 +11,14 @@ inline static size_t imp__calc_required_mat_size(size_t rows, size_t cols)
 
 matrix_t mat_null(void)
 {
-    return (matrix_t) {
+    matrix_t null_mat = {
         .rows = 0,
         .cols = 0,
-        .__allocated = 0,
+        .imp__allocated = 0,
         .data = NULL
     };
+
+    return null_mat;
 }
 
 matrix_t mat_create(size_t rows, size_t cols)
@@ -33,18 +35,18 @@ matrix_t mat_create(size_t rows, size_t cols)
     /*           <- rows -->   <-cols->
         data = [ __ __ __ __ | __ __ __ : __ __ __ : __ __ __ : __ __ __ ]
     */
-    matrix.__allocated = imp__calc_required_mat_size(rows, cols);
+    matrix.imp__allocated = imp__calc_required_mat_size(rows, cols);
 
     // take more space for future manipulations
-    matrix.__allocated = (size_t)((float)matrix.__allocated * 1.5f);
+    matrix.imp__allocated = (size_t)((float)matrix.imp__allocated * 1.5f);
 
-    matrix.data = (matrix_elem_t **)malloc(matrix.__allocated);
+    matrix.data = (matrix_elem_t **)malloc(matrix.imp__allocated);
 
     if (matrix.data == NULL)
         matrix = mat_null();
     else
     {
-        memset(matrix.data, 0, matrix.__allocated);
+        memset(matrix.data, 0, matrix.imp__allocated);
 
         // fill up row pointers
         for (size_t row = 0; row < rows; row++)
@@ -79,7 +81,7 @@ matrix_t mat_copy(const matrix_t *matrix)
 
     if (!mat_is_null(&result))
     {
-        size_t mem_size = result.__allocated;
+        size_t mem_size = result.imp__allocated;
         memcpy(result.data, matrix->data, mem_size);
     }
 
@@ -108,7 +110,7 @@ int mat_resize(matrix_t *matrix, size_t new_rows, size_t new_cols)
         matrix_elem_t **new_data = NULL;
 
         // check if realloc needed
-        if (new_size > matrix->__allocated)
+        if (new_size > matrix->imp__allocated)
         {
             // allocate much more
             new_size = (size_t)((float)new_size * 1.5f);
@@ -178,7 +180,7 @@ void mat_add_row(matrix_t *matrix, size_t dest_row, size_t src_row, matrix_elem_
 
 matrix_t mat_reduced(const matrix_t *matrix, size_t reduce_row, size_t reduce_col)
 {
-    matrix_t result =  mat_create(matrix->rows - 1, matrix->cols - 1);
+    matrix_t result = mat_create(matrix->rows - 1, matrix->cols - 1);
 
     if (!mat_is_null(&result))
     {

@@ -33,7 +33,7 @@ typedef double matrix_elem_t;
  * 
  * @param rows - количество строк матрицы
  * @param cols - количество столбцов матрицы
- * @param __allocated - размер выделенной памяти (для обработки внутри модуля)
+ * @param imp__allocated - размер выделенной памяти (для обработки внутри модуля)
  * @param data - динамический блок данных состоящий из указателей
  *               на строки и самих строк матрицы.
  */
@@ -41,7 +41,7 @@ typedef struct
 {
     size_t rows;
     size_t cols;
-    size_t __allocated;
+    size_t imp__allocated;
     matrix_elem_t **data;
 } matrix_t;
 
@@ -176,9 +176,9 @@ int mat_mult(const matrix_t *mat_1, const matrix_t *mat_2, matrix_t *res);
 
 /**
  * @brief Решает систему линейных уравнений с
- * коэффициентами в квадратной матрице matrix.
+ * коэффициентами в матрице matrix размера N*(N+1).
  * 
- * @param matrix - квадратная матрица коэффициентов
+ * @param matrix - матрица коэффициентов
  * @param result - матрица-столбец решений (если найдено)
  * 
  * @return mat_bad_dims - размер матрицы не удовлетворяют методу решения,
