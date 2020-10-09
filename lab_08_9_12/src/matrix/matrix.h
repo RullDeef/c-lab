@@ -11,7 +11,8 @@
 /**
  * @brief статус-коды операций реализованных в данном модуле.
  */
-enum {
+enum
+{
     mat_success = 0,
     mat_bad_create,
     mat_bad_dims,

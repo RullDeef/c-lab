@@ -48,14 +48,14 @@ static status_code_t imp__parse_filename(const char *str, filename_t filename)
     return status_code;
 }
 
-app_params_t* parse_app_params(int argc, const char **argv)
+app_params_t *parse_app_params(int argc, const char **argv)
 {
     app_params_t *app_params = NULL;
 
-    if (argc == 4 || argc == 5) // good args count
+    if (argc == 4 || argc == 5)
     {
         app_params = malloc(sizeof(app_params_t));
-        if (app_params) // good allocation
+        if (app_params)
         {
             if (imp__parse_app_command(argv[1], &app_params->command) != success)
             {

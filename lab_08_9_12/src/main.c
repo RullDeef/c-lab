@@ -33,7 +33,7 @@ status_code_t output_matrix(filename_t filename, const matrix_t *matrix, output_
         status_code = invalid_filename;
     else
     {
-        if (output_fn(file, matrix, precision)) // if output failed
+        if (output_fn(file, matrix, precision))
             status_code = invalid_file;
 
         fclose(file);
