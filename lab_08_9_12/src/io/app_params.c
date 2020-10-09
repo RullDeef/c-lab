@@ -62,7 +62,7 @@ app_params_t *parse_app_params(int argc, const char **argv)
                 free(app_params);
                 app_params = NULL;
             }
-            else if (app_params->command == command_ssle)
+            else if (app_params->command == command_ssle && argc == 4)
             {
                 if (imp__parse_filename(argv[2], app_params->ifname_1) != success ||
                     imp__parse_filename(argv[3], app_params->ofname) != success)
@@ -71,7 +71,7 @@ app_params_t *parse_app_params(int argc, const char **argv)
                     app_params = NULL;
                 }
             }
-            else
+            else if (app_params->command != command_ssle && argc == 5)
             {
                 if (imp__parse_filename(argv[2], app_params->ifname_1) != success ||
                     imp__parse_filename(argv[3], app_params->ifname_2) != success ||
@@ -80,6 +80,11 @@ app_params_t *parse_app_params(int argc, const char **argv)
                     free(app_params);
                     app_params = NULL;
                 }
+            }
+            else
+            {
+                free(app_params);
+                app_params = NULL;
             }
         }
     }
