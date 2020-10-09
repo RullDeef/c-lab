@@ -179,7 +179,9 @@ int mat_io_output_coordinate(FILE *file, const matrix_t *matrix, int precision)
 {
     int status_code = mat_io_success;
 
-    if (precision < 0)
+    if (mat_is_null(matrix))
+        status_code = mat_io_failed;
+    else if (precision < 0)
         status_code = mat_io_bad_precision;
     else
     {
