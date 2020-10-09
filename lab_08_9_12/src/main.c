@@ -132,20 +132,16 @@ status_code_t do_main_work(int argc, const char **argv, input_fn_t input_fn, out
 int main(int argc, const char **argv)
 {
     // matrix_t mat = mat_null();
-    // matrix_t res = mat_null();
-
-    // if (!input_matrix("m2x3.txt", &mat, mat_io_input_simple))
+    // 
+    // if (!input_matrix("m4x2.txt", &mat, mat_io_input_simple))
     // {
     //     printf("Original matrix:\n");
     //     mat_io_output_simple(stdout, &mat, 3);
     //     printf("\n");
-    //     
-    //     printf("\nsolve sle status: %d\n", mat_solve_sle(&mat, &res));
-
-    //     printf("result vector:\n");
-    //     mat_io_output_simple(stdout, &res, 3);
-    //     printf("\n");
     // }
+    // else
+    //     printf("error! incorrect file.\n");
+    // 
     // return 0;
 
     input_fn_t input_fn = mat_io_input_simple;

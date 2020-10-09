@@ -12,6 +12,7 @@ enum
     mat_io_success = 0,
     mat_io_failed,
     mat_io_invalid_input_file,
+    mat_io_bad_dims,
     mat_io_garbage_in_file,
     mat_io_bad_precision
 };
@@ -84,6 +85,31 @@ static bool imp__file_is_empty(FILE* file)
     return empty;
 }
 
+static int imp__scan_mat_dims(char *str, size_t *rows, size_t *cols)
+{
+    int status_code = mat_io_success;
+
+    *rows = strtoul(str, &str, 10);
+    if (*rows == 0 || errno == ERANGE)
+        status_code = mat_io_bad_dims;
+    else
+    {
+        *cols = strtoul(str, &str, 10);
+        if (*cols == 0 || errno == ERANGE)
+            status_code = mat_io_bad_dims;
+        else
+        {
+            while (*str != '\0' && isspace((int)*str))
+                str++;
+            
+            if (*str != '\0')
+                status_code = mat_io_garbage_in_file;
+        }
+    }
+
+    return status_code;
+}
+
 int mat_io_input_simple(FILE *file, matrix_t *matrix)
 {
     char temp[TEMP_STR_LENGTH];
@@ -96,9 +122,9 @@ int mat_io_input_simple(FILE *file, matrix_t *matrix)
         size_t rows;
         size_t cols;
 
-        if (sscanf(temp, "%lu %lu ", &rows, &cols) != 2 || rows == 0 || cols == 0)
-            status_code = mat_io_invalid_input_file;
-        else
+        //if (sscanf(temp, "%lu %lu ", &rows, &cols) != 2 || rows == 0 || cols == 0)
+        status_code = imp__scan_mat_dims(temp, &rows, &cols);
+        if (status_code == mat_io_success)
         {
             *matrix = mat_create(rows, cols);
             status_code = imp__safe_read_mat(file, matrix);
