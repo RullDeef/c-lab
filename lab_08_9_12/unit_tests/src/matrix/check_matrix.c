@@ -24,6 +24,7 @@ static matrix_t imp__craft_mat(size_t rows, size_t cols, const char *str)
 START_TEST(create_invalid_mat)
 {
     matrix_t mat = mat_null();
+    ck_assert_double_eq(mat_get(&mat, 0, 0), 0.0);
     
     mat = mat_create(0, 10);
     ck_assert(mat_is_null(&mat));
@@ -55,11 +56,100 @@ START_TEST(test_copy)
 }
 END_TEST
 
+START_TEST(test_resize)
+{
+    matrix_t mat = imp__craft_mat(1, 1, "4");
+
+    int status = mat_resize(&mat, 5, 5);
+    ck_assert_int_eq(status, mat_success);
+    ck_assert(!mat_is_null(&mat));
+    ck_assert_int_eq(mat.rows, 5);
+    ck_assert_int_eq(mat.cols, 5);
+    ck_assert_double_eq(mat_get(&mat, 0, 0), 4.0);
+
+    mat_free(&mat);
+}
+END_TEST
+
+START_TEST(test_add)
+{
+    matrix_t mat_1 = imp__craft_mat(2, 3,
+        " 1 0 -3 "
+        " 4 -2 5 "
+    );
+
+    matrix_t mat_2 = mat_null();
+    matrix_t res = mat_null();
+
+    int status = mat_add(&mat_1, &mat_2, &res);
+    ck_assert_int_ne(status, mat_success);
+
+    mat_2 = imp__craft_mat(2, 2,
+        " 5 -1 "
+        " 0  3 "
+    );
+
+    status = mat_add(&mat_1, &mat_2, &res);
+    ck_assert_int_ne(status, mat_success);
+
+    mat_free(&mat_2);
+    mat_2 = imp__craft_mat(2, 3,
+        " 5 -1 0 "
+        " 0 3 -2 "
+    );
+
+    status = mat_add(&mat_1, &mat_2, &res);
+    ck_assert_int_eq(status, mat_success);
+
+    mat_free(&mat_1);
+    mat_free(&mat_2);
+    mat_free(&res);
+}
+END_TEST
+
+START_TEST(test_mult)
+{
+    matrix_t mat_1 = imp__craft_mat(2, 3,
+        " 1 0 -3 "
+        " 4 -2 5 "
+    );
+
+    matrix_t mat_2 = mat_null();
+    matrix_t res = mat_null();
+
+    int status = mat_mult(&mat_1, &mat_2, &res);
+    ck_assert_int_ne(status, mat_success);
+
+    mat_2 = imp__craft_mat(2, 2,
+        " 5 -1 "
+        " 0  3 "
+    );
+
+    status = mat_mult(&mat_1, &mat_2, &res);
+    ck_assert_int_ne(status, mat_success);
+
+    mat_free(&mat_2);
+    mat_2 = imp__craft_mat(3, 2,
+        "  5 -1 "
+        "  0  3 "
+        " -2  0 "
+    );
+
+    status = mat_mult(&mat_1, &mat_2, &res);
+    ck_assert_int_eq(status, mat_success);
+
+    mat_free(&mat_1);
+    mat_free(&mat_2);
+    mat_free(&res);
+}
+END_TEST
+
 START_TEST(solve_sle)
 {
-    matrix_t mat = imp__craft_mat(2, 3,
-        "  1  0  -2 "
-        "  4 -7 -22 "
+    matrix_t mat = imp__craft_mat(3, 4,
+        "  1  0 0  -2 "
+        "  4 -7 0 -22 "
+        "  0  0 1   4 "
     );
 
     matrix_t res = mat_null();
@@ -68,13 +158,15 @@ START_TEST(solve_sle)
 
     ck_assert_int_eq(status, mat_success);
     ck_assert(!mat_is_null(&res));
-    ck_assert_int_eq(res.rows, 2);
+    ck_assert_int_eq(res.rows, 3);
     ck_assert_int_eq(res.cols, 1);
 
-    ck_assert_int_eq(mat_get(&res, 0, 0), -2);
-    ck_assert_int_eq(mat_get(&res, 1, 0), 2);
+    ck_assert_double_eq(mat_get(&res, 0, 0), -2.0);
+    ck_assert_double_eq(mat_get(&res, 1, 0), 2.0);
+    ck_assert_double_eq(mat_get(&res, 2, 0), 4.0);
 
     mat_free(&mat);
+    mat_free(&res);
 }
 END_TEST
 
@@ -92,6 +184,9 @@ START_TEST(solve_sle_bad_dims)
 
     ck_assert_int_ne(status, mat_success);
     ck_assert(mat_is_null(&res));
+
+    mat_free(&mat);
+    mat_free(&res);
 }
 END_TEST
 
@@ -109,6 +204,9 @@ START_TEST(solve_sle_bad_mat)
 
     ck_assert_int_ne(status, mat_success);
     ck_assert(mat_is_null(&res));
+
+    mat_free(&mat);
+    mat_free(&res);
 }
 END_TEST
 
@@ -126,6 +224,9 @@ START_TEST(solve_sle_zero_mat)
 
     ck_assert_int_ne(status, mat_success);
     ck_assert(mat_is_null(&res));
+
+    mat_free(&mat);
+    mat_free(&res);
 }
 END_TEST
 
@@ -143,6 +244,9 @@ START_TEST(solve_sle_impossible_mat)
 
     ck_assert_int_ne(status, mat_success);
     ck_assert(mat_is_null(&res));
+
+    mat_free(&mat);
+    mat_free(&res);
 }
 END_TEST
 
@@ -150,6 +254,9 @@ void test_case_matrix(TCase *tc_core)
 {
     tcase_add_test(tc_core, create_invalid_mat);
     tcase_add_test(tc_core, test_copy);
+    tcase_add_test(tc_core, test_resize);
+    tcase_add_test(tc_core, test_add);
+    tcase_add_test(tc_core, test_mult);
     tcase_add_test(tc_core, solve_sle);
     tcase_add_test(tc_core, solve_sle_bad_dims);
     tcase_add_test(tc_core, solve_sle_bad_mat);

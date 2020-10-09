@@ -76,7 +76,7 @@ do
     echo "Тест #$i: Упал с кодом $status" 
   else
     passed_neg=$(( passed_neg + 1 ))
-    echo "Test #$i: Прошёл с кодом $status"
+    echo "Тест #$i: Прошёл с кодом $status"
   fi
 done
 
@@ -105,8 +105,7 @@ for f in $(find ./src -name *.c); do
   mkdir -p ./func_tests/gcov/$(dirname $f)
   base_name=$(basename $f)
   out_file="./func_tests/gcov/src/.$(dirname $f)/$base_name.gcov"
-  gcov "$f" -n -t > $out_file
-  #percentage_i=`cat $out_file | grep -E -o "[0-9]+" | head -1`
+  gcov "$f" -t > $out_file
   percentage_i=`gcov "$f" -n | grep -E -o "[0-9]+" | head -1`
   percentage=$(( percentage + percentage_i / amount ))
 done

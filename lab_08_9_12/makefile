@@ -11,9 +11,9 @@ func_test : CFLAGS += -O0 -g -ggdb --coverage
 func_test : app.exe
 	./func_tests/test.sh
 
+unit_test : CFLAGS += -O0 -g -ggdb --coverage
 unit_test : unit_tests.exe
-	cd ./unit_tests/data
-	# valgrind -q ../../unit_tests.exe
+	./unit_tests/test.sh
 
 unit_tests.exe : \
 		unit_tests/src/check_main.c \
@@ -43,7 +43,7 @@ obj/matrix.o : src/matrix/matrix.c
 	mkdir -p obj; $(CC) $(CFLAGS) -c -o $@ $^
 
 clean :
-	rm -rf ./obj *.exe *.stackdump ./func_tests/gcov ./func_tests/out
+	rm -rf ./obj *.exe *.stackdump ./func_tests/gcov ./func_tests/out ./unit_tests/gcov
 	find . -type f -name "*.gcda" -delete
 	find . -type f -name "*.gcno" -delete
 	find . -type f -name "*.c.gcov" -delete
