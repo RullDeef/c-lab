@@ -21,7 +21,9 @@ matrix_t mat_null(void)
 
 matrix_t mat_create(size_t rows, size_t cols)
 {
-    assert(rows > 0 && cols > 0);
+    // assert(rows > 0 && cols > 0);
+    if (rows == 0 || cols == 0)
+        return mat_null();
 
     matrix_t matrix = {
         .rows = rows,

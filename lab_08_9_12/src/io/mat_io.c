@@ -25,7 +25,7 @@ static bool imp__has_garbage_next(FILE *file)
         temp = fgetc(file);
     } while (temp != EOF && isspace(temp));
 
-    fprintf(stderr, "temp char is '%c'\n", temp == EOF ? '.' : temp);
+    // fprintf(stderr, "temp char is '%c'\n", temp == EOF ? '.' : temp);
 
     return temp != EOF; // expect EOF if no garbage
 }
@@ -68,11 +68,20 @@ static int imp__safe_read_mat(FILE *file, matrix_t *matrix)
     // check for ongoing garbage in file
     if (imp__has_garbage_next(file))
     {
-        fprintf(stderr, "file has garbage.\n");
+        // fprintf(stderr, "file has garbage.\n");
         status_code = mat_io_garbage_in_file;
     }
 
     return status_code;
+}
+
+static bool imp__file_is_empty(FILE* file)
+{
+    fseek(file, 0, SEEK_END);
+    bool empty = ftell(file) == 0;
+    fseek(file, 0, SEEK_SET);
+
+    return empty;
 }
 
 int mat_io_input_simple(FILE *file, matrix_t *matrix)
@@ -80,7 +89,7 @@ int mat_io_input_simple(FILE *file, matrix_t *matrix)
     char temp[TEMP_STR_LENGTH];
     int status_code = mat_io_success;
 
-    if (fgets(temp, TEMP_STR_LENGTH, file) == NULL)
+    if (imp__file_is_empty(file) || fgets(temp, TEMP_STR_LENGTH, file) == NULL)
         status_code = mat_io_failed;
     else
     {
