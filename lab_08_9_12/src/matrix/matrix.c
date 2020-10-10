@@ -3,7 +3,6 @@
 #include <math.h>
 #include "matrix.h"
 #include <assert.h>
-#include <float.h>
 
 inline static size_t imp__calc_required_mat_size(size_t rows, size_t cols)
 {
@@ -313,7 +312,7 @@ static int imp__gauss_transform(matrix_t *matrix)
     if (matrix->rows == 1)
     {
         // adjust last bias
-        if (fabs(matrix->data[0][0]) <= DBL_MIN)
+        if (fabs(matrix->data[0][0]) == 0.0)
             status_code = mat_singular_matrix;
         else
         {
