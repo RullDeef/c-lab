@@ -207,7 +207,7 @@ int mat_io_output_coordinate(FILE *file, const matrix_t *matrix, int precision)
             for (size_t col = 0; col < matrix->cols; col++)
             {
                 matrix_elem_t value = mat_get(matrix, row, col);
-                if (fabs(value) == 0.0)
+                if (fabs(value) > 0.0)
                     fprintf(file, "%lu %lu %.*lf\n", row + 1, col + 1, precision, value);
             }
         }
