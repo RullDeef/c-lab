@@ -161,7 +161,7 @@ static size_t imp__get_nonzero_amount(const matrix_t *matrix)
     return amount;
 }
 
-/*
+//*
 int mat_io_output_simple(FILE *file, const matrix_t *matrix, int precision)
 {
     int status_code = mat_io_success;
@@ -187,7 +187,7 @@ int mat_io_output_simple(FILE *file, const matrix_t *matrix, int precision)
 
     return status_code;
 }
-*/
+// */
 
 int mat_io_output_coordinate(FILE *file, const matrix_t *matrix, int precision)
 {

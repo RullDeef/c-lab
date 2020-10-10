@@ -283,7 +283,7 @@ int mat_mult(const matrix_t *mat_1, const matrix_t *mat_2, matrix_t *res)
     return status_code;
 }
 
-static matrix_elem_t imp__get_max_abs(const matrix_t *matrix, size_t *prime_row, size_t *prime_col)
+static matrix_elem_t imp__get_prime(const matrix_t *matrix, size_t *prime_row, size_t *prime_col)
 {
     matrix_elem_t prime = 0.0;
 
@@ -312,7 +312,7 @@ static int imp__gauss_transform(matrix_t *matrix)
     if (matrix->rows == 1)
     {
         // adjust last bias
-        if (fabs(matrix->data[0][0]) == 0.0)
+        if (fabs(matrix->data[0][0]) <= 1e-10)
             status_code = mat_singular_matrix;
         else
         {
@@ -325,9 +325,9 @@ static int imp__gauss_transform(matrix_t *matrix)
     // determine prime row
     size_t prime_row = 0;
     size_t prime_col = 0;
-    matrix_elem_t prime = imp__get_max_abs(matrix, &prime_row, &prime_col);
+    matrix_elem_t prime = imp__get_prime(matrix, &prime_row, &prime_col);
 
-    if (prime == 0)
+    if (fabs(prime) == 0.0)
         status_code = mat_zero_matrix;
     else
     {

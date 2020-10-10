@@ -35,7 +35,7 @@ int mat_io_input_simple(FILE *file, matrix_t *matrix);
 /**
  * @brief Вывод матрицы в обычном формате с заданной точностью.
  */
-// int mat_io_output_simple(FILE *file, const matrix_t *matrix, int precision); // not implemented
+int mat_io_output_simple(FILE *file, const matrix_t *matrix, int precision); // not implemented
 
 /**
  * @brief Вывод матрицы в координатном формате с заданной точностью.
