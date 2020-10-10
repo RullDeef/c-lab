@@ -77,7 +77,6 @@ status_code_t do_ssle(filename_t ifname, filename_t ofname, input_fn_t input_fn,
 
     if ((status_code = input_matrix(ifname, &mat, input_fn)) == success)
     {
-        // solve system of linear equations here
         if (mat_solve_sle(&mat, &res) != mat_success)
             status_code = failure;
         else
@@ -105,9 +104,9 @@ status_code_t do_param_work(app_params_t *app_params, input_fn_t input_fn, outpu
         case command_ssle:
             status_code = do_ssle(app_params->ifname_1, app_params->ofname, input_fn, output_fn);
             break;
-        default:
-            status_code = invalid_command;
-            break;
+            // default:
+            //     status_code = invalid_command;
+            //     break;
     }
 
     return status_code;

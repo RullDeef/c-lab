@@ -61,12 +61,12 @@ do
   
   if [[ "$(expr substr $(uname -s) 1 6)" != "CYGWIN" && $(command -v drmemory &> /dev/null) ]]
   then
-    res=$(drmemory.exe -batch -ignore_kernel -no_use_stderr -- ./app.exe $args ./func_tests/out/neg_${n}_out_file.txt 1>./func_tests/out/neg_${n}_out.txt 2>./func_tests/out/neg_${n}_err.txt)
+    res=$(drmemory.exe -batch -ignore_kernel -no_use_stderr -- ./app.exe $args 1>./func_tests/out/neg_${n}_out.txt 2>./func_tests/out/neg_${n}_err.txt)
   elif command -v valgrind &> /dev/null
   then
-    res=$(valgrind -q -- ./app.exe $args ./func_tests/out/neg_${n}_out_file.txt 1>./func_tests/out/neg_${n}_out.txt 2>./func_tests/out/neg_${n}_err.txt)
+    res=$(valgrind -q -- ./app.exe $args 1>./func_tests/out/neg_${n}_out.txt 2>./func_tests/out/neg_${n}_err.txt)
   else
-    res=$(./app.exe $args ./func_tests/out/neg_${n}_out_file.txt 1>./func_tests/out/neg_${n}_out.txt 2>./func_tests/out/neg_${n}_err.txt)
+    res=$(./app.exe $args 1>./func_tests/out/neg_${n}_out.txt 2>./func_tests/out/neg_${n}_err.txt)
   fi
 
   status=$?

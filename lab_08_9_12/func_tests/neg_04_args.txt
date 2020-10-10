@@ -1,1 +1,1 @@
-m wrong_file.txt wrong_too.txt
+m wrong_file.txt wrong_too.txt ./func_tests/out/neg_04_out_file.txt
