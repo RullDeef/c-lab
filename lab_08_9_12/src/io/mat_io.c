@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <limits.h>
 #include <ctype.h>
+#include <math.h>
 
 #define TEMP_STR_LENGTH 256
 
