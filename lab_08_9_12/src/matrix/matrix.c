@@ -88,8 +88,6 @@ matrix_t mat_copy(const matrix_t *matrix)
     return result;
 }
 
-#include <stdio.h>
-
 int mat_resize(matrix_t *matrix, size_t new_rows, size_t new_cols)
 {
     int status_code = mat_success;
@@ -312,7 +310,7 @@ static int imp__gauss_transform(matrix_t *matrix)
     if (matrix->rows == 1)
     {
         // adjust last bias
-        if (fabs(matrix->data[0][0]) <= 1e-10)
+        if (fabs(matrix->data[0][0]) < 1e-6)
             status_code = mat_singular_matrix;
         else
         {
@@ -327,7 +325,7 @@ static int imp__gauss_transform(matrix_t *matrix)
     size_t prime_col = 0;
     matrix_elem_t prime = imp__get_prime(matrix, &prime_row, &prime_col);
 
-    if (fabs(prime) == 0.0)
+    if (fabs(prime) < 1.0e-6)
         status_code = mat_zero_matrix;
     else
     {
