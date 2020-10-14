@@ -4,6 +4,10 @@
 #include "matrix.h"
 #include <assert.h>
 
+/**
+ * @brief Рассчитывает необходимый объем памяти
+ * для хранения матрицы заданного размера.
+ */
 inline static size_t imp__calc_required_mat_size(size_t rows, size_t cols)
 {
     return rows * (sizeof(matrix_elem_t *) + cols * sizeof(matrix_elem_t));
@@ -281,6 +285,9 @@ int mat_mult(const matrix_t *mat_1, const matrix_t *mat_2, matrix_t *res)
     return status_code;
 }
 
+/**
+ * @brief Определяет позицию и модуль максимального по модулю элемента матрицы.
+ */
 static matrix_elem_t imp__get_prime(const matrix_t *matrix, size_t *prime_row, size_t *prime_col)
 {
     matrix_elem_t prime = 0.0;
@@ -301,12 +308,71 @@ static matrix_elem_t imp__get_prime(const matrix_t *matrix, size_t *prime_row, s
     return prime;
 }
 
-// recursive function
+static void imp__normalize_all_rows(matrix_t *matrix, size_t prime_row, size_t prime_col, matrix_elem_t prime)
+{
+    for (size_t row = 0; row < matrix->rows; row++)
+    {
+        if (row != prime_row)
+        {
+            // добавить главную строку к текущей
+            matrix_elem_t m = -matrix->data[row][prime_col] / prime;
+            mat_add_row(matrix, row, prime_row, m);
+        }
+    }
+}
+
+static void imp__copy_mat_values(matrix_t *matrix, matrix_t *reduced, size_t prime_row, size_t prime_col)
+{
+    for (size_t row = 0; row < matrix->rows; row++)
+    {
+        if (row != prime_row)
+        {
+            size_t reduced_row = row > prime_row ? row - 1 : row;
+            for (size_t col = 0; col < matrix->cols; col++)
+            {
+                if (col != prime_col)
+                {
+                    size_t reduced_col = col > prime_col ? col - 1 : col;
+                    matrix->data[row][col] = reduced->data[reduced_row][reduced_col];
+                }
+            }
+        }
+    }
+}
+
+/**
+ * @brief Удаляет остальные элементы в столбце с главным элементом используя главную строку.
+ */
+static void imp__reset_prime_row(matrix_t *matrix, size_t prime_row, size_t prime_col, matrix_elem_t prime)
+{
+    for (size_t col = 0; col < matrix->cols - 1; col++)
+    {
+        if (col != prime_col)
+        {
+            for (size_t row = 0; row < matrix->rows; row++)
+            {
+                if (row != prime_row && matrix->data[row][col] != 0.0)
+                {
+                    matrix_elem_t m = matrix->data[prime_row][col] / matrix->data[row][col];
+                    // matrix->data[prime_row][col] -= m * matrix->data[row][col];
+                    matrix->data[prime_row][col] = 0.0;
+                    matrix->data[prime_row][matrix->cols - 1] -= m * matrix->data[row][matrix->cols - 1];
+                    break;
+                }
+            }
+        }
+    }
+
+    // обработать последний элемент в главной строке
+    matrix->data[prime_row][matrix->cols - 1] /= matrix->data[prime_row][prime_col];
+    matrix->data[prime_row][prime_col] = 1.0;
+}
+
 static int imp__gauss_transform(matrix_t *matrix)
 {
     int status_code = mat_success;
 
-    // base case for recursion
+    // базовый случай рекурсии
     if (matrix->rows == 1)
     {
         // adjust last bias
@@ -320,7 +386,7 @@ static int imp__gauss_transform(matrix_t *matrix)
         return status_code;
     }
 
-    // determine prime row
+    // определить главную строку в матрице
     size_t prime_row = 0;
     size_t prime_col = 0;
     matrix_elem_t prime = imp__get_prime(matrix, &prime_row, &prime_col);
@@ -329,18 +395,7 @@ static int imp__gauss_transform(matrix_t *matrix)
         status_code = mat_zero_matrix;
     else
     {
-        // normalize all rows
-        for (size_t row = 0; row < matrix->rows; row++)
-        {
-            if (row == prime_row)
-                continue;
-
-            // add prime row to current
-            matrix_elem_t m = -matrix->data[row][prime_col] / prime;
-            mat_add_row(matrix, row, prime_row, m);
-        }
-
-        // reduce matrix
+        imp__normalize_all_rows(matrix, prime_row, prime_col, prime);
         matrix_t reduced = mat_reduced(matrix, prime_row, prime_col);
 
         if (!mat_is_null(&reduced))
@@ -349,48 +404,9 @@ static int imp__gauss_transform(matrix_t *matrix)
 
             if (status_code == mat_success)
             {
-                // copy matrix values back
-                for (size_t row = 0; row < matrix->rows; row++)
-                {
-                    if (row == prime_row)
-                        continue;
-
-                    size_t reduced_row = row > prime_row ? row - 1 : row;
-                    for (size_t col = 0; col < matrix->cols; col++)
-                    {
-                        if (col == prime_col)
-                            continue;
-
-                        size_t reduced_col = col > prime_col ? col - 1 : col;
-                        matrix->data[row][col] = reduced.data[reduced_row][reduced_col];
-                    }
-                }
-
-                // elliminate non-primes in prime's row
-                for (size_t col = 0; col < matrix->cols - 1; col++)
-                {
-                    if (col == prime_col)
-                        continue;
-                    
-                    for (size_t row = 0; row < matrix->rows; row++)
-                    {
-                        if (row == prime_row)
-                            continue;
-
-                        if (matrix->data[row][col] != 0.0)
-                        {
-                            matrix_elem_t m = matrix->data[prime_row][col] / matrix->data[row][col];
-                            matrix->data[prime_row][col] -= m * matrix->data[row][col];
-                            // adjust biases too
-                            matrix->data[prime_row][matrix->cols - 1] -= m * matrix->data[row][matrix->cols - 1];
-                            break;
-                        }
-                    }
-                }
-
-                // adjust last bias
-                matrix->data[prime_row][matrix->cols - 1] /= matrix->data[prime_row][prime_col];
-                matrix->data[prime_row][prime_col] = 1.0;
+                // вернуть значения из обработанной матрицы в исходную
+                imp__copy_mat_values(matrix, reduced, prime_row, prime_col);
+                imp__reset_prime_row(matrix, prime_row, prime_col, prime);
             }
         }
 
@@ -400,6 +416,9 @@ static int imp__gauss_transform(matrix_t *matrix)
     return status_code;
 }
 
+/**
+ * @brief Переставляет строки матрицы местами, приводя её к диагональному виду.
+ */
 static void imp__rearrange_rows(matrix_t *matrix)
 {
     for (size_t col = 0; col < matrix->cols - 2; col++)
@@ -415,7 +434,6 @@ static void imp__rearrange_rows(matrix_t *matrix)
     }
 }
 
-// необходимое условие - rows + 1 == cols
 int mat_solve_sle(matrix_t *matrix, matrix_t *result)
 {
     int status_code = mat_success;

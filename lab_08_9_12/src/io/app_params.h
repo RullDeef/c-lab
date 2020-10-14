@@ -12,6 +12,9 @@ typedef enum
 
 typedef char filename_t[MAX_FILENAME_LENGTH];
 
+/**
+ * @brief Параметры программы.
+ */
 typedef struct
 {
     app_command_t command;
@@ -20,6 +23,9 @@ typedef struct
     filename_t ofname;
 } app_params_t;
 
+/**
+ * @brief Считывает параметры программы из параметров командной строки.
+ */
 app_params_t *parse_app_params(int argc, const char **argv);
 
 #endif // __APP_PARAMS_H_

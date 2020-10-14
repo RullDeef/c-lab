@@ -18,6 +18,9 @@ enum
     mat_io_bad_precision
 };
 
+/**
+ * @brief Проверяет файл на наличие непробельных символов.
+ */
 static bool imp__has_garbage_next(FILE *file)
 {
     char temp;
@@ -27,11 +30,12 @@ static bool imp__has_garbage_next(FILE *file)
         temp = fgetc(file);
     } while (temp != EOF && isspace(temp));
 
-    // fprintf(stderr, "temp char is '%c'\n", temp == EOF ? '.' : temp);
-
     return temp != EOF; // expect EOF if no garbage
 }
 
+/**
+ * @brief Проверяет строку на наличие непробельных символов.
+ */
 static int imp__check_row_ending(char *str)
 {
     int status_code = mat_io_success;
@@ -45,6 +49,9 @@ static int imp__check_row_ending(char *str)
     return status_code;
 }
 
+/**
+ * @brief Считывает строку матрицы из символьной строки
+ */
 static int imp__read_matrix_row(char *str, size_t row, matrix_t *matrix)
 {
     int status_code = mat_io_success;
@@ -65,6 +72,9 @@ static int imp__read_matrix_row(char *str, size_t row, matrix_t *matrix)
     return status_code;
 }
 
+/**
+ * @brief Считывает матрицу из проверенного файла.
+ */
 static int imp__safe_read_mat(FILE *file, matrix_t *matrix)
 {
     int status_code = mat_io_success;
@@ -81,14 +91,14 @@ static int imp__safe_read_mat(FILE *file, matrix_t *matrix)
 
     // check for ongoing garbage in file
     if (status_code == mat_io_success && imp__has_garbage_next(file))
-    {
-        // fprintf(stderr, "file has garbage.\n");
         status_code = mat_io_garbage_in_file;
-    }
 
     return status_code;
 }
 
+/**
+ * @brief Проверяет, пуст ли файл.
+ */
 static bool imp__file_is_empty(FILE* file)
 {
     fseek(file, 0, SEEK_END);
@@ -98,6 +108,9 @@ static bool imp__file_is_empty(FILE* file)
     return empty;
 }
 
+/**
+ * @brief Считывает размеры матрицы из строки.
+ */
 static int imp__scan_mat_dims(char *str, size_t *rows, size_t *cols)
 {
     int status_code = mat_io_success;
@@ -135,7 +148,6 @@ int mat_io_input_simple(FILE *file, matrix_t *matrix)
         size_t rows;
         size_t cols;
 
-        //if (sscanf(temp, "%lu %lu ", &rows, &cols) != 2 || rows == 0 || cols == 0)
         status_code = imp__scan_mat_dims(temp, &rows, &cols);
         if (status_code == mat_io_success)
             status_code = mat_resize(matrix, rows, cols);
@@ -149,6 +161,9 @@ int mat_io_input_simple(FILE *file, matrix_t *matrix)
     return status_code;
 }
 
+/**
+ * @brief Возвращает число ненулевых (с точностью 1.0е-6) элементов матрицы
+ */
 static size_t imp__get_nonzero_amount(const matrix_t *matrix)
 {
     size_t amount = 0;
@@ -160,34 +175,6 @@ static size_t imp__get_nonzero_amount(const matrix_t *matrix)
 
     return amount;
 }
-
-/*
-int mat_io_output_simple(FILE *file, const matrix_t *matrix, int precision)
-{
-    int status_code = mat_io_success;
-
-    if (precision < 0)
-        status_code = mat_io_bad_precision;
-    else
-    {
-        fprintf(file, "%lu %lu\n", matrix->rows, matrix->cols);
-
-        for (size_t row = 0; row < matrix->rows; row++)
-        {
-            for (size_t col = 0; col < matrix->cols; col++)
-            {
-                matrix_elem_t value = mat_get(matrix, row, col);
-                fprintf(file, "% .*lf", precision, value);
-                if (col + 1 < matrix->cols)
-                    fprintf(file, " ");
-            }
-            fprintf(file, "\n");
-        }
-    }
-
-    return status_code;
-}
-// */
 
 int mat_io_output_coordinate(FILE *file, const matrix_t *matrix, int precision)
 {
