@@ -405,7 +405,7 @@ static int imp__gauss_transform(matrix_t *matrix)
             if (status_code == mat_success)
             {
                 // вернуть значения из обработанной матрицы в исходную
-                imp__copy_mat_values(matrix, reduced, prime_row, prime_col);
+                imp__copy_mat_values(matrix, &reduced, prime_row, prime_col);
                 imp__reset_prime_row(matrix, prime_row, prime_col, prime);
             }
         }

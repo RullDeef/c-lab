@@ -58,12 +58,16 @@ static int imp__read_matrix_row(char *str, size_t row, matrix_t *matrix)
 
     for (size_t col = 0; col < matrix->cols && strlen(str) > 0 && status_code == mat_io_success; col++)
     {
-        matrix_elem_t value = strtod(str, &str);
+        char *end = NULL;
+        matrix_elem_t value = strtod(str, &end);
 
-        if (errno == ERANGE)
+        if (str == end || errno == ERANGE)
             status_code = mat_io_invalid_input_file;
         else
+        {
             mat_set(matrix, row, col, value);
+            str = end;
+        }
     }
 
     if (status_code == mat_io_success)

@@ -1,0 +1,1 @@
+o ./func_tests/neg_18_in.txt ./func_tests/out/neg_18_out.txt

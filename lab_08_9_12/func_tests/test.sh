@@ -23,17 +23,17 @@ do
   then
     status=$(valgrind -q -- ./app.exe $args ./func_tests/out/pos_${n}_out_file.txt 1>./func_tests/out/pos_${n}_out.txt 2>./func_tests/out/pos_${n}_err.txt)
   else
-    status=$(./app.exe $args ./func_tests/out/pos_${n}_out_file.txt 1>./func_tests/out/pos_${n}_out.txt 2>./func_tests/out/pos_${n}_err.txt)
+    status=$(./app.exe $args ./func_tests/out/pos_${n}_out.txt 1>./func_tests/out/pos_${n}_out.txt 2>./func_tests/out/pos_${n}_err.txt)
   fi
   
   status=$?
-  actual=$(cat ./func_tests/out/pos_${n}_out_file.txt)
+  actual=$(cat ./func_tests/out/pos_${n}_out.txt)
 
   if [ $status -ne 0 ]
   then
     echo "Тест #$i: Упал с кодом $status" 
   else
-    diff -q "./func_tests/pos_${n}_out.txt" "./func_tests/out/pos_${n}_out_file.txt" >/dev/null
+    diff -q "./func_tests/pos_${n}_out.txt" "./func_tests/out/pos_${n}_out.txt" >/dev/null
     if [ $? -eq 0 ]
     then
       passed_pos=$(( passed_pos + 1 ))
