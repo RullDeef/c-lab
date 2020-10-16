@@ -3,6 +3,7 @@
 
 void imp__swap_items(item_t *item_1, item_t *item_2);
 void imp__pop_item(item_t *items, short int *items_count, short int index);
+bool imp__item_is_valid(const item_t *item);
 
 void imp__swap_items(item_t *item_1, item_t *item_2)
 {
@@ -18,12 +19,25 @@ void imp__pop_item(item_t *items, short int *items_count, short int index)
     (*items_count)--;
 }
 
+bool imp__item_is_valid(const item_t *item)
+{
+    return item->mass > 0.0f && item->volume > 0.0f;
+}
+
 bool has_invalid_items(const item_t *items, short int items_count)
 {
+    bool has_invalid_item = false;
+
     for (short int i = 0; i < items_count; i++)
-        if (items[i].mass <= 0.0f || items[i].volume <= 0.0f)
-            return true;
-    return false;
+    {
+        if (!imp__item_is_valid(items + i))
+        {
+            has_invalid_item = true;
+            break;
+        }
+    }
+
+    return has_invalid_item;
 }
 
 void calculate_density(item_t *items, short int items_count)
