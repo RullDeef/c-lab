@@ -7,12 +7,19 @@
 #include "item_io.h"
 
 #define MAX_PRICE_STR_LEN 128
+#define MAX_ITEMS_COUNT_STR_LEN 128
 
 static void imp__mark_file_eof(FILE *file)
 {
     int c;
     if ((c = fgetc(file)) != EOF)
         ungetc(c, file);
+}
+
+static void imp__skip_items_count(FILE *file)
+{
+    char tmp[MAX_ITEMS_COUNT_STR_LEN];
+    fgets(tmp, MAX_ITEMS_COUNT_STR_LEN, file);
 }
 
 static int imp__read_price(FILE *file, unsigned int *price)
@@ -68,6 +75,7 @@ struct item_array it_read_array_file(FILE *file)
 {
     struct item_array ita = ita_create();
 
+    imp__skip_items_count(file);
     while (ita_is_valid(&ita) && !feof(file))
     {
         struct item it = it_read_file(file);
@@ -76,6 +84,9 @@ struct item_array it_read_array_file(FILE *file)
         else
             ita_destroy(&ita);
     }
+
+    if (ita_is_valid(&ita) && ita.size == 0U)
+        ita_destroy(&ita);
 
     return ita;
 }
