@@ -1,5 +1,5 @@
 CC := gcc
-CFLAGS := -std=c99 -Wall -Werror -pedantic -Wextra -Iinc
+CFLAGS := -std=gnu99 -Wall -Werror -pedantic -Wextra -Iinc
 LFLAGS :=
 
 .PHONY : clean func unit
@@ -12,15 +12,17 @@ func : LFLAGS += --coverage
 func : app.exe
 	./func_tests/test.sh
 
-unit_tests.exe :
-	echo unit
+unit : unit_tests.exe
+	./unit_tests.exe
 
-app.exe : \
+app.exe : obj/main.o \
 		obj/item.o \
 		obj/item_array.o \
-		obj/item_io.o \
-		obj/main.o
+		obj/item_io.o
 	$(CC) -o $@ $^ $(LFLAGS)
+
+unit_tests.exe :
+	echo unit
 
 obj/item.o : src/item.c \
 		inc/item.h
