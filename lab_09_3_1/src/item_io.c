@@ -33,12 +33,14 @@ static int imp__read_price(FILE *file, unsigned int *price)
 {
     char tmp[MAX_PRICE_STR_LEN];
     int status = EXIT_FAILURE;
+    long signed_price;
     int count;
 
     if (fgets(tmp, MAX_PRICE_STR_LEN, file) != NULL &&
-            sscanf(tmp, "%u %n", price, &count) == 1 &&
-            (size_t)count == strlen(tmp))
+            sscanf(tmp, "%ld %n", &signed_price, &count) == 1 &&
+            signed_price > 0 && (size_t)count == strlen(tmp))
     {
+        *price = (unsigned int)signed_price;
         imp__mark_file_eof(file);
         status = EXIT_SUCCESS;
     }
@@ -56,7 +58,7 @@ struct item it_read_file(FILE *file)
     if ((len = getline(&name, &n, file)) != -1)
     {
         while (len > 0U && isspace((int)name[len - 1]))
-            name[len - 1] = '\0';
+            name[--len] = '\0';
 
         if (len == 0 || imp__read_price(file, &price) != EXIT_SUCCESS)
         {
