@@ -1,28 +1,15 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include "item.h"
 #include "item_array.h"
 #include "item_io.h"
+#include "arg_reader.h"
 
-int read_args(int argc, char **argv, char **fname, float *price)
+#define	EXIT_FAILURE	1	/* Failing exit status.  */
+#define	EXIT_SUCCESS	0	/* Successful exit status.  */
+
+int main(int argc, const char **argv)
 {
-    int status = EXIT_FAILURE;
-
-    if (argc == 3)
-    {
-        *fname = argv[1];
-        if (sscanf(argv[2], "%f", price) == 1)
-            status = EXIT_SUCCESS;
-    }
-
-    return status;
-}
-
-int main(int argc, char **argv)
-{
-    char *fname = NULL;
-    float price = 0.0f;;
+    const char *fname = NULL;
+    float price = 0.0f;
     int status;
 
     status = read_args(argc, argv, &fname, &price);
