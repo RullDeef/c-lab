@@ -16,10 +16,17 @@ static void imp__mark_file_eof(FILE *file)
         ungetc(c, file);
 }
 
-static void imp__skip_items_count(FILE *file)
+static int imp__read_items_count(FILE *file, unsigned int *count)
 {
     char tmp[MAX_ITEMS_COUNT_STR_LEN];
-    fgets(tmp, MAX_ITEMS_COUNT_STR_LEN, file);
+    int status = EXIT_FAILURE;
+    int n;
+
+    if (fgets(tmp, MAX_ITEMS_COUNT_STR_LEN, file) != NULL &&
+            sscanf(tmp, "%u %n", count, &n) == 1 && (size_t)n == strlen(tmp))
+        status = EXIT_SUCCESS;
+
+    return status;
 }
 
 static int imp__read_price(FILE *file, unsigned int *price)
@@ -74,18 +81,21 @@ void it_print_file(FILE *file, const struct item *it)
 struct item_array it_read_array_file(FILE *file)
 {
     struct item_array ita = ita_create();
+    unsigned int count;
 
-    imp__skip_items_count(file);
-    while (ita_is_valid(&ita) && !feof(file))
+    if (imp__read_items_count(file, &count) == EXIT_SUCCESS)
     {
-        struct item it = it_read_file(file);
-        if (it_is_valid(&it))
-            ita_insert(&ita, &it);
-        else
-            ita_destroy(&ita);
+        while (ita_is_valid(&ita) && !feof(file))
+        {
+            struct item it = it_read_file(file);
+            if (it_is_valid(&it))
+                ita_insert(&ita, &it);
+            else
+                ita_destroy(&ita);
+        }
     }
 
-    if (ita_is_valid(&ita) && ita.size == 0U)
+    if (ita_is_valid(&ita) && (ita.size == 0U || ita.size != count))
         ita_destroy(&ita);
 
     return ita;
