@@ -2,7 +2,6 @@
 #include <memory.h>
 #include <math.h>
 #include "matrix.h"
-#include <assert.h>
 
 /**
  * @brief Рассчитывает необходимый объем памяти
@@ -11,6 +10,12 @@
 inline static size_t imp__calc_required_mat_size(size_t rows, size_t cols)
 {
     return rows * (sizeof(matrix_elem_t *) + cols * sizeof(matrix_elem_t));
+}
+
+inline static void imp__reassign_row_ptrs(matrix_t matrix)
+{
+    for (size_t row = 0; row < matrix.rows; row++)
+        matrix.data[row] = (matrix_elem_t *)(matrix.data + matrix.rows) + matrix.cols * row;
 }
 
 matrix_t mat_null(void)
@@ -27,49 +32,33 @@ matrix_t mat_null(void)
 
 matrix_t mat_create(size_t rows, size_t cols)
 {
-    // assert(rows > 0 && cols > 0);
-    if (rows == 0 || cols == 0)
-        return mat_null();
+    matrix_t matrix = mat_null();
 
-    matrix_t matrix = {
-        .rows = rows,
-        .cols = cols
-    };
-
-    /*           <- rows -->   <-cols->
-        data = [ __ __ __ __ | __ __ __ : __ __ __ : __ __ __ : __ __ __ ]
-    */
-    matrix.imp__allocated = imp__calc_required_mat_size(rows, cols);
-
-    // take more space for future manipulations
-    matrix.imp__allocated = (size_t)((float)matrix.imp__allocated * 1.5f);
-
-    matrix.data = (matrix_elem_t **)malloc(matrix.imp__allocated);
-
-    if (matrix.data == NULL)
-        matrix = mat_null();
-    else
+    if (rows != 0 && cols != 0)
     {
-        memset(matrix.data, 0, matrix.imp__allocated);
+        matrix.imp__allocated = imp__calc_required_mat_size(rows, cols);
+        matrix.data = (matrix_elem_t **)calloc(1, matrix.imp__allocated);
 
-        // fill up row pointers
-        for (size_t row = 0; row < rows; row++)
-            matrix.data[row] = (matrix_elem_t *)(matrix.data + rows) + cols * row;
+        if (matrix.data == NULL)
+            matrix.imp__allocated = 0U;
+        else
+        {
+            matrix.rows = rows;
+            matrix.cols = cols;
+            imp__reassign_row_ptrs(matrix);
+        }
     }
 
     return matrix;
 }
 
-bool mat_is_null(const matrix_t *matrix)
+inline bool mat_is_null(const matrix_t *matrix)
 {
-    assert(matrix != NULL);
     return matrix->data == NULL;
 }
 
 void mat_free(matrix_t *matrix)
 {
-    assert(matrix != NULL);
-    
     if (!mat_is_null(matrix))
     {
         free(matrix->data);
@@ -79,8 +68,6 @@ void mat_free(matrix_t *matrix)
 
 matrix_t mat_copy(const matrix_t *matrix)
 {
-    assert(matrix != NULL);
-
     matrix_t result = mat_create(matrix->rows, matrix->cols);
 
     if (!mat_is_null(&result))
@@ -92,6 +79,19 @@ matrix_t mat_copy(const matrix_t *matrix)
     return result;
 }
 
+static void imp__copy_values(matrix_t *dest, matrix_t *src)
+{
+    for (size_t row = 0; row < src->rows; row++)
+    {
+        for (size_t col = 0; col < src->cols; col++)
+        {
+            matrix_elem_t value;
+            mat_get(src, row, col, &value);
+            mat_set(dest, row, col, value);
+        }
+    }
+}
+
 int mat_resize(matrix_t *matrix, size_t new_rows, size_t new_cols)
 {
     int status_code = mat_success;
@@ -99,36 +99,27 @@ int mat_resize(matrix_t *matrix, size_t new_rows, size_t new_cols)
     if (mat_is_null(matrix))
     {
         *matrix = mat_create(new_rows, new_cols);
-        if (mat_is_null(matrix))
-            status_code = mat_bad_create;
+        status_code = mat_is_null(matrix) ? mat_bad_create : mat_success;
     }
 
     // действительно нужно что-то делать?
     if (status_code == mat_success && (matrix->rows != new_rows || matrix->cols != new_cols))
     {
         matrix_t old_matrix = *matrix;
-        
+
         size_t new_size = imp__calc_required_mat_size(new_rows, new_cols);
         matrix_elem_t **new_data = NULL;
 
-        // check if realloc needed
         if (new_size > matrix->imp__allocated)
         {
-            // allocate much more
-            new_size = (size_t)((float)new_size * 1.5f);
-            // warning - after realloc will be reading from memory that does not belong us
+            new_size = (size_t)((float)new_size * MAT_ALLOC_MULTIPLIER);
             new_data = (matrix_elem_t**)calloc(new_size, sizeof(char));
 
             if (new_data == NULL)
-            {
-                // fprintf(stderr, "resize: bad realloc for %lu bytes.\n", new_size);
                 status_code = mat_bad_alloc;
-            }
             else
             {
-                // fprintf(stderr, "resize: reallocated %lu bytes.\n", new_size);
                 matrix->data = new_data;
-
                 matrix->rows = new_rows;
                 matrix->cols = new_cols;
             }
@@ -136,29 +127,23 @@ int mat_resize(matrix_t *matrix, size_t new_rows, size_t new_cols)
 
         if (status_code == mat_success)
         {
-            // reassign pointers
-            for (size_t row = 0; row < new_rows; row++)
-                matrix->data[row] = (matrix_elem_t *)(matrix->data + new_rows) + new_cols * row;
-
-            // fprintf(stderr, "resize: pointers has been updated.\n");
-            // fprintf(stderr, "resize: old matrix dims: %lu x %lu.\n", old_matrix.rows, old_matrix.cols);
-
-            // copy old values to newly allocated memory
-            // warning - will be reading from memory that does not belong us
-            for (size_t row = 0; row < old_matrix.rows; row++)
-            {
-                for (size_t col = 0; col < old_matrix.cols; col++)
-                {
-                    matrix_elem_t value = mat_get(&old_matrix, row, col);
-                    mat_set(matrix, row, col, value);
-                }
-            }
-
+            imp__reassign_row_ptrs(*matrix);
+            imp__copy_values(matrix, &old_matrix);
             mat_free(&old_matrix);
         }
     }
 
     return status_code;
+}
+
+void swap(void *a, void *b, size_t size)
+{
+    for (size_t i = 0; i < size; i++)
+    {
+        char temp = *((char *)a + i);
+        *((char *)a + i) = *((char *)b + i);
+        *((char *)b + i) = temp;
+    }
 }
 
 void mat_swap_rows(matrix_t *matrix, size_t row_1, size_t row_2)
@@ -173,9 +158,6 @@ void mat_swap_rows(matrix_t *matrix, size_t row_1, size_t row_2)
 
 void mat_add_row(matrix_t *matrix, size_t dest_row, size_t src_row, matrix_elem_t k)
 {
-    assert(0 <= dest_row && dest_row < matrix->rows);
-    assert(0 <= src_row && src_row < matrix->rows);
-
     for (size_t col = 0; col < matrix->cols; col++)
         matrix->data[dest_row][col] += k * matrix->data[src_row][col];
 }
@@ -206,18 +188,30 @@ matrix_t mat_reduced(const matrix_t *matrix, size_t reduce_row, size_t reduce_co
     return result;
 }
 
-matrix_elem_t mat_get(const matrix_t *matrix, size_t row, size_t col)
+int mat_get(const matrix_t *matrix, size_t row, size_t col, matrix_elem_t *value)
 {
+    int status = mat_bad_index;
+
     if (!mat_is_null(matrix) && 0 <= row && row < matrix->rows && 0 <= col && col < matrix->cols)
-        return matrix->data[row][col];
-    else
-        return 0.0;
+    {
+        *value = matrix->data[row][col];
+        status = mat_success;
+    }
+
+    return status;
 }
 
-void mat_set(matrix_t *matrix, size_t row, size_t col, matrix_elem_t value)
+int mat_set(matrix_t *matrix, size_t row, size_t col, matrix_elem_t value)
 {
+    int status = mat_bad_index;
+
     if (!mat_is_null(matrix) && 0 <= row && row < matrix->rows && 0 <= col && col < matrix->cols)
+    {
         matrix->data[row][col] = value;
+        status = mat_success;
+    }
+
+    return status;
 }
 
 int mat_add(const matrix_t *mat_1, const matrix_t *mat_2, matrix_t *res)
@@ -237,12 +231,11 @@ int mat_add(const matrix_t *mat_1, const matrix_t *mat_2, matrix_t *res)
         {
             for (size_t col = 0; col < res->cols; col++)
             {
-                matrix_elem_t m_1 = mat_get(mat_1, row, col);
-                matrix_elem_t m_2 = mat_get(mat_2, row, col);
+                matrix_elem_t m_1, m_2;
+                mat_get(mat_1, row, col, &m_1);
+                mat_get(mat_2, row, col, &m_2);
 
-                matrix_elem_t r = m_1 + m_2;
-
-                mat_set(res, row, col, r);
+                mat_set(res, row, col, m_1 + m_2);
             }
         }
     }
@@ -271,9 +264,9 @@ int mat_mult(const matrix_t *mat_1, const matrix_t *mat_2, matrix_t *res)
 
                 for (size_t mid = 0; mid < mat_1->cols; mid++)
                 {
-                    matrix_elem_t m_1 = mat_get(mat_1, row, mid);
-                    matrix_elem_t m_2 = mat_get(mat_2, mid, col);
-
+                    matrix_elem_t m_1, m_2;
+                    mat_get(mat_1, row, mid, &m_1);
+                    mat_get(mat_2, mid, col, &m_2);
                     r += m_1 * m_2;
                 }
 
@@ -321,7 +314,7 @@ static void imp__normalize_all_rows(matrix_t *matrix, size_t prime_row, size_t p
     }
 }
 
-static void imp__copy_mat_values(matrix_t *matrix, matrix_t *reduced, size_t prime_row, size_t prime_col)
+static void imp__copy_reduced_mat_values(matrix_t *matrix, matrix_t *reduced, size_t prime_row, size_t prime_col)
 {
     for (size_t row = 0; row < matrix->rows; row++)
     {
@@ -405,7 +398,7 @@ static int imp__gauss_transform(matrix_t *matrix)
             if (status_code == mat_success)
             {
                 // вернуть значения из обработанной матрицы в исходную
-                imp__copy_mat_values(matrix, &reduced, prime_row, prime_col);
+                imp__copy_reduced_mat_values(matrix, &reduced, prime_row, prime_col);
                 imp__reset_prime_row(matrix, prime_row, prime_col, prime);
             }
         }
@@ -425,9 +418,9 @@ static void imp__rearrange_rows(matrix_t *matrix)
     {
         for (size_t row = col; row < matrix->rows; row++)
         {
-            if (matrix->data[row][col] == 1.0)
+            if (fabs(matrix->data[row][col] - 1.0) < MAT_EPSILON)
             {
-                mat_swap_rows(matrix, col, row);
+                swap((void *)(matrix->data + col), (void *)(matrix->data + row), sizeof(matrix_elem_t *));
                 break;
             }
         }

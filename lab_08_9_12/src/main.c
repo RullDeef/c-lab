@@ -10,6 +10,32 @@ typedef int (*bin_op_fn_t)(const matrix_t *, const matrix_t *, matrix_t *);
  * @brief Выполняет операцию над матрицами, хранящимися в файлах
  * с указанными именами и выводит результат в выходной файл.
  */
+status_code_t do_mat_bin_op(filename_t ifname_1, filename_t ifname_2, filename_t ofname, bin_op_fn_t bin_op_fn, input_fn_t input_fn, output_fn_t output_fn);
+
+/**
+ * @brief Решает СЛАУ, представимую в виде матрицы во
+ * входном файле и выводит результат в выходной файл.
+ */
+status_code_t do_ssle(filename_t ifname, filename_t ofname, input_fn_t input_fn, output_fn_t output_fn);
+
+/**
+ * @brief Решает одну задачу, в зависимости от передаваемых параметров.
+ */
+status_code_t do_param_work(app_params_t *app_params, input_fn_t input_fn, output_fn_t output_fn);
+
+/**
+ * @brief Организует всю работу программы, принимая специальные функции ввода и вывода.
+ */
+status_code_t do_main_work(int argc, const char **argv, input_fn_t input_fn, output_fn_t output_fn);
+
+int main(int argc, const char **argv)
+{
+    input_fn_t input_fn = mat_io_input_simple;
+    output_fn_t output_fn = mat_io_output_coordinate;
+
+    return do_main_work(argc, argv, input_fn, output_fn);
+}
+
 status_code_t do_mat_bin_op(filename_t ifname_1, filename_t ifname_2, filename_t ofname, bin_op_fn_t bin_op_fn, input_fn_t input_fn, output_fn_t output_fn)
 {
     status_code_t status_code = success;
@@ -36,10 +62,6 @@ status_code_t do_mat_bin_op(filename_t ifname_1, filename_t ifname_2, filename_t
     return status_code;
 }
 
-/**
- * @brief Решает СЛАУ, представимую в виде матрицы во
- * входном файле и выводит результат в выходной файл.
- */
 status_code_t do_ssle(filename_t ifname, filename_t ofname, input_fn_t input_fn, output_fn_t output_fn)
 {
     status_code_t status_code = success;
@@ -61,9 +83,6 @@ status_code_t do_ssle(filename_t ifname, filename_t ofname, input_fn_t input_fn,
     return status_code;
 }
 
-/**
- * @brief Решает одну задачу, в зависимости от передаваемых параметров.
- */
 status_code_t do_param_work(app_params_t *app_params, input_fn_t input_fn, output_fn_t output_fn)
 {
     status_code_t status_code = success;
@@ -84,9 +103,6 @@ status_code_t do_param_work(app_params_t *app_params, input_fn_t input_fn, outpu
     return status_code;
 }
 
-/**
- * @brief Организует всю работу программы, принимая специальные функции ввода и вывода.
- */
 status_code_t do_main_work(int argc, const char **argv, input_fn_t input_fn, output_fn_t output_fn)
 {
     app_params_t *app_params = parse_app_params(argc, argv);
@@ -101,12 +117,4 @@ status_code_t do_main_work(int argc, const char **argv, input_fn_t input_fn, out
     }
 
     return status_code;
-}
-
-int main(int argc, const char **argv)
-{
-    input_fn_t input_fn = mat_io_input_simple;
-    output_fn_t output_fn = mat_io_output_coordinate;
-
-    return do_main_work(argc, argv, input_fn, output_fn);
 }

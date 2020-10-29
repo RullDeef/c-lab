@@ -8,6 +8,11 @@
 
 #include <stdbool.h>
 
+#define MAT_ALLOC_MULTIPLIER 1.5f
+
+/* __DBL_EPSILON__ */
+#define MAT_EPSILON (double)2.22044604925031308084726333618164062e-16L
+
 /**
  * @brief статус-коды операций реализованных в данном модуле.
  */
@@ -18,6 +23,7 @@ enum
     mat_bad_dims,
     mat_bad_copy,
     mat_bad_alloc,
+    mat_bad_index,
     mat_bad_resize,
     mat_bad_matrix,
     mat_zero_matrix,
@@ -124,12 +130,12 @@ matrix_t mat_reduced(const matrix_t *matrix, size_t reduce_row, size_t reduce_co
 /**
  * @brief Возвращает элемент, находящийся в заданной позиции.
  * 
- * При неверных параметрах возвращает 0.
+ * При неверных параметрах возвращает ненулевой код ошибки.
  * 
  * @param row - индекс строки элемента,
  * @param col - индекс столбца элемента.
  */
-matrix_elem_t mat_get(const matrix_t *matrix, size_t row, size_t col);
+int mat_get(const matrix_t *matrix, size_t row, size_t col, matrix_elem_t *value);
 
 /**
  * @brief Устанавливает значение элемента,
@@ -141,7 +147,7 @@ matrix_elem_t mat_get(const matrix_t *matrix, size_t row, size_t col);
  * @param col - индекс столбца элемента.
  * @param value - устанавливаемое значение элемента.
  */
-void mat_set(matrix_t *matrix, size_t row, size_t col, matrix_elem_t value);
+int mat_set(matrix_t *matrix, size_t row, size_t col, matrix_elem_t value);
 
 /**
  * @brief Складывает две матрицы поэлементно.

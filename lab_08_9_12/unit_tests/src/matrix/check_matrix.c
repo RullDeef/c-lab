@@ -24,7 +24,10 @@ static matrix_t imp__craft_mat(size_t rows, size_t cols, const char *str)
 START_TEST(create_invalid_mat)
 {
     matrix_t mat = mat_null();
-    ck_assert_double_eq(mat_get(&mat, 0, 0), 0.0);
+    matrix_elem_t value = 0.0;
+
+    mat_get(&mat, 0, 0, &value);
+    ck_assert_double_eq(value, 0.0);
     
     mat = mat_create(0, 10);
     ck_assert(mat_is_null(&mat));
@@ -59,13 +62,16 @@ END_TEST
 START_TEST(test_resize)
 {
     matrix_t mat = imp__craft_mat(1, 1, "4");
+    matrix_elem_t value = 0.0;
 
     int status = mat_resize(&mat, 5, 5);
     ck_assert_int_eq(status, mat_success);
     ck_assert(!mat_is_null(&mat));
     ck_assert_int_eq(mat.rows, 5);
     ck_assert_int_eq(mat.cols, 5);
-    ck_assert_double_eq(mat_get(&mat, 0, 0), 4.0);
+
+    mat_get(&mat, 0, 0, &value);
+    ck_assert_double_eq(value, 4.0);
 
     mat_free(&mat);
 }
@@ -153,6 +159,7 @@ START_TEST(solve_sle)
     );
 
     matrix_t res = mat_null();
+    matrix_elem_t value = 0.0;
 
     int status = mat_solve_sle(&mat, &res);
 
@@ -161,9 +168,14 @@ START_TEST(solve_sle)
     ck_assert_int_eq(res.rows, 3);
     ck_assert_int_eq(res.cols, 1);
 
-    ck_assert_double_eq(mat_get(&res, 0, 0), -2.0);
-    ck_assert_double_eq(mat_get(&res, 1, 0), 2.0);
-    ck_assert_double_eq(mat_get(&res, 2, 0), 4.0);
+    mat_get(&res, 0, 0, &value);
+    ck_assert_double_eq(value, -2.0);
+
+    mat_get(&res, 1, 0, &value);
+    ck_assert_double_eq(value, 2.0);
+
+    mat_get(&res, 2, 0, &value);
+    ck_assert_double_eq(value, 4.0);
 
     mat_free(&mat);
     mat_free(&res);

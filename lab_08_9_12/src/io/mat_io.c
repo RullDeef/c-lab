@@ -173,9 +173,15 @@ static size_t imp__get_nonzero_amount(const matrix_t *matrix)
     size_t amount = 0;
 
     for (size_t row = 0; row < matrix->rows; row++)
+    {
         for (size_t col = 0; col < matrix->cols; col++)
-            if (fabs(mat_get(matrix, row, col)) >= 1.0e-6)
+        {
+            matrix_elem_t value;
+            mat_get(matrix, row, col, &value);
+            if (fabs(value) > MAT_EPSILON)
                 amount++;
+        }
+    }
 
     return amount;
 }
@@ -197,8 +203,9 @@ int mat_io_output_coordinate(FILE *file, const matrix_t *matrix, int precision)
         {
             for (size_t col = 0; col < matrix->cols; col++)
             {
-                matrix_elem_t value = mat_get(matrix, row, col);
-                if (fabs(value) >= 1.0e-6)
+                matrix_elem_t value;
+                mat_get(matrix, row, col, &value);
+                if (fabs(value) > MAT_EPSILON)
                     fprintf(file, "%lu %lu %.*lf\n", row + 1, col + 1, precision, value);
             }
         }
