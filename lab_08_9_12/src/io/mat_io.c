@@ -206,3 +206,39 @@ int mat_io_output_coordinate(FILE *file, const matrix_t *matrix, int precision)
 
     return status_code;
 }
+
+status_code_t input_matrix(filename_t filename, matrix_t *matrix, input_fn_t input_ft)
+{
+    FILE *file = fopen(filename, "rt");
+    status_code_t status_code = success;
+
+    if (!file)
+        status_code = invalid_filename;
+    else
+    {
+        if (input_ft(file, matrix))
+            status_code = invalid_file;
+
+        fclose(file);
+    }
+
+    return status_code;
+}
+
+status_code_t output_matrix(filename_t filename, const matrix_t *matrix, output_fn_t output_fn, int precision)
+{
+    FILE *file = fopen(filename, "wt");
+    status_code_t status_code = success;
+
+    if (!file)
+        status_code = invalid_filename;
+    else
+    {
+        if (output_fn(file, matrix, precision))
+            status_code = invalid_file;
+
+        fclose(file);
+    }
+
+    return status_code;
+}

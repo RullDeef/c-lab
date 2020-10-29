@@ -7,50 +7,6 @@
 typedef int (*bin_op_fn_t)(const matrix_t *, const matrix_t *, matrix_t *);
 
 /**
- * @brief Считывает матрицу из файла передоваемой функцией чтения.
- */
-status_code_t input_matrix(filename_t filename, matrix_t *matrix, input_fn_t input_ft)
-{
-    FILE *file = fopen(filename, "rt");
-    status_code_t status_code = success;
-
-    if (!file)
-        status_code = invalid_filename;
-    else
-    {
-        if (input_ft(file, matrix))
-            status_code = invalid_file;
-
-        fclose(file);
-    }
-
-    return status_code;
-}
-
-/**
- * @brief Выводит матрицу в файл с помощью передаваемой функции записи.
- * 
- * @param pricision - кол-во цифр после точки.
- */
-status_code_t output_matrix(filename_t filename, const matrix_t *matrix, output_fn_t output_fn, int precision)
-{
-    FILE *file = fopen(filename, "wt");
-    status_code_t status_code = success;
-
-    if (!file)
-        status_code = invalid_filename;
-    else
-    {
-        if (output_fn(file, matrix, precision))
-            status_code = invalid_file;
-
-        fclose(file);
-    }
-
-    return status_code;
-}
-
-/**
  * @brief Выполняет операцию над матрицами, хранящимися в файлах
  * с указанными именами и выводит результат в выходной файл.
  */
