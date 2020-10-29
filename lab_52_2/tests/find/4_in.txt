@@ -1,7 +1,0 @@
-prod pro
-manfr 1
-100
-1
-prod no pro
-manfr 2
-200
