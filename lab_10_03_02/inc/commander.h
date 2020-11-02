@@ -1,8 +1,6 @@
 #ifndef __COMMANDER_H_
 #define __COMMANDER_H_
 
-#include <stdio.h>
-
 typedef char cmd_type_t;
 
 enum

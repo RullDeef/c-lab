@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include "num_dcmp.h"
 
-#define PRIMES_AMOUNT 20U
+#define PRIMES_AMOUNT 50U
 static unsigned int primes[PRIMES_AMOUNT];
 
 static bool imp__is_prime(unsigned int number)
@@ -113,7 +113,7 @@ struct num_dcmp ndcmp_multiply(const struct num_dcmp *nd_1, const struct num_dcm
         tail = push_back(&res, node_1->power, tail);
         node_1 = node_1->next;
     }
-    
+
     while (node_2 != NULL)
     {
         tail = push_back(&res, node_2->power, tail);
@@ -123,7 +123,48 @@ struct num_dcmp ndcmp_multiply(const struct num_dcmp *nd_1, const struct num_dcm
     return res;
 }
 
-struct num_dcmp ndcmp_divide(const struct num_dcmp *nd_1, const struct num_dcmp *nd_2);
+struct num_dcmp ndcmp_divide(const struct num_dcmp *nd_1, const struct num_dcmp *nd_2)
+{
+    struct num_dcmp res = { .head = NULL };
+
+    struct imp__power_node *node_1 = nd_1->head;
+    struct imp__power_node *node_2 = nd_2->head;
+
+    struct imp__power_node *tail = NULL;
+    
+    bool error = false;
+
+    while (!error && node_1 != NULL && node_2 != NULL)
+    {
+        if (node_1->power < node_2->power)
+            error = true;
+        else
+        {
+            unsigned int power = node_1->power - node_2->power;
+            tail = push_back(&res, power, tail);
+
+            node_1 = node_1->next;
+            node_2 = node_2->next;
+        }
+    }
+
+    while (!error && node_1 != NULL)
+    {
+        tail = push_back(&res, node_1->power, tail);
+        node_1 = node_1->next;
+    }
+
+    if (!error && node_2 != NULL)
+        error = true;
+
+    if (error)
+    {
+        ndcmp_destroy(&res);
+        res.head = NULL;
+    }
+
+    return res;
+}
 
 struct num_dcmp ndcmp_square(const struct num_dcmp *nd)
 {
@@ -135,9 +176,18 @@ struct num_dcmp ndcmp_square(const struct num_dcmp *nd)
     return res;
 }
 
-void ndcmp_output(const struct num_dcmp *nd)
+int ndcmp_output(const struct num_dcmp *nd)
 {
-    for (const struct imp__power_node *node = nd->head; node; node = node->next)
-        printf("%d ", node->power);
-    printf("L\n");
+    int status = EXIT_SUCCESS;
+
+    if (nd->head == NULL)
+        status = EXIT_FAILURE;
+    else
+    {
+        for (const struct imp__power_node *node = nd->head; node; node = node->next)
+            printf("%d ", node->power);
+        printf("L\n");
+    }
+
+    return status;
 }

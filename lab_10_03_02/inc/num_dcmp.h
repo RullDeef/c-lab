@@ -20,6 +20,6 @@ struct num_dcmp ndcmp_divide(const struct num_dcmp *nd_1, const struct num_dcmp 
 
 struct num_dcmp ndcmp_square(const struct num_dcmp *nd);
 
-void ndcmp_output(const struct num_dcmp *nd);
+int ndcmp_output(const struct num_dcmp *nd);
 
 #endif // __NUM_DCMP_H_

@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -47,10 +48,9 @@ static int imp__cmd_out(char *line)
     {
         struct num_dcmp nd = ndcmp_decompose(number);
 
-        ndcmp_output(&nd);
+        status = ndcmp_output(&nd);
 
         ndcmp_destroy(&nd);
-        status = EXIT_SUCCESS;
     }
 
     return status;
@@ -66,11 +66,10 @@ static int imp__cmd_sqr(char *line)
         struct num_dcmp nd = ndcmp_decompose(number);
         struct num_dcmp sq = ndcmp_square(&nd);
 
-        ndcmp_output(&sq);
+        status = ndcmp_output(&sq);
 
         ndcmp_destroy(&nd);
         ndcmp_destroy(&sq);
-        status = EXIT_SUCCESS;
     }
 
     return status;
@@ -88,12 +87,33 @@ static int imp__cmd_mul(char *line_1, char *line_2)
         struct num_dcmp nd_2 = ndcmp_decompose(number_2);
         struct num_dcmp prod = ndcmp_multiply(&nd_1, &nd_2);
 
-        ndcmp_output(&prod);
+        status = ndcmp_output(&prod);
 
         ndcmp_destroy(&nd_1);
         ndcmp_destroy(&nd_2);
         ndcmp_destroy(&prod);
-        status = EXIT_SUCCESS;
+    }
+
+    return status;
+}
+
+static int imp__cmd_div(char *line_1, char *line_2)
+{
+    int status = EXIT_FAILURE;
+
+    unsigned long number_1 = cmd_parse_number(line_1);
+    unsigned long number_2 = cmd_parse_number(line_2);
+    if (number_1 != 0UL && number_2 != 0UL)
+    {
+        struct num_dcmp nd_1 = ndcmp_decompose(number_1);
+        struct num_dcmp nd_2 = ndcmp_decompose(number_2);
+        struct num_dcmp res = ndcmp_divide(&nd_1, &nd_2);
+
+        status = ndcmp_output(&res);
+
+        ndcmp_destroy(&nd_1);
+        ndcmp_destroy(&nd_2);
+        ndcmp_destroy(&res);
     }
 
     return status;
@@ -146,20 +166,20 @@ int cmd_execute(cmd_type_t cmd)
 
     switch (cmd)
     {
-    case cmd_out:
-        status = imp__unar_cmd_wrapper(imp__cmd_out);
-        break;
-    
-    case cmd_sqr:
-        status = imp__unar_cmd_wrapper(imp__cmd_sqr);
-        break;
-    
-    case cmd_mul:
-        status = imp__bin_cmd_wrapper(imp__cmd_mul);
-        break;
-
-    default:
-        break;
+        case cmd_out:
+            status = imp__unar_cmd_wrapper(imp__cmd_out);
+            break;
+        case cmd_sqr:
+            status = imp__unar_cmd_wrapper(imp__cmd_sqr);
+            break;
+        case cmd_mul:
+            status = imp__bin_cmd_wrapper(imp__cmd_mul);
+            break;
+        case cmd_div:
+            status = imp__bin_cmd_wrapper(imp__cmd_div);
+            break;
+        default:
+            break;
     }
 
     return status;
