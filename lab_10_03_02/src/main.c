@@ -9,13 +9,12 @@ int main(void)
     char *line = NULL;
     size_t line_len = 0;
 
-    getline(&line, &line_len, stdin);
-    if (line != NULL)
+    if (getline(&line, &line_len, stdin) > 0)
     {
         cmd_type_t cmd = cmd_parse(line);
         status = cmd_execute(cmd);
-        free(line);
     }
 
+    free(line);
     return status;
 }

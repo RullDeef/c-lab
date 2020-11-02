@@ -185,7 +185,7 @@ int ndcmp_output(const struct num_dcmp *nd)
     else
     {
         for (const struct imp__power_node *node = nd->head; node; node = node->next)
-            printf("%d ", node->power);
+            printf("%u ", node->power);
         printf("L\n");
     }
 

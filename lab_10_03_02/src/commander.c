@@ -126,13 +126,10 @@ static int imp__unar_cmd_wrapper(int (*cmd)(char *))
 
     int status = EXIT_FAILURE;
 
-    getline(&line, &len, stdin);
-    if (line != NULL)
-    {
+    if (getline(&line, &len, stdin) > 0)
         status = cmd(line);
-        free(line);
-    }
 
+    free(line);
     return status;
 }
 
@@ -145,18 +142,14 @@ static int imp__bin_cmd_wrapper(int (*cmd)(char *, char *))
 
     int status = EXIT_FAILURE;
 
-    getline(&line_1, &line_1_len, stdin);
-    if (line_1 != NULL)
+    if (getline(&line_1, &line_1_len, stdin) > 0)
     {
-        getline(&line_2, &line_2_len, stdin);
-        if (line_2 != NULL)
-        {
+        if (getline(&line_2, &line_2_len, stdin) > 0)
             status = cmd(line_1, line_2);
-            free(line_2);
-        }
-        free(line_1);
+        free(line_2);
     }
 
+    free(line_1);
     return status;
 }
 
