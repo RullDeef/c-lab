@@ -95,7 +95,7 @@ static void imp__compress(struct imp__power_node **node)
     if (*node != NULL)
     {
         imp__compress(&(*node)->next);
-        if ((*node)->power == 0U)
+        if ((*node)->power == 0U && (*node)->next == NULL)
         {
             free(*node);
             *node = NULL;
