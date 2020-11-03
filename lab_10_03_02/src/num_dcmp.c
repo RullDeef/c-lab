@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include "num_dcmp.h"
 
-#define PRIMES_AMOUNT 50U
+#define PRIMES_AMOUNT 500U
 static unsigned int primes[PRIMES_AMOUNT];
 
 static bool imp__is_prime(unsigned int number)
@@ -37,7 +37,7 @@ static void imp__recalc_primes()
 
 static struct imp__power_node *create_node(unsigned int power)
 {
-    struct imp__power_node *node = malloc(sizeof(struct imp__power_node));
+    struct imp__power_node *node = calloc(1, sizeof(struct imp__power_node));
     if (node != NULL)
         node->power = power;
     return node;
@@ -59,7 +59,7 @@ static struct imp__power_node *push_back(struct num_dcmp *nd, unsigned int power
     return tail;
 }
 
-struct num_dcmp ndcmp_decompose(unsigned long number)
+struct num_dcmp nd_decompose(unsigned long number)
 {
     struct num_dcmp nd;
     if (number == 1U)
@@ -84,13 +84,31 @@ struct num_dcmp ndcmp_decompose(unsigned long number)
     return nd;
 }
 
-void ndcmp_destroy(struct num_dcmp *nd)
+void nd_destroy(struct num_dcmp *nd)
 {
     for (struct imp__power_node *prev = nd->head, *node = NULL; prev; free(prev), prev = node)
         node = prev->next;
 }
 
-struct num_dcmp ndcmp_multiply(const struct num_dcmp *nd_1, const struct num_dcmp *nd_2)
+static void imp__compress(struct imp__power_node **node)
+{
+    if (*node != NULL)
+    {
+        imp__compress(&(*node)->next);
+        if ((*node)->power == 0U)
+        {
+            free(*node);
+            *node = NULL;
+        }
+    }
+}
+
+void nd_compress(struct num_dcmp *nd)
+{
+    imp__compress(&nd->head);
+}
+
+struct num_dcmp nd_multiply(const struct num_dcmp *nd_1, const struct num_dcmp *nd_2)
 {
     struct num_dcmp res = { .head = NULL };
 
@@ -123,7 +141,7 @@ struct num_dcmp ndcmp_multiply(const struct num_dcmp *nd_1, const struct num_dcm
     return res;
 }
 
-struct num_dcmp ndcmp_divide(const struct num_dcmp *nd_1, const struct num_dcmp *nd_2)
+struct num_dcmp nd_divide(const struct num_dcmp *nd_1, const struct num_dcmp *nd_2)
 {
     struct num_dcmp res = { .head = NULL };
 
@@ -159,14 +177,15 @@ struct num_dcmp ndcmp_divide(const struct num_dcmp *nd_1, const struct num_dcmp 
 
     if (error)
     {
-        ndcmp_destroy(&res);
+        nd_destroy(&res);
         res.head = NULL;
     }
 
+    nd_compress(&res);
     return res;
 }
 
-struct num_dcmp ndcmp_square(const struct num_dcmp *nd)
+struct num_dcmp nd_square(const struct num_dcmp *nd)
 {
     struct num_dcmp res = { .head = NULL };
 
@@ -176,17 +195,16 @@ struct num_dcmp ndcmp_square(const struct num_dcmp *nd)
     return res;
 }
 
-int ndcmp_output(const struct num_dcmp *nd)
+int nd_output(const struct num_dcmp *nd)
 {
-    int status = EXIT_SUCCESS;
+    int status = EXIT_FAILURE;
 
-    if (nd->head == NULL)
-        status = EXIT_FAILURE;
-    else
+    if (nd->head != NULL)
     {
         for (const struct imp__power_node *node = nd->head; node; node = node->next)
             printf("%u ", node->power);
         printf("L\n");
+        status = EXIT_SUCCESS;
     }
 
     return status;

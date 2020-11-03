@@ -46,11 +46,11 @@ static int imp__cmd_out(char *line)
     unsigned long number = cmd_parse_number(line);
     if (number != 0UL)
     {
-        struct num_dcmp nd = ndcmp_decompose(number);
+        struct num_dcmp nd = nd_decompose(number);
 
-        status = ndcmp_output(&nd);
+        status = nd_output(&nd);
 
-        ndcmp_destroy(&nd);
+        nd_destroy(&nd);
     }
 
     return status;
@@ -63,13 +63,13 @@ static int imp__cmd_sqr(char *line)
     unsigned long number = cmd_parse_number(line);
     if (number != 0UL)
     {
-        struct num_dcmp nd = ndcmp_decompose(number);
-        struct num_dcmp sq = ndcmp_square(&nd);
+        struct num_dcmp nd = nd_decompose(number);
+        struct num_dcmp sq = nd_square(&nd);
 
-        status = ndcmp_output(&sq);
+        status = nd_output(&sq);
 
-        ndcmp_destroy(&nd);
-        ndcmp_destroy(&sq);
+        nd_destroy(&nd);
+        nd_destroy(&sq);
     }
 
     return status;
@@ -83,15 +83,15 @@ static int imp__cmd_mul(char *line_1, char *line_2)
     unsigned long number_2 = cmd_parse_number(line_2);
     if (number_1 != 0UL && number_2 != 0UL)
     {
-        struct num_dcmp nd_1 = ndcmp_decompose(number_1);
-        struct num_dcmp nd_2 = ndcmp_decompose(number_2);
-        struct num_dcmp prod = ndcmp_multiply(&nd_1, &nd_2);
+        struct num_dcmp nd_1 = nd_decompose(number_1);
+        struct num_dcmp nd_2 = nd_decompose(number_2);
+        struct num_dcmp prod = nd_multiply(&nd_1, &nd_2);
 
-        status = ndcmp_output(&prod);
+        status = nd_output(&prod);
 
-        ndcmp_destroy(&nd_1);
-        ndcmp_destroy(&nd_2);
-        ndcmp_destroy(&prod);
+        nd_destroy(&nd_1);
+        nd_destroy(&nd_2);
+        nd_destroy(&prod);
     }
 
     return status;
@@ -105,15 +105,15 @@ static int imp__cmd_div(char *line_1, char *line_2)
     unsigned long number_2 = cmd_parse_number(line_2);
     if (number_1 != 0UL && number_2 != 0UL)
     {
-        struct num_dcmp nd_1 = ndcmp_decompose(number_1);
-        struct num_dcmp nd_2 = ndcmp_decompose(number_2);
-        struct num_dcmp res = ndcmp_divide(&nd_1, &nd_2);
+        struct num_dcmp nd_1 = nd_decompose(number_1);
+        struct num_dcmp nd_2 = nd_decompose(number_2);
+        struct num_dcmp res = nd_divide(&nd_1, &nd_2);
 
-        status = ndcmp_output(&res);
+        status = nd_output(&res);
 
-        ndcmp_destroy(&nd_1);
-        ndcmp_destroy(&nd_2);
-        ndcmp_destroy(&res);
+        nd_destroy(&nd_1);
+        nd_destroy(&nd_2);
+        nd_destroy(&res);
     }
 
     return status;
