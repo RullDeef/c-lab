@@ -62,7 +62,7 @@ static struct imp__power_node *push_back(struct num_dcmp *nd, unsigned int power
 struct num_dcmp nd_decompose(unsigned long number)
 {
     struct num_dcmp nd;
-    if (number == 1U)
+    if (number <= 1U)
         nd.head = NULL;
     else
     {
