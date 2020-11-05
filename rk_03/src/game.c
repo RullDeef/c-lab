@@ -98,6 +98,7 @@ int game_load(struct game_field *gf, const char *filename)
             }
 
             free(line);
+            status = EXIT_SUCCESS;
         }
 
         fclose(file);

@@ -10,21 +10,42 @@
     #define msleep(ms) usleep(ms * 1000)
 #endif
 
+int input(struct game_field *gf);
+void mainloop(struct game_field *gf);
 void show_state(struct game_field *gf);
+
 
 int main(void)
 {
-    int status = EXIT_SUCCESS;
-    initscr();
-
-    int rows, cols;
-    getmaxyx(stdscr, rows, cols);
-
     struct game_field gf;
 
+    initscr();
+    int status = input(&gf);
+
+    if (status == EXIT_SUCCESS)
+    {
+        mainloop(&gf);
+
+        clear();
+        game_destroy(&gf);
+        printw("END OF GAME.");
+    }
+
+    refresh();
+    getch();
+    endwin();
+    return status;
+}
+
+int input(struct game_field *gf)
+{
+    int status = EXIT_SUCCESS;
+    int percent;
+
+    int rows, cols; // std screen size
+    getmaxyx(stdscr, rows, cols);
 
     printw("Enter fill percent (1...100) or 0 to input from file: ");
-    int percent;
 
     if (scanw("%d", &percent) == 1 && (percent == 0 || (percent > 0 && percent <= 100)))
     {
@@ -35,7 +56,11 @@ int main(void)
 
             if (scanw("%s", &filename) == 1)
             {
-                game_load(&gf, filename);
+                if (game_load(gf, filename) != EXIT_SUCCESS)
+                {
+                    printw("invalid file.");
+                    status = EXIT_FAILURE;
+                }
             }
             else
             {
@@ -45,20 +70,9 @@ int main(void)
         }
         else
         {
-            gf = game_init(rows, cols);
-            game_randomize(&gf, percent);
+            *gf = game_init(rows, cols);
+            game_randomize(gf, percent);
         }
-        
-        while (!game_update(&gf))
-        {
-            show_state(&gf);
-            msleep(200);
-            refresh();
-        }
-
-        clear();
-        game_destroy(&gf);
-        printw("END OF GAME.");
     }
     else
     {
@@ -66,10 +80,18 @@ int main(void)
         status = EXIT_FAILURE;
     }
 
-    refresh();
-    getch();
-    endwin();
     return status;
+}
+
+void mainloop(struct game_field *gf)
+{
+    do
+    {
+        show_state(gf);
+        msleep(200);
+        refresh();
+    }
+    while (!game_update(gf));
 }
 
 void show_state(struct game_field *gf)
