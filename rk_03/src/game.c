@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include "game.h"
 
 static size_t calc_alloc_size(int rows, int cols)
@@ -44,6 +46,64 @@ static int count_neighbors(struct game_field *gf, int row, int col)
     }
 
     return neighbors;
+}
+
+static bool check_file_dims(FILE *file, int *rows, int *cols)
+{
+    bool valid = true;
+    char *line = NULL;
+    size_t size = 0U;
+
+    *cols = -1;
+    *rows = 0;
+
+    while (!feof(file) && getline(&line, &size, file) != EOF)
+    {
+        if (*cols == -1)
+            *cols = strlen(line);
+        else if (*cols != strlen(line))
+        {
+            valid = false;
+            break;
+        }
+        (*rows)++;
+    }
+
+    free(line);
+    return valid;
+}
+
+int game_load(struct game_field *gf, const char *filename)
+{
+
+    FILE *file = fopen(filename, "rt");
+    int status = EXIT_FAILURE;
+
+    if (file)
+    {
+        int rows, cols;
+        if (check_file_dims(file, &rows, &cols))
+        {
+            rewind(file);
+
+            *gf = game_init(rows, cols);
+
+            char *line = NULL;
+            size_t size = 0U;
+            for (int row = 0; row < rows; row++)
+            {
+                getline(&line, &size, file);
+                for (int col = 0; col < cols; col++)
+                    gf->cells[row][col].alive = line[col] == '1';
+            }
+
+            free(line);
+        }
+
+        fclose(file);
+    }
+
+    return status;
 }
 
 bool game_update(struct game_field *gf)

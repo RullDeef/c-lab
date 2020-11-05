@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <curses.h>
 #include "game.h"
 
@@ -13,31 +14,62 @@ void show_state(struct game_field *gf);
 
 int main(void)
 {
+    int status = EXIT_SUCCESS;
     initscr();
 
     int rows, cols;
     getmaxyx(stdscr, rows, cols);
 
-    struct game_field gf = game_init(rows, cols);
+    struct game_field gf;
 
-    game_randomize(&gf, 5);
 
-    while (!game_update(&gf))
+    printw("Enter fill percent (1...100) or 0 to input from file: ");
+    int percent;
+
+    if (scanw("%d", &percent) == 1 && (percent == 0 || (percent > 0 && percent <= 100)))
     {
-        show_state(&gf);
-        msleep(200);
-        refresh();
+        if (percent == 0)
+        {
+            char filename[256];
+            printw("Enter file name: ");
+
+            if (scanw("%s", &filename) == 1)
+            {
+                game_load(&gf, filename);
+            }
+            else
+            {
+                printw("Wrong filename.");
+                status = EXIT_FAILURE;
+            }
+        }
+        else
+        {
+            gf = game_init(rows, cols);
+            game_randomize(&gf, percent);
+        }
+        
+        while (!game_update(&gf))
+        {
+            show_state(&gf);
+            msleep(200);
+            refresh();
+        }
+
+        clear();
+        game_destroy(&gf);
+        printw("END OF GAME.");
+    }
+    else
+    {
+        printw("Wrong percent.\n");
+        status = EXIT_FAILURE;
     }
 
-    game_destroy(&gf);
-
-    clear();
-    printw("Достигнут конец игры.");
     refresh();
-
     getch();
     endwin();
-    return 0;
+    return status;
 }
 
 void show_state(struct game_field *gf)
