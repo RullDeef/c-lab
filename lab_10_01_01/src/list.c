@@ -3,27 +3,32 @@
 
 int copy(node_t *head, node_t **new_head)
 {
-    int status = EXIT_SUCCESS;
+    int status = EXIT_FAILURE;
 
-    *new_head = NULL;
-    node_t **node = new_head;
-    while (status == EXIT_SUCCESS && head != NULL)
+    if (new_head != NULL)
     {
-        *node = malloc(sizeof(node_t));
-        if (*node == NULL)
-            status = EXIT_FAILURE;
-        else
+        status = head ? EXIT_SUCCESS : EXIT_FAILURE;
+        *new_head = NULL;
+        node_t **node = new_head;
+        while (status == EXIT_SUCCESS && head != NULL)
         {
-            **node = *head;
-            node = &((*node)->next);
+            *node = malloc(sizeof(node_t));
+            if (*node == NULL)
+                status = EXIT_FAILURE;
+            else
+            {
+                **node = *head;
+                node = &((*node)->next);
+                head = head->next;
+            }
         }
-    }
 
-    while (status == EXIT_FAILURE && *new_head != NULL)
-    {
-        node_t *next = (*new_head)->next;
-        free(*new_head);
-        *new_head = next;
+        while (status == EXIT_FAILURE && *new_head != NULL)
+        {
+            node_t *next = (*new_head)->next;
+            free(*new_head);
+            *new_head = next;
+        }
     }
 
     return status;
@@ -33,7 +38,7 @@ void *pop_front(node_t **head)
 {
     void *data = NULL;
 
-    if (*head != NULL)
+    if (head != NULL && *head != NULL)
     {
         data = (*head)->data;
 
@@ -49,7 +54,7 @@ void *pop_back(node_t **head)
 {
     void *data = NULL;
 
-    if (*head != NULL)
+    if (head != NULL && *head != NULL)
     {
         node_t **back = head;
 
@@ -57,7 +62,7 @@ void *pop_back(node_t **head)
         {
             node_t *bef_back = *head;
             while (bef_back->next->next != NULL)
-                bef_back = (*back)->next;
+                bef_back = bef_back->next;
 
             back = &(bef_back->next);
         }
@@ -124,8 +129,11 @@ node_t *reverse(node_t *head)
 {
     node_t *new_head = NULL;
 
-    for (node_t *next = head ? head->next : NULL; head; new_head = head, head = next)
+    for (node_t *temp; head; new_head = head, head = temp)
+    {
+        temp = head->next;
         head->next = new_head;
+    }
 
     return new_head;
 }
@@ -135,7 +143,7 @@ void front_back_split(node_t *head, node_t **back)
     node_t **mid = &head;
 
     for (node_t *node = head; node != NULL && node->next != NULL; node = node->next->next)
-        mid = &((*mid)->next);
+        mid = node->next->next ? &((*mid)->next) : mid;
     
     *back = *mid ? (*mid)->next : NULL;
     if (*mid != NULL)
@@ -147,23 +155,30 @@ node_t *sorted_merge(node_t **head_a, node_t **head_b, int (*cmp)(const void *, 
     node_t *head = NULL;
     node_t **node = &head;
 
-    node_t **old_head_a = head_a;
-    node_t **old_head_b = head_b;
+    node_t *node_a = *head_a;
+    node_t *node_b = *head_b;
 
-    while (*head_a != NULL && *head_b != NULL)
+    while (node_a != NULL && node_b != NULL)
     {
-        int res = cmp((*head_a)->data, (*head_b)->data);
+        int res = cmp(node_a->data, node_b->data);
 
-        *node = res <= 0 ? *head_a : *head_b;
-        node_t ***target = res <= 0 ? &head_a : &head_b;
-        *target = &((**target)->next);
+        if (res <= 0)
+        {
+            *node = node_a;
+            node_a = node_a->next;
+        }
+        else
+        {
+            *node = node_b;
+            node_b = node_b->next;
+        }
 
         node = &((*node)->next);
     }
 
-    *node = *head_a ? *head_a : *head_b;
-    *old_head_a = NULL;
-    *old_head_b = NULL;
+    *node = node_a ? node_a : node_b;
+    *head_a = NULL;
+    *head_b = NULL;
 
     return head;
 }

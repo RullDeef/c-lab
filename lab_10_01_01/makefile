@@ -10,12 +10,15 @@ CHECK_SRC := $(shell find ./unit -type f -name *.c)
 CHECK_OBJS := $(subst .c,.o,$(CHECK_SRC))
 CHECK_OBJS := $(subst unit,obj,$(CHECK_OBJS))
 
-.PHONY : clean
+.PHONY : unit clean
+
+unit : unit_tests.exe
+	valgrind --leak-check=full -- ./unit_tests.exe
 
 clean :
-	rm -rf obj app.exe
+	rm -rf obj *.exe
 
-unit_tests.exe : $(CHECK_OBJS)
+unit_tests.exe : $(CHECK_OBJS) $(OBJECTS)
 	$(CC) -o $@ $^ -lcheck
 
 $(OBJECTS) : obj/%.o : src/%.c
