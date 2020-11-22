@@ -1,1 +1,0 @@
-./func-tests/neg_07_in.txt
