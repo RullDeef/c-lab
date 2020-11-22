@@ -1,6 +1,7 @@
 .vscode
 
-# prevent saving my own shell scripts
+lab_01_*_*
+
 */build
 */debug
 
@@ -15,3 +16,10 @@
 *.files
 *.includes
 
+lab_52_2/test.sh
+lab_52_2/build.sh
+lab_52_2/tests/.temp
+
+**.gcov
+**.gcda
+**.gcno
