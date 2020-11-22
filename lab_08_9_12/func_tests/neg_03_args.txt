@@ -1,0 +1,1 @@
+a wrong_file.txt wrong_too.txt ./func_tests/out/neg_03_out_file.txt

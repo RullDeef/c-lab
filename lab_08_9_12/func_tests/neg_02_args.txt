@@ -1,0 +1,1 @@
+cmd txt.txt temp_out.txt ./func_tests/out/neg_02_out_file.txt
