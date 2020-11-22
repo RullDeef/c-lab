@@ -7,6 +7,7 @@ struct imp__power_node
     struct imp__power_node *next;
 };
 
+// number decomposition struct (linked-list-like)
 struct num_dcmp
 {
     struct imp__power_node *head;

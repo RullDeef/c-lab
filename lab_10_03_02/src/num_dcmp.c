@@ -4,19 +4,18 @@
 #include "num_dcmp.h"
 
 #define PRIMES_AMOUNT 500U
+#define FIRST_PRIME 2U
 static unsigned int primes[PRIMES_AMOUNT];
 
 static bool imp__is_prime(unsigned int number)
 {
     bool is_prime = true;
 
-    for (unsigned int i = 2; i <= number / 2; i++)
+    for (unsigned int i = 0U; primes[i] <= number / 2; i++)
     {
-        if (number % i == 0)
-        {
-            is_prime = false;
+        is_prime = number % primes[i] != 0;
+        if (!is_prime)
             break;
-        }
     }
 
     return is_prime;
@@ -26,7 +25,7 @@ static void imp__recalc_primes()
 {
     if (primes[0] == 0U)
     {
-        primes[0] = 2U;
+        primes[0] = FIRST_PRIME;
         for (unsigned short i = 1U; i < PRIMES_AMOUNT; i++)
         {
             primes[i] = primes[i - 1U];
