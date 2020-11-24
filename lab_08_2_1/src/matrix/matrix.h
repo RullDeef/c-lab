@@ -8,7 +8,7 @@ struct matrix
 {
     int rows;
     int cols;
-    int **data;
+    long long **data;
 };
 
 struct matrix mat_create(int rows, int cols);

@@ -4,15 +4,15 @@
 
 struct matrix mat_create(int rows, int cols)
 {
-    struct matrix mat = { .rows = rows, .cols = cols };
-    mat.data = calloc(rows, sizeof(int*));
+    struct matrix mat = {.rows = rows, .cols = cols};
+    mat.data = calloc(rows, sizeof(long long *));
 
     if (mat.data != NULL)
     {
         bool mem_error = false;
         for (int row = 0; row < rows && !mem_error; row++)
         {
-            mat.data[row] = calloc(cols, sizeof(int));
+            mat.data[row] = calloc(cols, sizeof(long long));
             mem_error = mat.data[row] == NULL;
         }
 
@@ -28,7 +28,7 @@ struct matrix mat_create(int rows, int cols)
 
 struct matrix mat_invalid(void)
 {
-    struct matrix mat = { .data = NULL };
+    struct matrix mat = {.data = NULL};
     return mat;
 }
 
@@ -56,8 +56,8 @@ struct matrix mat_read(FILE *file)
     bool input_valid = true;
     for (int row = 0; row < rows && input_valid; row++)
         for (int col = 0; col < cols && input_valid; col++)
-            input_valid = fscanf(file, "%d", mat.data[row] + col) == 1;
-    
+            input_valid = fscanf(file, "%lld", mat.data[row] + col) == 1;
+
     if (!input_valid)
     {
         mat_destroy(mat);
@@ -74,7 +74,7 @@ int mat_print(FILE *file, struct matrix mat)
     for (int row = 0; row < mat.rows && output_valid; row++)
     {
         for (int col = 0; col < mat.cols && output_valid; col++)
-            output_valid = fprintf(file, " %d" + (col == 0), mat.data[row][col]) > 0;
+            output_valid = fprintf(file, " %lld" + (col == 0), mat.data[row][col]) > 0;
         fprintf(file, "\n");
     }
 
@@ -83,7 +83,7 @@ int mat_print(FILE *file, struct matrix mat)
 
 static void get_max_elem_index(struct matrix mat, int *max_row, int *max_col)
 {
-    int max = mat.data[0][0];
+    long long max = mat.data[0][0];
     *max_row = 0;
     *max_col = 0;
 
@@ -142,17 +142,17 @@ static int get_arifm_mean(struct matrix mat, int col)
 
 static int get_min(struct matrix mat, int row)
 {
-    int min = mat.data[0][0];
+    long long min = mat.data[0][0];
 
     for (int col = 0; col < mat.cols; col++)
         min = mat.data[row][col] < min ? mat.data[row][col] : min;
-    
+
     return min;
 }
 
 struct matrix mat_expand(struct matrix mat, int z)
 {
-    int **new_data = realloc(mat.data, z * sizeof(int*));
+    long long **new_data = realloc(mat.data, z * sizeof(long long *));
     if (new_data == NULL)
     {
         mat_destroy(mat);
@@ -165,7 +165,7 @@ struct matrix mat_expand(struct matrix mat, int z)
         bool mem_error = false;
         for (int row = 0; row < mat.rows && !mem_error; row++)
         {
-            int *new_row = realloc(mat.data[row], z * sizeof(int));
+            long long *new_row = realloc(mat.data[row], z * sizeof(long long));
             mem_error = new_row == NULL;
             if (!mem_error)
                 mat.data[row] = new_row;
@@ -178,7 +178,7 @@ struct matrix mat_expand(struct matrix mat, int z)
         }
 
         for (int row = mat.rows; row < z; row++)
-            mat.data[row] = calloc(z, sizeof(int));
+            mat.data[row] = calloc(z, sizeof(long long));
     }
 
     while (mat.rows < z)
@@ -210,7 +210,7 @@ struct matrix mat_mult(struct matrix left, struct matrix right)
         {
             for (int col = 0; col < res.cols; col++)
             {
-                int val = 0;
+                long long val = 0;
 
                 for (int mid = 0; mid < left.cols; mid++)
                     val += left.data[row][mid] * right.data[mid][col];
