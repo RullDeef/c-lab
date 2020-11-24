@@ -4,11 +4,12 @@ int main(int argc, const char **argv)
 {
     int status = 0;
 
-    struct matrix a = mat_read(stdin);
+    FILE *file = stdin; // fopen("in.txt", "rt");
+    struct matrix a = mat_read(file);
 
     if (mat_is_valid(a))
     {
-        struct matrix b = mat_read(stdin);
+        struct matrix b = mat_read(file);
 
         if (mat_is_valid(b))
         {
@@ -27,7 +28,7 @@ int main(int argc, const char **argv)
                 b = mat_expand(b, z);
 
             int p, q;
-            if (scanf("%d%d", &p, &q) != 2 || p < 0 || q < 0)
+            if (fscanf(file, "%d%d", &p, &q) != 2 || p < 0 || q < 0)
                 status = -3;
             else
             {

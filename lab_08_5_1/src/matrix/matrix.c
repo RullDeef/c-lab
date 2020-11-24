@@ -234,6 +234,8 @@ struct matrix mat_pow(struct matrix mat, int q)
             for (int col = 0; col < res.cols; col++)
                 res.data[row][col] = row == col;
     }
+    else if (q == 1)
+        return mat;
     else
     {
         res = mat_mult(mat, mat);
