@@ -4,7 +4,7 @@
 
 struct matrix mat_create(int rows, int cols)
 {
-    struct matrix mat = {.rows = rows, .cols = cols};
+    struct matrix mat = { .rows = rows, .cols = cols };
     mat.data = calloc(rows, sizeof(long long *));
 
     if (mat.data != NULL)
@@ -28,7 +28,7 @@ struct matrix mat_create(int rows, int cols)
 
 struct matrix mat_invalid(void)
 {
-    struct matrix mat = {.data = NULL};
+    struct matrix mat = { .data = NULL };
     return mat;
 }
 
@@ -133,11 +133,19 @@ struct matrix mat_make_square(struct matrix mat)
 static int get_arifm_mean(struct matrix mat, int col)
 {
     float mean = 0.0f;
+    int amount = 0;
 
     for (int row = 0; row < mat.rows; row++)
+    {
+        if (mat.data[row][col] != 0)
+            amount++;
         mean += mat.data[row][col];
+    }
 
-    return (int)floorf(mean / mat.rows);
+    if (amount == 0)
+        return 0;
+
+    return (int)floorf(mean / amount);
 }
 
 static int get_min(struct matrix mat, int row)
