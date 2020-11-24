@@ -10,11 +10,11 @@ OBJ := $(subst .c,.o,$(subst src,obj,$(SRC)))
 func : app.exe
 	./func_tests/test.sh
 
-unit : SRC -= ./src/main.c
-unit : OBJ -= ./obj/main.o
 unit : unit_tests.exe
 	./unit_tests/test.sh
 
+unit_tests.exe : SRC-= ./src/main.c
+unit_tests.exe : SRC+= ./unit/check_main.c
 unit_tests.exe : $(SRC)
 	$(CC) $(CFLAGS) -lcheck -lm -o $@ $^
 
