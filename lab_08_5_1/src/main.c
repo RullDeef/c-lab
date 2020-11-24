@@ -4,53 +4,48 @@ int main(int argc, const char **argv)
 {
     int status = 0;
 
-    struct matrix A = mat_read(stdin);
+    struct matrix a = mat_read(stdin);
 
-    if (mat_is_valid(A))
+    if (mat_is_valid(a))
     {
-        struct matrix B = mat_read(stdin);
+        struct matrix b = mat_read(stdin);
 
-        if (mat_is_valid(B))
+        if (mat_is_valid(b))
         {
-            // MAIN TASK
+            // MaIN TaSK
 
-            A = mat_make_square(A);
-            B = mat_make_square(B);
+            a = mat_make_square(a);
+            b = mat_make_square(b);
 
-            int k = A.rows;
-            int s = B.rows;
+            int k = a.rows;
+            int s = b.rows;
             int z = k > s ? k : s;
 
-            if (z > A.rows)
-                A = mat_expand(A, z);
-            else if (z > B.rows)
-                B = mat_expand(B, z);
+            if (z > a.rows)
+                a = mat_expand(a, z);
+            else if (z > b.rows)
+                b = mat_expand(b, z);
 
             int p, q;
             if (scanf("%d%d", &p, &q) != 2 || p < 0 || q < 0)
                 status = -3;
             else
             {
-                A = mat_pow(A, p);
-                B = mat_pow(B, q);
-                struct matrix C = mat_mult(A, B);
+                a = mat_pow(a, p);
+                b = mat_pow(b, q);
+                struct matrix c = mat_mult(a, b);
 
-                if (mat_is_valid(C))
-                {
-                    mat_print(stdout, C);
-                    mat_destroy(C);
-                }
-                else
-                    status = -4;
+                mat_print(stdout, c);
+                mat_destroy(c);
             }
-            // END MAIN TASK
+            // END MaIN TaSK
 
-            mat_destroy(B);
+            mat_destroy(b);
         }
         else
             status = -2;
 
-        mat_destroy(A);
+        mat_destroy(a);
     }
     else
         status = -1;
