@@ -1,6 +1,6 @@
 CC := gcc
-CFLAGS := -std=c99 -Wall -Werror -pedantic -g -ggdb --coverage
-LFLAGS := -std=c99 --coverage
+CFLAGS := -std=c99 -Wall -Werror -pedantic -g -ggdb
+LFLAGS := -lm
 
 SRC := $(shell find ./src -name *.c)
 OBJ := $(subst .c,.o,$(subst src,obj,$(SRC)))
@@ -19,7 +19,7 @@ unit_tests.exe : $(SRC)
 	$(CC) $(CFLAGS) -lcheck -lm -o $@ $^
 
 app.exe : $(OBJ)
-	$(CC) $(LFLAGS) -lm -o $@ $^
+	$(CC) -o $@ $^ $(LFLAGS)
 
 $(OBJ) : obj/%.o : src/%.c
 	mkdir -p $(shell dirname $@); $(CC) $(CFLAGS) -c -o $@ $^

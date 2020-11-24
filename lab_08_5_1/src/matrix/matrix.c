@@ -244,7 +244,7 @@ struct matrix mat_pow(struct matrix mat, int q)
         temp = res;
         while (--q > 0)
         {
-            res = mat_mult(res, mat);
+            res = mat_mult(temp, mat);
             mat_destroy(temp);
             temp = res;
         }
