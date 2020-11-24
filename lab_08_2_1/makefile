@@ -16,7 +16,7 @@ unit : unit_tests.exe
 unit_tests.exe : SRC-= ./src/main.c
 unit_tests.exe : SRC+= ./unit/check_main.c
 unit_tests.exe : $(SRC)
-	$(CC) $(CFLAGS) -lcheck -lm -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ -lcheck -lm 
 
 app.exe : $(OBJ)
 	$(CC) -o $@ $^ $(LFLAGS)
