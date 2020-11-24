@@ -91,7 +91,7 @@ static void get_max_elem_index(struct matrix mat, int *max_row, int *max_col)
     {
         for (int col = 0; col < mat.cols; col++)
         {
-            if (mat.data[row][col] >= max)
+            if (mat.data[row][col] > max)
             {
                 max = mat.data[row][col];
                 *max_row = row;
@@ -137,7 +137,7 @@ static int get_arifm_mean(struct matrix mat, int col)
     for (int row = 0; row < mat.rows; row++)
         mean += mat.data[row][col];
 
-    return (int)(mean / mat.rows);
+    return (int)floorf(mean / mat.rows);
 }
 
 static int get_min(struct matrix mat, int row)
