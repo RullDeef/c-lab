@@ -110,7 +110,7 @@ struct matrix mat_make_square(struct matrix mat)
         get_min_elem_index(mat, &min_row, &min_col);
         free(mat.data[min_row]);
 
-        for (int row = min_row; row + 1 < min_row; row++)
+        for (int row = min_row; row + 1 < mat.rows; row++)
             mat.data[row] = mat.data[row + 1];
 
         mat.rows--;

