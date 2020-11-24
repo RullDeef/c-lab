@@ -137,7 +137,7 @@ static int get_arifm_mean(struct matrix mat, int col)
     for (int row = 0; row < mat.rows; row++)
         mean += mat.data[row][col];
 
-    return (int)floorf(mean / mat.rows);
+    return (int)(mean / mat.rows);
 }
 
 static int get_min(struct matrix mat, int row)
