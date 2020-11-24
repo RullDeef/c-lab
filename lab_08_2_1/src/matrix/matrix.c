@@ -150,7 +150,7 @@ static int get_arifm_mean(struct matrix mat, int col)
 
 static int get_min(struct matrix mat, int row)
 {
-    long long min = mat.data[0][0];
+    long long min = mat.data[row][0];
 
     for (int col = 0; col < mat.cols; col++)
         min = mat.data[row][col] < min ? mat.data[row][col] : min;
