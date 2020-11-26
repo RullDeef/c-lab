@@ -129,7 +129,10 @@ static void parse_int(char *s, size_t *n, size_t *write, int num, int_parser_t p
         s[(*write)++] = (*n)-- == 1U ? '\0' : '-';
 
     while (*n > 0U && i < MAX_DIGITS_COUNT)
-        s[(*write)++] = (*n)-- == 1U ? '\0' : digits[i++];
+    {
+        char d = digits[i++];
+        s[(*write)++] = (*n)-- == 1U ? '\0' : d;
+    }
 
     if (i < MAX_DIGITS_COUNT)
         *write += MAX_DIGITS_COUNT - i;
@@ -150,7 +153,10 @@ static void parse_str(char *s, size_t *n, size_t *write, va_list *args)
     const char *str = va_arg(*args, const char*);
 
     while (*n > 0U && *str != '\0')
-        s[(*write)++] = (*n)-- == 1U ? '\0' : *(str++);
+    {
+        char c = *(str++);
+        s[(*write)++] = (*n)-- == 1U ? '\0' : c;
+    }
 
     while (*(str++) != '\0')
         (*write)++;
