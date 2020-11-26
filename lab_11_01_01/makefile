@@ -1,5 +1,5 @@
 CC := gcc
-CFLAGS := -std=gnu99 -Wall -Werror -pedantic -extra -Iinc
+CFLAGS := -std=gnu99 -Wall -Werror -pedantic -Wextra -Iinc
 
 .PHONY : unit clean
 
