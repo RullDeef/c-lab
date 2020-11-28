@@ -44,8 +44,8 @@ int my_snprintf(char *s, size_t n, const char *format, ...)
 
     va_end(args);
 
-    if (n > 0U)
-        s[write] = '\0';
+    //if (n > 0U)
+    //    s[write] = '\0';
 
     return write;
 }
@@ -125,8 +125,12 @@ static void parse_int(char *s, size_t *n, size_t *write, int num, int_parser_t p
 
     for (i = 0; i + 1 < MAX_DIGITS_COUNT && digits[i] == '0'; i++);
 
-    if (sign == -1 && *n > 0U)
-        s[(*write)++] = (*n)-- == 1U ? '\0' : '-';
+    if (sign == -1)
+    {
+        if (*n > 0U)
+            s[*write] = (*n)-- == 1U ? '\0' : '-';
+        (*write)++;
+    }
 
     while (*n > 0U && i < MAX_DIGITS_COUNT)
     {
