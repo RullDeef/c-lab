@@ -1,1 +1,1 @@
-c d ld i li x lx o lo s
+c d ld s

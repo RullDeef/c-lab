@@ -1,201 +1,123 @@
 #include <stdarg.h>
+#include <stdbool.h>
 #include "strlib.h"
 
-#define MAX_DIGITS_COUNT 11
-#define SINGLE 0
-#define DOUBLE 1
-#define HALF 2
+#define MAX_NUM_DIGITS_COUNT 20
+#define DEC_BASE 10
 
-static void parse_spec(char *s, size_t *n, size_t *write, const char **format, va_list *args, int hl);
-static void parse_decimal(char *s, size_t *n, size_t *write, va_list *args, int hl);
-static void parse_octal(char *s, size_t *n, size_t *write, va_list *args, int hl);
-static void parse_hexadecimal(char *s, size_t *n, size_t *write, va_list *args, int hl);
-static void parse_char(char *s, size_t *n, size_t *write, va_list *args);
-static void parse_str(char *s, size_t *n, size_t *write, va_list *args);
-static void parse_percent(char *s, size_t *n, size_t *write);
+static bool fmt_is_valid(const char *format);
+static int put_char(char **buf, size_t *n, char c);
+static int put_str(char **buf, size_t *n, const char *str);
+static int put_number(char **buf, size_t *n, long int num, int base);
 
-typedef void (*int_parser_t)(long *, char *);
-static void dec_parser(long *num, char *digit);
-static void oct_parser(long *num, char *digit);
-static void hex_parser(long *num, char *digit);
+static int parse_format(char **buf, size_t *n, const char **format, va_list *args);
 
-static long get_int(int hl, va_list *args);
-static void parse_int(char *s, size_t *n, size_t *write, long num, int_parser_t parser);
-
-int my_snprintf(char *s, size_t n, const char *format, ...)
+int my_snprintf(char *buf, size_t n, const char *format, ...)
 {
-    size_t write = 0U;
+    if (!fmt_is_valid(format) || (buf == NULL && n > 0))
+        return -1;
 
+    int write = 0;
     va_list args;
     va_start(args, format);
 
-    while (format != NULL && *format != '\0')
+    while (*format)
     {
-        if (*format == '%')
-        {
-            format++;
-            parse_spec(s, &n, &write, &format, &args, SINGLE);
-        }
+        if (*format == '%' && *(format++))
+            write += parse_format(&buf, &n, &format, &args);
         else
-        {
-            if (n > 0U)
-                s[write] = n-- == 1U ? '\0' : *format;
-
-            write++;
-            format++;
-        }
+            write += put_char(&buf, &n, *(format++));
     }
 
-    va_end(args);
+    put_char(&buf, &n, '\0');
 
-    if (n > 0U)
-        s[write] = '\0';
+    va_end(args);
+    return write;
+}
+
+static bool fmt_is_valid(const char *format)
+{
+    bool valid = true;
+
+    while (valid && *format)
+    {
+        if (*format == '%')
+            valid = format++ && ((*format == 'c' || *format == 's')
+                || (*format == 'l' && format++) || (*format == 'd'));
+        format++;
+    }
+
+    return valid;
+}
+
+static int put_char(char **buf, size_t *n, char c)
+{
+    if (*n > 0)
+        *((*buf)++) = (*n)-- == 1 ? '\0' : c;
+    return 1;
+}
+
+static int put_str(char **buf, size_t *n, const char *str)
+{
+    int write = 0;
+    for (; *str; str++, write++)
+        put_char(buf, n, *str);
+    return write;
+}
+
+static int put_number(char **buf, size_t *n, long int num, int base)
+{
+    char digits[MAX_NUM_DIGITS_COUNT];
+    int write = 0;
+
+    bool negative = num < 0;
+    if (negative)
+    {
+        write = put_char(buf, n, '-');
+        num *= -1;
+    }
+
+    int i = 0;
+    do
+    {
+        digits[i++] = '0' + num % base;
+        num /= base;
+    }
+    while (num != 0);
+
+    write += i; // amount of digits
+
+    while (i > 0)
+        put_char(buf, n, digits[--i]);
 
     return write;
 }
 
-static void parse_spec(char *s, size_t *n, size_t *write, const char **format, va_list *args, int hl)
+static int parse_format(char **buf, size_t *n, const char **format, va_list *args)
 {
-    switch (*((*format)++))
+    int write = 0;
+
+    switch(*((*format)++))
     {
-        case 'h':
-            parse_spec(s, n, write, format, args, HALF);
+        case 'c':
+            write += put_char(buf, n, (char)va_arg(*args, int));
             break;
-        case 'l':
-            parse_spec(s, n, write, format, args, DOUBLE);
-            break;
-        case 'x':
-            parse_hexadecimal(s, n, write, args, hl);
-            break;
-        case 'o':
-            parse_octal(s, n, write, args, hl);
+        case 's':
+            write += put_str(buf, n, va_arg(*args, const char *));
             break;
         case 'd':
         case 'i':
-            parse_decimal(s, n, write, args, hl);
+            write += put_number(buf, n, va_arg(*args, int), DEC_BASE);
             break;
-        case 'c':
-            parse_char(s, n, write, args);
-            break;
-        case 's':
-            parse_str(s, n, write, args);
-            break;
-        case '%':
-            parse_percent(s, n, write);
-            break;
-    }
-}
-
-static long get_int(int hl, va_list *args)
-{
-    long number = 0;
-    switch (hl)
-    {
-        case SINGLE:
-        case HALF:
-            number = va_arg(*args, int);
-            break;
-        case DOUBLE:
-            number = va_arg(*args, long);
+        case 'l':
+            switch(*((*format)++))
+            {
+                case 'd':
+                    write += put_number(buf, n, va_arg(*args, long int), DEC_BASE);
+                    break;
+            }
             break;
     }
-    return number;
-}
 
-static void parse_decimal(char *s, size_t *n, size_t *write, va_list *args, int hl)
-{
-    long number = get_int(hl, args);
-    parse_int(s, n, write, number, dec_parser);
-}
-
-static void parse_octal(char *s, size_t *n, size_t *write, va_list *args, int hl)
-{
-    long number = get_int(hl, args);
-    parse_int(s, n, write, number, oct_parser);
-}
-static void parse_hexadecimal(char *s, size_t *n, size_t *write, va_list *args, int hl)
-{
-    long number = get_int(hl, args);
-    parse_int(s, n, write, number, hex_parser);
-}
-
-static void dec_parser(long *num, char *digit)
-{
-    *digit = '0' + *num % 10;
-    *num /= 10;
-}
-
-static void oct_parser(long *num, char *digit)
-{
-    *digit = '0' + *num % 8;
-    *num /= 8;
-}
-
-static void hex_parser(long *num, char *digit)
-{
-    *digit = *num % 16;
-    *digit += *digit < 10 ? '0' : 'a' - 10;
-    *num /= 16;
-}
-
-static void parse_int(char *s, size_t *n, size_t *write, long num, int_parser_t parser)
-{
-    char digits[MAX_DIGITS_COUNT] = { 0 };
-
-    int sign = num < 0 ? -1 : 1;
-    num *= sign;
-
-    int i = MAX_DIGITS_COUNT;
-    while (i-- > 0)
-        parser(&num, digits + i);
-
-    for (i = 0; i + 1 < MAX_DIGITS_COUNT && digits[i] == '0'; i++);
-
-    if (sign == -1)
-    {
-        if (*n > 0U)
-            s[*write] = (*n)-- == 1U ? '\0' : '-';
-        (*write)++;
-    }
-
-    while (*n > 0U && i < MAX_DIGITS_COUNT)
-    {
-        char d = digits[i++];
-        s[(*write)++] = (*n)-- == 1U ? '\0' : d;
-    }
-
-    if (i < MAX_DIGITS_COUNT)
-        *write += MAX_DIGITS_COUNT - i;
-}
-
-static void parse_char(char *s, size_t *n, size_t *write, va_list *args)
-{
-    char c = (char)va_arg(*args, int);
-
-    if (*n > 0U)
-        s[*write] = (*n)-- == 1U ? '\0' : c;
-
-    (*write)++;
-}
-
-static void parse_str(char *s, size_t *n, size_t *write, va_list *args)
-{
-    const char *str = va_arg(*args, const char*);
-
-    while (*n > 0U && *str != '\0')
-    {
-        char c = *(str++);
-        s[(*write)++] = (*n)-- == 1U ? '\0' : c;
-    }
-
-    while (*(str++) != '\0')
-        (*write)++;
-}
-
-static void parse_percent(char *s, size_t *n, size_t *write)
-{
-    if (*n > 0U)
-        s[*write] = (*n)-- == 1U ? '\0' : '%';
-
-    (*write)++;
+    return write;
 }
