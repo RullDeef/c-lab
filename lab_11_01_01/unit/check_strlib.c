@@ -83,6 +83,20 @@ START_TEST(test_oct)
 }
 END_TEST
 
+START_TEST(test_long)
+{
+    long nums[] = { 0, 1, 123456789, 16, 256, 10000 };
+    for (long *num = nums; *num != nums[5]; num++)
+    {
+        check_snprintf("%ld", *num);
+        check_snprintf("num = %ld", *num);
+        check_snprintf("%ld = num", *num);
+        check_snprintf("num = %ld = num", *num);
+        check_snprintf("%ld%ld", *num, *num);
+    }
+}
+END_TEST
+
 int main(void)
 {
     Suite *suite = suite_create("my_snprintf");
@@ -93,6 +107,7 @@ int main(void)
     tcase_add_test(tcase, test_dec);
     tcase_add_test(tcase, test_hex);
     tcase_add_test(tcase, test_oct);
+    tcase_add_test(tcase, test_long);
     suite_add_tcase(suite, tcase);
 
     SRunner *runner = srunner_create(suite);
