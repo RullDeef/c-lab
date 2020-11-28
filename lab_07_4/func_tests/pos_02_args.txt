@@ -1,0 +1,1 @@
+./app.exe ./func_tests/pos_02_in.txt .temp

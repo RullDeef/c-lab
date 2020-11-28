@@ -1,0 +1,1 @@
+./app.exe ./func_tests/neg_06_in.txt .temp
