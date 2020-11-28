@@ -16,7 +16,7 @@ static void dec_parser(int *num, char *digit);
 static void oct_parser(int *num, char *digit);
 static void hex_parser(int *num, char *digit);
 
-static void parse_int(char *s, size_t *n, size_t *write, int number, int_parser_t parser);
+static void parse_int(char *s, size_t *n, size_t *write, int num, int_parser_t parser);
 
 int my_snprintf(char *s, size_t n, const char *format, ...)
 {
@@ -44,8 +44,8 @@ int my_snprintf(char *s, size_t n, const char *format, ...)
 
     va_end(args);
 
-    //if (n > 0U)
-    //    s[write] = '\0';
+    if (n > 0U)
+        s[write] = '\0';
 
     return write;
 }
