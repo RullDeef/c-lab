@@ -87,7 +87,7 @@ END_TEST
 
 START_TEST(test_long)
 {
-    long nums[] = { 0L, 1L, 1234567890123456789L, 16L, 256L, 10000L };
+    long nums[] = { 0L, 1L, -1234567890123456789L, 16L, -256L, 10000L };
     for (long *num = nums; *num != nums[5]; num++)
     {
         check_snprintf("%ld", *num);

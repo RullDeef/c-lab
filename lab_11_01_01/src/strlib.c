@@ -2,13 +2,13 @@
 #include <stdbool.h>
 #include "strlib.h"
 
-#define MAX_NUM_DIGITS_COUNT 20
+#define MAX_NUM_DIGITS_COUNT 40
 #define DEC_BASE 10
 
 static bool fmt_is_valid(const char *format);
 static int put_char(char **buf, size_t *n, char c);
 static int put_str(char **buf, size_t *n, const char *str);
-static int put_number(char **buf, size_t *n, long int num, int base);
+static int put_number(char **buf, size_t *n, long long int num, int base);
 
 static int parse_format(char **buf, size_t *n, const char **format, va_list *args);
 
@@ -65,7 +65,7 @@ static int put_str(char **buf, size_t *n, const char *str)
     return write;
 }
 
-static int put_number(char **buf, size_t *n, long int num, int base)
+static int put_number(char **buf, size_t *n, long long int num, int base)
 {
     char digits[MAX_NUM_DIGITS_COUNT];
     int write = 0;
@@ -113,7 +113,7 @@ static int parse_format(char **buf, size_t *n, const char **format, va_list *arg
             switch(*((*format)++))
             {
                 case 'd':
-                    write += put_number(buf, n, va_arg(*args, long int), DEC_BASE);
+                    write += put_number(buf, n, va_arg(*args, long long int), DEC_BASE);
                     break;
             }
             break;
