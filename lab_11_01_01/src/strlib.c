@@ -1,9 +1,12 @@
 #include <stdarg.h>
 #include <stdbool.h>
+#include <assert.h>
 #include "strlib.h"
 
-#define MAX_NUM_DIGITS_COUNT 40
+#define MAX_NUM_DIGITS_COUNT 20
+#define HEX_BASE 16
 #define DEC_BASE 10
+#define OCT_BASE 8
 
 static bool fmt_is_valid(const char *format);
 static int put_char(char **buf, size_t *n, char c);
@@ -43,7 +46,8 @@ static bool fmt_is_valid(const char *format)
     {
         if (*format == '%')
             valid = format++ && ((*format == 'c' || *format == 's')
-                || (*format == 'l' && format++) || (*format == 'd'));
+                || ((*format == 'l' || *format == 'h') && format++) || (*format == 'd'
+                || *format == 'x' || *format == 'o'));
         format++;
     }
 
@@ -65,6 +69,7 @@ static int put_str(char **buf, size_t *n, const char *str)
     return write;
 }
 
+
 static int put_number(char **buf, size_t *n, long long int num, int base)
 {
     char digits[MAX_NUM_DIGITS_COUNT];
@@ -74,13 +79,17 @@ static int put_number(char **buf, size_t *n, long long int num, int base)
     if (negative)
     {
         write = put_char(buf, n, '-');
-        num *= -1;
     }
 
     int i = 0;
     do
     {
-        digits[i++] = '0' + num % base;
+        char digit = '0' + (num % base > 0 ? num % base : -(num % base));
+        if (digit > '9')
+            digit += 'a' - '0' - 10;
+
+        digits[i++] = digit;
+
         num /= base;
     }
     while (num != 0);
@@ -97,7 +106,7 @@ static int parse_format(char **buf, size_t *n, const char **format, va_list *arg
 {
     int write = 0;
 
-    switch(*((*format)++))
+    switch (*((*format)++))
     {
         case 'c':
             write += put_char(buf, n, (char)va_arg(*args, int));
@@ -109,11 +118,37 @@ static int parse_format(char **buf, size_t *n, const char **format, va_list *arg
         case 'i':
             write += put_number(buf, n, va_arg(*args, int), DEC_BASE);
             break;
+        case 'x':
+            write += put_number(buf, n, va_arg(*args, int), HEX_BASE);
+            break;
+        case 'o':
+            write += put_number(buf, n, va_arg(*args, int), OCT_BASE);
+            break;
         case 'l':
-            switch(*((*format)++))
+            switch (*((*format)++))
             {
                 case 'd':
                     write += put_number(buf, n, va_arg(*args, long long int), DEC_BASE);
+                    break;
+                case 'x':
+                    write += put_number(buf, n, va_arg(*args, long long int), HEX_BASE);
+                    break;
+                case 'o':
+                    write += put_number(buf, n, va_arg(*args, long long int), OCT_BASE);
+                    break;
+            }
+            break;
+        case 'h':
+            switch (*((*format)++))
+            {
+                case 'd':
+                    write += put_number(buf, n, va_arg(*args, short int), DEC_BASE);
+                    break;
+                case 'x':
+                    write += put_number(buf, n, va_arg(*args, short int), HEX_BASE);
+                    break;
+                case 'o':
+                    write += put_number(buf, n, va_arg(*args, short int), OCT_BASE);
                     break;
             }
             break;

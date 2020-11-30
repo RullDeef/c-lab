@@ -55,7 +55,6 @@ START_TEST(test_dec)
 }
 END_TEST
 
-/*
 START_TEST(test_hex)
 {
     int nums[] = { 0, 1, 123456789, 16, 256, 10000 };
@@ -83,7 +82,6 @@ START_TEST(test_oct)
     }
 }
 END_TEST
-*/
 
 START_TEST(test_long)
 {
@@ -96,6 +94,11 @@ START_TEST(test_long)
         check_snprintf("num = %ld = num", *num);
         check_snprintf("%ld%ld", *num, *num);
     }
+
+    check_snprintf("%ld", (long)INT32_MIN);
+    check_snprintf("%ld", (long)INT32_MAX);
+    check_snprintf("%ld", (long)INT64_MIN);
+    check_snprintf("%ld", (long)INT64_MAX);
 }
 END_TEST
 
@@ -104,16 +107,18 @@ int main(void)
     Suite *suite = suite_create("my_snprintf");
     TCase *tcase = tcase_create("core");
 
-    tcase_add_test(tcase, test_char);
-    tcase_add_test(tcase, test_str);
-    tcase_add_test(tcase, test_dec);
-    // tcase_add_test(tcase, test_hex);
-    // tcase_add_test(tcase, test_oct);
+    tcase_add_test(tcase, test_hex);
+    tcase_add_test(tcase, test_oct);
     tcase_add_test(tcase, test_long);
     suite_add_tcase(suite, tcase);
 
+
     SRunner *runner = srunner_create(suite);
     srunner_run_all(runner, CK_VERBOSE);
+    
+    tcase_add_test(tcase, test_char);
+    tcase_add_test(tcase, test_str);
+    tcase_add_test(tcase, test_dec);
 
     int failed = srunner_ntests_failed(runner);
     srunner_free(runner);
