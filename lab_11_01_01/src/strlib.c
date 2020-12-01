@@ -142,13 +142,13 @@ static int parse_format(char **buf, size_t *n, const char **format, va_list *arg
             switch (*((*format)++))
             {
                 case 'd':
-                    write += put_number(buf, n, va_arg(*args, short int), DEC_BASE);
+                    write += put_number(buf, n, va_arg(*args, int), DEC_BASE);
                     break;
                 case 'x':
-                    write += put_number(buf, n, va_arg(*args, short int), HEX_BASE);
+                    write += put_number(buf, n, va_arg(*args, int), HEX_BASE);
                     break;
                 case 'o':
-                    write += put_number(buf, n, va_arg(*args, short int), OCT_BASE);
+                    write += put_number(buf, n, va_arg(*args, int), OCT_BASE);
                     break;
             }
             break;
