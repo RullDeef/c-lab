@@ -2,13 +2,19 @@
 #include <stdbool.h>
 #include "strlib.h"
 
-#define MAX_NUM_DIGITS_COUNT 20
+#define EXIT_FAILURE -1
+
+#define FORMAT_SPEC_SYM '%'
+
+#define MAX_DIGITS_COUNT 21
 #define HEX_BASE 16
 #define DEC_BASE 10
 #define OCT_BASE 8
 
+#define HEX_DIGIT_SHIFT ('a' - '0' - 10)
+
 static bool fmt_is_valid(const char *format);
-static int put_char(char **buf, size_t *n, char c);
+static void put_char(char **buf, size_t *n, char c);
 static int put_str(char **buf, size_t *n, const char *str);
 static int put_number(char **buf, size_t *n, long long num, int base);
 
@@ -17,7 +23,7 @@ static int parse_format(char **buf, size_t *n, const char **format, va_list *arg
 int my_snprintf(char *buf, size_t n, const char *format, ...)
 {
     if (!fmt_is_valid(format) || (buf == NULL && n > 0))
-        return -1;
+        return EXIT_FAILURE;
 
     int write = 0;
     va_list args;
@@ -25,10 +31,13 @@ int my_snprintf(char *buf, size_t n, const char *format, ...)
 
     while (*format)
     {
-        if (*format == '%' && *(format++))
+        if (*format == FORMAT_SPEC_SYM && *(format++))
             write += parse_format(&buf, &n, &format, &args);
         else
-            write += put_char(&buf, &n, *(format++));
+        {
+            put_char(&buf, &n, *(format++));
+            write++;
+        }
     }
 
     put_char(&buf, &n, '\0');
@@ -43,8 +52,8 @@ static bool fmt_is_valid(const char *format)
 
     while (valid && *format)
     {
-        if (*format == '%')
-            valid = format++ && ((*format == 'c' || *format == 's')
+        if (*format == FORMAT_SPEC_SYM)
+            valid = format++ && ((*format == 'c' || *format == 's' || *format == 'i')
                 || ((*format == 'l' || *format == 'h') && format++) || (*format == 'd'
                 || *format == 'x' || *format == 'o'));
         format++;
@@ -53,56 +62,74 @@ static bool fmt_is_valid(const char *format)
     return valid;
 }
 
-static int put_char(char **buf, size_t *n, char c)
+static void put_char(char **buf, size_t *n, char c)
 {
     if (*n > 0)
         *((*buf)++) = (*n)-- == 1 ? '\0' : c;
-    return 1;
 }
 
 static int put_str(char **buf, size_t *n, const char *str)
 {
     int write = 0;
-    for (; *str; str++, write++)
-        put_char(buf, n, *str);
+
+    for (; *str; write++)
+        put_char(buf, n, *(str++));
+
     return write;
 }
 
-static int put_number(char **buf, size_t *n, long long num, int base)
+static char get_last_digit(long long num, int base)
 {
-    char digits[MAX_NUM_DIGITS_COUNT];
-    int write = 0;
+    char digit;
 
-    if (num < 0)
-        write = put_char(buf, n, '-');
+    if (num >= 0)
+    {
+        if (num >= base)
+            digit = (num - base) % base;
+        else
+            digit = num;
+    }
+    else
+        digit = -(num % base);
 
-    int i = 0;
+    digit += '0';
+    if (digit > '9')
+        digit += HEX_DIGIT_SHIFT;
+
+    return digit;
+}
+
+static int extract_digits(char *digits, long long num, int base)
+{
+    int digits_count = 0;
+
     do
     {
-        int d;
-        if (num >= 0)
-        {
-            if (num >= base)
-                d = (num - base) % base;
-            else
-                d = num;
-        }
-        else
-            d = -(num % base);
-
-        char digit = '0' + d;
-        if (d > 9)
-            digit += 'a' - '0' - 10;
-
-        digits[i++] = digit;
+        digits[digits_count++] = get_last_digit(num, base);
         num /= base;
     }
     while (num != 0);
 
-    write += i; // amount of digits
+    return digits_count;
+}
 
-    while (i > 0)
-        put_char(buf, n, digits[--i]);
+static int put_number(char **buf, size_t *n, long long num, int base)
+{
+    char digits[MAX_DIGITS_COUNT];
+    int digits_count;
+    int write = 0;
+
+    if (num < 0 && base == DEC_BASE)
+    {
+        put_char(buf, n, '-');
+        write = 1;
+    }
+
+    digits_count = extract_digits(digits, num, base);
+    write += digits_count;
+
+    while (digits_count > 0)
+        put_char(buf, n, digits[--digits_count]);
 
     return write;
 }
@@ -114,7 +141,8 @@ static int parse_format(char **buf, size_t *n, const char **format, va_list *arg
     switch (*((*format)++))
     {
         case 'c':
-            write += put_char(buf, n, (char)va_arg(*args, int));
+            put_char(buf, n, (char)va_arg(*args, int));
+            write++;
             break;
         case 's':
             write += put_str(buf, n, va_arg(*args, const char *));
@@ -136,10 +164,10 @@ static int parse_format(char **buf, size_t *n, const char **format, va_list *arg
                     write += put_number(buf, n, va_arg(*args, long), DEC_BASE);
                     break;
                 case 'x':
-                    write += put_number(buf, n, va_arg(*args, long), HEX_BASE);
+                    write += put_number(buf, n, va_arg(*args, unsigned long), HEX_BASE);
                     break;
                 case 'o':
-                    write += put_number(buf, n, va_arg(*args, long), OCT_BASE);
+                    write += put_number(buf, n, va_arg(*args, unsigned long), OCT_BASE);
                     break;
             }
             break;
@@ -147,13 +175,13 @@ static int parse_format(char **buf, size_t *n, const char **format, va_list *arg
             switch (*((*format)++))
             {
                 case 'd':
-                    write += put_number(buf, n, va_arg(*args, int), DEC_BASE);
+                    write += put_number(buf, n, (short)va_arg(*args, int), DEC_BASE);
                     break;
                 case 'x':
-                    write += put_number(buf, n, va_arg(*args, int), HEX_BASE);
+                    write += put_number(buf, n, (unsigned short)va_arg(*args, unsigned int), HEX_BASE);
                     break;
                 case 'o':
-                    write += put_number(buf, n, va_arg(*args, int), OCT_BASE);
+                    write += put_number(buf, n, (unsigned short)va_arg(*args, unsigned int), OCT_BASE);
                     break;
             }
             break;
