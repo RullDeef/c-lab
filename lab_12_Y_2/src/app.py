@@ -3,11 +3,12 @@ from tkinter import simpledialog
 
 # actions
 
-from awork import fill_fib
+from awork import fill_fib, fill_prime, cycle_shift
 
 # actual data
 
 ARRAYS_COUNT = 2
+MAX_ARRAY_SIZE = 20
 arrays = [()] * ARRAYS_COUNT
 array_selected = 0
 
@@ -87,17 +88,48 @@ def make_region_action():
     for i, w in enumerate((14, 2)):
         frame.columnconfigure(i, weight=w)
 
-    # fill fib
-    def fill_fib_action():
-        n = simpledialog.askinteger("Внимание", "Укажите размер массива", parent=root, minvalue=1, maxvalue=20)
-        if n is not None:
-            array = fill_fib(n)
-            array_strings[array_selected].set(" ".join(map(str, array)))
+    def init_fill_fib():
+        def fill_fib_action():
+            n = simpledialog.askinteger("Внимание", "Укажите размер массива", parent=root, minvalue=1, maxvalue=MAX_ARRAY_SIZE)
+            if n is not None:
+                array = fill_fib(n)
+                array_strings[array_selected].set(" ".join(map(str, array)))
 
-    lbl_fill_fib = tk.Label(frame, text="Заполнить выбранный массив числами Фиббоначи")
-    lbl_fill_fib.grid(row=0, column=0)
-    btn_fill_fib = tk.Button(frame, text="выполнить", command=fill_fib_action)
-    btn_fill_fib.grid(row=0, column=1)
+        label = tk.Label(frame, text="Заполнить выбранный массив числами Фиббоначи")
+        label.grid(row=0, column=0)
+        button = tk.Button(frame, text="выполнить", command=fill_fib_action)
+        button.grid(row=0, column=1)
+
+    init_fill_fib()
+
+    def init_fill_prime():
+        def fill_prime_action():
+            n = simpledialog.askinteger("Внимание", "Укажите размер массива", parent=root, minvalue=1, maxvalue=MAX_ARRAY_SIZE)
+            if n is not None:
+                array = fill_prime(n)
+                array_strings[array_selected].set(" ".join(map(str, array)))
+
+        label = tk.Label(frame, text="Заполнить выбранный массив первыми простыми числами")
+        label.grid(row=1, column=0)
+        button = tk.Button(frame, text="выполнить", command=fill_prime_action)
+        button.grid(row=1, column=1)
+
+    init_fill_prime()
+
+    def init_cycle_shift():
+        def cycle_shift_action():
+            k = simpledialog.askinteger("Внимание", "Укажите величину сдвига", parent=root)
+            if k is not None:
+                array = list(arrays[array_selected])
+                cycle_shift(array, k)
+                array_strings[array_selected].set(" ".join(map(str, array)))
+
+        label = tk.Label(frame, text="Циклически сдвинуть выбранный массив")
+        label.grid(row=2, column=0)
+        button = tk.Button(frame, text="выполнить", command=cycle_shift_action)
+        button.grid(row=2, column=1)
+    
+    init_cycle_shift()
 
 make_region_action()
 
