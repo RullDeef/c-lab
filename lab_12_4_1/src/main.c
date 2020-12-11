@@ -5,7 +5,20 @@
 #include "array.h"
 
 #ifdef ARRAY_PLUGIN
+
+#ifdef WIN32
 #include <windows.h>
+#define LIB_HANDLE HMODULE
+#define LIB_LOAD(libname) LoadLibrary(libname)
+#define LIB_SYM(handle, symbol) GetProcAddress(handle, symbol)
+#define LIB_FREE(handle) FreeLibrary(handle)
+#else
+#include <dlfcn.h>
+#define LIB_HANDLE void *
+#define LIB_LOAD(libname) dlopen(libname, RTLD_NOW)
+#define LIB_SYM(handle, symbol) dlsym(handle, symbol)
+#define LIB_FREE(handle) dlclose(handle)
+#endif
 typedef struct array(ARR_CALL *arr_create_fn_t)(size_t);
 typedef void(ARR_CALL *arr_destroy_fn_t)(struct array *);
 typedef int(ARR_CALL *arr_fscanf_fn_t)(FILE *, struct array *);
@@ -48,21 +61,21 @@ int process(FILE *ifstream, FILE *ofstream, bool filtration)
     int status = EXIT_FAILURE;
 
 #ifdef ARRAY_PLUGIN
-    HMODULE hArrayDll = LoadLibrary("./bin/plugin/array.dll");
-    if (hArrayDll == NULL)
+    LIB_HANDLE lib_arr_handle = LIB_LOAD(ARR_LIB_PATH);
+    if (lib_arr_handle == NULL)
     {
-        fprintf(stderr, "error: could not load array.dll plugin\n");
+        fprintf(stderr, "error: could not load plugin " ARR_LIB_PATH "\n");
         status = EXIT_FAILURE;
     }
     else
     {
         // load library functions
-        arr_create_fn_t arr_create = (arr_create_fn_t)GetProcAddress(hArrayDll, "arr_create");
-        arr_destroy_fn_t arr_destroy = (arr_destroy_fn_t)GetProcAddress(hArrayDll, "arr_destroy");
-        arr_fscanf_fn_t arr_fscanf = (arr_fscanf_fn_t)GetProcAddress(hArrayDll, "arr_fscanf");
-        arr_fprintf_fn_t arr_fprintf = (arr_fprintf_fn_t)GetProcAddress(hArrayDll, "arr_fprintf");
-        arr_sort_fn_t arr_sort = (arr_sort_fn_t)GetProcAddress(hArrayDll, "arr_sort");
-        arr_filter_fn_t arr_filter = (arr_filter_fn_t)GetProcAddress(hArrayDll, "arr_filter");
+        arr_create_fn_t arr_create = (arr_create_fn_t)LIB_SYM(lib_arr_handle, "arr_create");
+        arr_destroy_fn_t arr_destroy = (arr_destroy_fn_t)LIB_SYM(lib_arr_handle, "arr_destroy");
+        arr_fscanf_fn_t arr_fscanf = (arr_fscanf_fn_t)LIB_SYM(lib_arr_handle, "arr_fscanf");
+        arr_fprintf_fn_t arr_fprintf = (arr_fprintf_fn_t)LIB_SYM(lib_arr_handle, "arr_fprintf");
+        arr_sort_fn_t arr_sort = (arr_sort_fn_t)LIB_SYM(lib_arr_handle, "arr_sort");
+        arr_filter_fn_t arr_filter = (arr_filter_fn_t)LIB_SYM(lib_arr_handle, "arr_filter");
 #endif
 
         struct array arr = arr_create(ARRAY_INITIAL_CAPACITY);
@@ -82,7 +95,7 @@ int process(FILE *ifstream, FILE *ofstream, bool filtration)
         arr_destroy(&arr);
 
 #ifdef ARRAY_PLUGIN
-        FreeLibrary(hArrayDll);
+        LIB_FREE(lib_arr_handle);
     }
 #endif
 
