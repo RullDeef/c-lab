@@ -48,10 +48,10 @@ SOURCES := $(shell find src -name *.c)
 OBJECTS := $(subst .c,.o,$(SOURCES))
 OBJECTS := $(subst src,obj,$(OBJECTS))
 
-.PHONY : app-static app-dynamic app-plugin clean clean-obj
+.PHONY : app-static app-dynamic app-plugin clean clean-obj unit
 
 clean :
-	rm -rf obj lib bin
+	rm -rf obj lib bin unit_test.$(APPEXT)
 
 clean-obj :
 	rm -rf obj
@@ -67,6 +67,9 @@ app-plugin : CFLAGS += -D ARRAY_DYNAMIC -D ARRAY_PLUGIN
 app-plugin : bin/plugin/app.$(APPEXT)
 	cp ./lib/$(LIBPREP)array.$(LIBEXT) ./bin/plugin/$(LIBPREP)array.$(LIBEXT); ./bin/plugin/app.$(APPEXT)
 
+unit : unit_test.$(APPEXT)
+	./unit_test.$(APPEXT)
+
 bin/static/app.$(APPEXT) : obj/main.o lib/libarray.a
 	mkdir -p $(dir $@); $(CC) -o $@ obj/main.o -Llib -larray
 
@@ -75,6 +78,9 @@ bin/plugin/app.$(APPEXT) : obj/main.o lib/$(LIBPREP)array.$(LIBEXT)
 
 bin/dynamic/app.$(APPEXT) : obj/main.o lib/$(LIBPREP)array.$(LIBEXT)
 	mkdir -p $(dir $@); $(CC) -o $@ obj/main.o -Llib -larray
+
+unit_test.$(APPEXT) : unit/check_main.c unit/check_array.c src/array.c
+	$(CC) $(CFLAGS) -Isrc -o $@ $^ -lcheck
 
 lib/libarray.a : obj/array.o
 	mkdir -p $(dir $@); ar rcs $@ $^

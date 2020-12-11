@@ -35,6 +35,9 @@ ARR_API void ARR_CALL arr_destroy(struct array *arr);
 
 ARR_API int ARR_CALL arr_resize(struct array *arr, size_t capacity);
 
+ARR_API int ARR_CALL arr_set(struct array *arr, size_t index, int value);
+ARR_API int ARR_CALL arr_get(struct array *arr, size_t index, int *value);
+
 ARR_API int ARR_CALL arr_push_back(struct array *arr, int data);
 ARR_API int ARR_CALL arr_pop_back(struct array *arr, int *data);
 

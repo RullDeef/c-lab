@@ -7,7 +7,7 @@
 ARR_API struct array ARR_CALL arr_create(size_t capacity)
 {
     struct array arr = { .size = 0U };
-    arr.data = malloc(capacity * sizeof(int));
+    arr.data = capacity == 0U ? NULL : malloc(capacity * sizeof(int));
     arr.capacity = arr.data == NULL ? 0U : capacity;
     return arr;
 }
@@ -50,6 +50,33 @@ ARR_API int ARR_CALL arr_resize(struct array *arr, size_t capacity)
     return status;
 }
 
+ARR_API int ARR_CALL arr_set(struct array *arr, size_t index, int value)
+{
+    int status = EXIT_SUCCESS;
+
+    if (index < arr->capacity)
+    {
+        arr->data[index] = value;
+        arr->size = index + 1 > arr->size ? index + 1 : arr->size;
+    }
+    else
+        status = EXIT_FAILURE;
+
+    return status;
+}
+
+ARR_API int ARR_CALL arr_get(struct array *arr, size_t index, int *value)
+{
+    int status = EXIT_SUCCESS;
+
+    if (index < arr->size)
+        *value = arr->data[index];
+    else
+        status = EXIT_FAILURE;
+
+    return status;
+}
+
 ARR_API int ARR_CALL arr_push_back(struct array *arr, int data)
 {
     int status = EXIT_SUCCESS;
@@ -86,7 +113,7 @@ ARR_API int ARR_CALL arr_fscanf(FILE *file, struct array *arr)
     int number;
     while (status == EXIT_SUCCESS && fscanf(file, "%d", &number) == 1)
         status = arr_push_back(arr, number);
-    
+
     if (status != EXIT_SUCCESS)
         arr_destroy(arr);
 
@@ -100,6 +127,9 @@ ARR_API int ARR_CALL arr_fprintf(FILE *file, struct array arr)
     for (size_t i = 0U; status == EXIT_SUCCESS && i < arr.size; i++)
         if (fprintf(file, "%s%d", i == 0U ? "" : " ", arr.data[i]) < 0)
             status = EXIT_FAILURE;
+
+    if (status == EXIT_SUCCESS)
+        fprintf(file, "\n");
 
     return status;
 }
@@ -154,7 +184,7 @@ ARR_API int ARR_CALL arr_filter(struct array arr_in, struct array *arr_out)
             for (size_t i = 0U; i < arr_in.size; i++)
                 if (arr_in.data[i] > mean)
                     arr_push_back(arr_out, arr_in.data[i]);
-            
+
             status = EXIT_SUCCESS;
         }
     }
