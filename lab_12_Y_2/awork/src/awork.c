@@ -5,6 +5,22 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
+bool is_full_square(long number)
+{
+    bool result = false;
+
+    for (long i = 1; i * i <= number; i++)
+    {
+        if (number % i == 0 && number / i == i)
+        {
+            result = true;
+            break;
+        }
+    }
+
+    return result;
+}
+
 static PyObject *method_fill_prime(PyObject *PY_UNUSED(self), PyObject *args)
 {
     int size;
@@ -126,10 +142,53 @@ static PyObject *method_cycle_shift(PyObject *PY_UNSUSED(self), PyObject *args)
     return Py_None;
 }
 
+static PyObject *method_pull_squares(PyObject *PY_UNSUSED(self), PyObject *args)
+{
+    PyObject *array_from, *array_to;
+
+    if (!PyArg_ParseTuple(args, "OO", &array_from, &array_to))
+    {
+        PyErr_SetString(PyExc_TypeError, "function takes two arguments - list <from> and list <to>");
+        return NULL;
+    }
+
+    if (!PyList_Check(array_from))
+    {
+        PyErr_SetString(PyExc_TypeError, "first argument is not an array (list)");
+        return NULL;
+    }
+
+    if (!PyList_Check(array_to))
+    {
+        PyErr_SetString(PyExc_TypeError, "second argument is not an array (list)");
+        return NULL;
+    }
+
+    int size = (int)PyList_GET_SIZE(array_from);
+    for (int i = 0; i < size; i++)
+    {
+        PyObject *item = PyList_GET_ITEM(array_from, i);
+        if (PyLong_Check(item))
+        {
+            long number = PyLong_AsLong(item);
+            if (is_full_square(number))
+            {
+                PyList_Append(array_to, item);
+                PyList_SetSlice(array_from, i, i + 1, NULL);
+                i--;
+                size--;
+            }
+        }
+    }
+
+    return Py_None;
+}
+
 static PyMethodDef AworkMethods[] = {
     { "fill_fib", method_fill_fib, METH_VARARGS, "Fills array with first n fib nums" },
     { "fill_prime", method_fill_prime, METH_VARARGS, "Fills array with first n prime nums" },
     { "cycle_shift", method_cycle_shift, METH_VARARGS, "Shifts array by k positions" },
+    { "pull_squares", method_pull_squares, METH_VARARGS, "Pulls squares from one array to another" },
     { NULL, NULL, 0, NULL }
 };
 

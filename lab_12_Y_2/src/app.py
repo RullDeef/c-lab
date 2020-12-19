@@ -1,9 +1,10 @@
 import tkinter as tk
 from tkinter import simpledialog
+from tkinter import messagebox
 
 # actions
 
-from awork import fill_fib, fill_prime, cycle_shift
+from awork import fill_fib, fill_prime, cycle_shift, pull_squares
 
 # actual data
 
@@ -55,7 +56,7 @@ def make_region_data():
 
         def trace(*args, **kwargs):
             arrays[row] = tuple(map(int, filter(lambda s: s != "-", strvar.get().split())))
-            print(arrays)
+            # print(arrays)
 
         strvar.trace("w", trace)
 
@@ -130,6 +131,30 @@ def make_region_action():
         button.grid(row=2, column=1)
     
     init_cycle_shift()
+
+    def init_squares_pull():
+        def squares_pull_action():
+            n = simpledialog.askinteger("Внимание", "Укажите номер массива, из которого надо перенести\nполные квадраты в выбранный массив", parent=root, minvalue=1, maxvalue=ARRAYS_COUNT)
+            if n is None:
+                return
+
+            n -= 1
+            if n == array_selected:
+                messagebox.showerror("Ошибка", "Нельзя выбрать один и тот же массив дважды")
+                return
+
+            array_from = list(arrays[n])
+            array_to = list(arrays[array_selected])
+            pull_squares(array_from, array_to)
+            array_strings[n].set(" ".join(map(str, array_from)))
+            array_strings[array_selected].set(" ".join(map(str, array_to)))
+
+        label = tk.Label(frame, text="Слить полные квадраты в выбранный массив из другого")
+        label.grid(row=3, column=0)
+        button = tk.Button(frame, text="выполнить", command=squares_pull_action)
+        button.grid(row=3, column=1)
+
+    init_squares_pull()
 
 make_region_action()
 
