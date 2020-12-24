@@ -17,7 +17,6 @@ array_selected = 0
 
 root = tk.Tk()
 root.title("app")
-root.geometry("640x480")
 
 root.rowconfigure(0, weight=0)
 root.rowconfigure(1, weight=1)
